@@ -1,15 +1,1 @@
-.DS_Store
-node_modules
-.turbo
-*.log
-dist
-dist-ssr
-*.local
-.env
-.cache
-server/dist
-public/dist
-build
-coverage
-vite.config.ts.timestamp-*.*
-dev-dist
+/node_modules

@@ -1,0 +1,19 @@
+{
+  "editor.tabSize": 2,
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "eslint.workingDirectories": [
+    {
+      "pattern": "./*"
+    }
+  ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "_editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "editor.formatOnType": false,
+  "editor.formatOnPaste": false,
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.formatDocument": "always",
+    "source.fixAll.eslint": "always"
+  }
+}

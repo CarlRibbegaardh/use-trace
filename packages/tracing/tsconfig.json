@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Default",
+  "compilerOptions": {
+    /* Base options: */
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "verbatimModuleSyntax": true,
+    "allowJs": false,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "composite": false,
+    /* Strictness */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    /* Module resolution */
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    /* New compilation features */
+    "incremental": false,
+    /* DOM */
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    /* React */
+    "jsx": "react-jsx",
+    /* Build */
+    "noEmit": false,
+    "declaration": true,
+    "outDir": "dist"
+  },
+  "include": ["src"]
+}

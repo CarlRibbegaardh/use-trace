@@ -1,0 +1,44 @@
+{
+  "name": "@cr/tracing",
+  "version": "0.3.0",
+  "description": "Tracing library from Carl",
+  "author": "Carl Ribbegårdh",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "tslib": "^2.6.3"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^14.3.1",
+    "@types/node": "^20.14.10",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
+    "@typescript-eslint/parser": "^7.16.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-sort-exports": "^0.9.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "jsdom": "^24.1.0",
+    "typescript": "~5.5.3",
+    "vitest": "^1.6.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
+    "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix",
+    "test": "vitest run"
+  },
+  "files": [
+    "dist",
+    "package.json",
+    "tsconfig.json",
+    "README.md"
+  ],
+  "main": "./dist/index.js",
+  "types": "./src/index.ts"
+}
