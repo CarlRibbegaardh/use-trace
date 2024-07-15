@@ -4,6 +4,14 @@
   "description": "Tracing library to detect rerender causes and state changes",
   "author": "Carl Ribbegårdh",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CarlRibbegaardh/tracing/"
+  },
+  "bugs": {
+    "url": "https://github.com/CarlRibbegaardh/tracing//issues"
+  },
+  "homepage": "https://github.com/CarlRibbegaardh/tracing/",
   "type": "module",
   "dependencies": {
     "tslib": "^2.6.3"

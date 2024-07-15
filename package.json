@@ -5,6 +5,7 @@
     "build": "pnpm -r build",
     "dev": "pnpm -r dev",
     "lint": "pnpm -r lint",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "publish": "pnpm --filter tracing publish --access public"
   }
 }
