@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
-import { useTrace } from "@cr/tracing";
+import { useTrace } from "use-trace";
 import { Component } from "./Component";
 import { Component2 } from "./Component2";
 import { Component1 } from "./Component1";

@@ -1,5 +1,5 @@
 {
-  "name": "@cr/tracing",
+  "name": "use-trace",
   "version": "0.3.0",
   "description": "Tracing library to detect rerender causes and state changes",
   "author": "Carl Ribbegårdh",

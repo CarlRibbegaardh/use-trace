@@ -1,4 +1,4 @@
-import { useTrace } from "@cr/tracing";
+import { useTrace } from "use-trace";
 
 export interface ComponentProps {
   counter1: number;

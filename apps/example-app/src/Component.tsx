@@ -1,4 +1,4 @@
-import { useTrace } from "@cr/tracing";
+import { useTrace } from "use-trace";
 import { useState } from "react";
 
 export function Component() {
