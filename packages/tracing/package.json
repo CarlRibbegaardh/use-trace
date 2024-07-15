@@ -1,7 +1,7 @@
 {
   "name": "@cr/tracing",
   "version": "0.3.0",
-  "description": "Tracing library from Carl",
+  "description": "Tracing library to detect rerender causes and state changes",
   "author": "Carl Ribbegårdh",
   "license": "MIT",
   "type": "module",
