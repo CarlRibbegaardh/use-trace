@@ -6,6 +6,6 @@
     "dev": "pnpm -r dev",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
-    "publish-please": "pnpm --filter use-trace publish --access public"
+    "publish-please": "pnpm --filter use-trace publish"
   }
 }
