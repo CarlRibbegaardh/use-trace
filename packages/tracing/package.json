@@ -1,17 +1,17 @@
 {
   "name": "use-trace",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Tracing library to detect rerender causes and state changes",
   "author": "Carl Ribbegårdh",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/CarlRibbegaardh/tracing/"
+    "url": "https://github.com/CarlRibbegaardh/use-trace/"
   },
   "bugs": {
-    "url": "https://github.com/CarlRibbegaardh/tracing//issues"
+    "url": "https://github.com/CarlRibbegaardh/use-trace/issues"
   },
-  "homepage": "https://github.com/CarlRibbegaardh/tracing/",
+  "homepage": "https://github.com/CarlRibbegaardh/use-trace/",
   "type": "module",
   "dependencies": {
     "tslib": "^2.6.3"
