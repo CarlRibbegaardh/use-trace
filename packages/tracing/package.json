@@ -1,6 +1,6 @@
 {
   "name": "use-trace",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Tracing library to detect rerender causes and state changes",
   "author": "Carl Ribbegårdh",
   "license": "MIT",
@@ -48,5 +48,5 @@
     "README.md"
   ],
   "main": "./dist/index.js",
-  "types": "./src/index.ts"
+  "types": "./dist/index.d.ts"
 }

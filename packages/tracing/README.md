@@ -1,4 +1,15 @@
-# Tracing Library to understand state changes
+<p align="center">
+  <a aria-label="npm version" href="https://www.npmjs.com/package/use-trace">
+    <img alt="" src="https://badgen.net/npm/v/use-trace">
+  </a>
+  <a aria-label="npm types" href="https://www.npmjs.com/package/use-trace">
+    <img alt="" src="https://badgen.net/npm/types/use-trace">
+  </a>
+</p>
+
+# useTrace
+
+## Tracing Library to understand state changes
 
 This library is built to help understanding state changes triggering rerenders.
 The gihub project contains an example project using the library.
