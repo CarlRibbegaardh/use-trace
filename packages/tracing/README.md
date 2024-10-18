@@ -17,7 +17,7 @@ The gihub project contains an example project using the library.
 ### Output
 
 <p>
-  <img src="docs/image.png">
+  <img src="docs/output.png">
 </p>
 State is any variables you pass to the state function.
 
