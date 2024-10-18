@@ -1,4 +1,4 @@
-export { areHookInputsEqual } from "./areHookInputsEqual";
-export { traceEnter } from "./traceEnter";
-export { traceExit } from "./traceExit";
-export { traceLogFn } from "./traceLogFn";
+export { areHookInputsEqual } from "./areHookInputsEqual.js";
+export { traceEnter } from "./traceEnter.js";
+export { traceExit } from "./traceExit.js";
+export { traceLogFn } from "./traceLogFn.js";

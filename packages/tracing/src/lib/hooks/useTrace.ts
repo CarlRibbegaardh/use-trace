@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { traceEnter, traceExit, traceLogFn } from "../functions";
-import { useObjectChangeTracker } from "./useObjectChangeTracker";
-import type { IUseTrace } from "../interfaces";
+import { traceEnter, traceExit, traceLogFn } from "../functions/index.js";
+import { useObjectChangeTracker } from "./useObjectChangeTracker.js";
+import type { IUseTrace } from "../interfaces/IUseTrace.js";
 
 const noop = (): void => {
   // Empty
@@ -27,13 +27,13 @@ export function useTrace(
       return {
         exit: traceExit(scopeName),
         log: traceLogFn(scopeName),
-        state: stateTracker.compare
+        state: stateTracker.compare,
       };
     } else {
       return {
         state: noop,
         log: noop,
-        exit: noop
+        exit: noop,
       };
     }
   }, [active, scopeName, stateTracker.compare]);

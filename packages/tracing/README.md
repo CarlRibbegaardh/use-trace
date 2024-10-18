@@ -14,6 +14,15 @@
 This library is built to help understanding state changes triggering rerenders.
 The gihub project contains an example project using the library.
 
+### Output
+
+<p>
+  <img src="docs/image.png">
+</p>
+State is any variables you pass to the state function.
+
+Props is any props you pass to the hook.
+
 ## Usage
 
 ### Initialization

@@ -1,2 +1,2 @@
-export type { IObjectChangeTracker } from "./IObjectChangeTracker";
-export type { IUseTrace } from "./IUseTrace";
+export type { IObjectChangeTracker } from "./IObjectChangeTracker.js";
+export type { IUseTrace } from "./IUseTrace.js";

@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react";
-import { areHookInputsEqual } from "../functions";
-import type { IObjectChangeTracker } from "../interfaces";
+import { areHookInputsEqual } from "../functions/areHookInputsEqual.js";
+import type { IObjectChangeTracker } from "../interfaces/IObjectChangeTracker.js";
 
 export function useObjectChangeTracker(
   scopeName: string,

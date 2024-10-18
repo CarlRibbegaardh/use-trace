@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { renderHook } from "@testing-library/react";
-import { useTrace } from "./useTrace";
+import { useTrace } from "./useTrace.js";
 
 test("Ensure rendering stability", () => {
   const hook = renderHook(
@@ -8,7 +8,7 @@ test("Ensure rendering stability", () => {
       return useTrace(scopeName.x, scopeName.y);
     },
     {
-      initialProps: { x: "a", y: { a: "a" } }
+      initialProps: { x: "a", y: { a: "a" } },
     }
   );
 

@@ -1,2 +1,2 @@
-export type { IUseTrace } from "./lib/interfaces";
-export { useTrace } from "./lib/hooks";
+export type { IUseTrace } from "./lib/interfaces/index.js";
+export { useTrace } from "./lib/hooks/index.js";

@@ -1,4 +1,4 @@
-import { isRefObject } from "./isRefObject";
+import { isRefObject } from "./isRefObject.js";
 import type { DependencyList } from "react";
 
 // https://github.com/discord/react-base-hooks/blob/master/src/areHookInputsEqual.ts
@@ -13,7 +13,7 @@ export function areHookInputsEqual(
   if (nextDeps.length !== prevDeps.length) {
     return {
       equal: false,
-      diffIndex: [-1]
+      diffIndex: [-1],
     };
   }
 
@@ -41,6 +41,6 @@ export function areHookInputsEqual(
 
   return {
     equal: 0 === diffIndex.length,
-    diffIndex: diffIndex
+    diffIndex: diffIndex,
   };
 }

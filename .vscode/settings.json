@@ -4,7 +4,7 @@
   "files.trimTrailingWhitespace": true,
   "eslint.workingDirectories": [
     {
-      "pattern": "./*"
+      "pattern": "./*/*"
     }
   ],
   "editor.defaultFormatter": "esbenp.prettier-vscode",

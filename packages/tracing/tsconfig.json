@@ -15,8 +15,8 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
     /* Module resolution */
-    "moduleResolution": "Bundler",
-    "module": "ESNext",
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext",
     /* New compilation features */
     "incremental": false,
     /* DOM */
