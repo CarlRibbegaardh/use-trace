@@ -1,1 +1,1 @@
-./packages/tracing/README.md
+packages/tracing/README.md
