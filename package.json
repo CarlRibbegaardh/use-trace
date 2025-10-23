@@ -4,6 +4,7 @@
   "scripts": {
     "build": "pnpm -r build",
     "dev": "pnpm -r dev",
+    "dev2": "pnpm -r dev2",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
     "publish-please": "pnpm --filter use-trace publish"
