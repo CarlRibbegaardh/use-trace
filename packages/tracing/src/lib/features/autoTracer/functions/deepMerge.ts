@@ -26,6 +26,12 @@ export function deepMergeOptions(
   if (source.enableAutoTracerInternalsLogging !== undefined) {
     result.enableAutoTracerInternalsLogging = source.enableAutoTracerInternalsLogging;
   }
+  if (source.maxFiberDepth !== undefined) {
+    result.maxFiberDepth = source.maxFiberDepth;
+  }
+  if (source.showFunctionContentOnChange !== undefined) {
+    result.showFunctionContentOnChange = source.showFunctionContentOnChange;
+  }
 
   // Handle nested colors object
   if (source.colors) {

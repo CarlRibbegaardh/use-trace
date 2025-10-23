@@ -22,15 +22,15 @@ export function validateMaxFiberDepth(depth: number | undefined): number {
     return 100;
   }
 
-  // Clamp between 20 and 1000
+  // Clamp between 20 and 10000
   if (depth < 20) {
     logWarn("AutoTracer: maxFiberDepth too low, using minimum (20)");
     return 20;
   }
 
-  if (depth > 1000) {
+  if (depth > 10000) {
     logWarn("AutoTracer: maxFiberDepth too high, using maximum (1000)");
-    return 1000;
+    return 10000;
   }
 
   return Math.floor(depth); // Ensure integer
