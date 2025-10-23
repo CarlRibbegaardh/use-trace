@@ -31,6 +31,7 @@ const stopTracing = autoTracer({
   enableAutoTracerInternalsLogging: true, // Enable console logging (default: false)
   maxFiberDepth: 100, // Maximum traversal depth (default: 100, range: 20-1000)
   showFunctionContentOnChange: false, // Show full function content vs "* function changed *" (default: false)
+  skipNonTrackedBranches: true, // Skip non-tracked branches (default: true)
 });
 ```
 

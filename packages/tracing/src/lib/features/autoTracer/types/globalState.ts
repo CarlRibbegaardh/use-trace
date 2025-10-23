@@ -1,6 +1,7 @@
 import type { AutoTracerOptions } from "../interfaces/AutoTracerOptions.js";
 import { deepMergeOptions } from "../functions/deepMerge.js";
 import { defaultAutoTracerOptions } from "./defaultSettings.js";
+import { log } from "../functions/log.js";
 
 export let isGlobalTracerInstalled = false;
 export let renderStartTime = 0;
@@ -38,14 +39,6 @@ export function setTraceOptions(options: AutoTracerOptions): void {
 
   // Debug logging to verify options are being applied
   if (options.enableAutoTracerInternalsLogging) {
-    console.log("🔧 AutoTracer options updated:", {
-      enabled: traceOptions.enabled,
-      includeReconciled: traceOptions.includeReconciled,
-      includeSkipped: traceOptions.includeSkipped,
-      showFlags: traceOptions.showFlags,
-      enableAutoTracerInternalsLogging: traceOptions.enableAutoTracerInternalsLogging,
-      definitiveRenderColor:
-        traceOptions.colors?.definitiveRender?.lightMode?.text,
-    });
+    log("AutoTracer options updated:", JSON.stringify(options, null, 2));
   }
 }

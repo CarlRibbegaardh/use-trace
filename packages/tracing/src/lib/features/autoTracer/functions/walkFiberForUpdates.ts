@@ -116,7 +116,7 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
   if (!fiber || typeof fiber !== "object") return;
 
   // Prevent infinite recursion - use configurable traversal depth limit
-  const maxDepth = traceOptions.maxFiberDepth ?? 100;
+  const maxDepth = traceOptions.maxFiberDepth ?? 1000;
   if (depth > maxDepth) {
     logWarn(
       `AutoTracer: Maximum traversal depth (${maxDepth}) reached, stopping to prevent stack overflow`
@@ -146,17 +146,20 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
 
     // Filter: only show tracked components or those in parent chain of tracked components
     const isTracked = wasTracked(fiberNode);
-    const isInParentChain = isInParentChainOfTracked(fiberNode, depth);
 
-    if (!isTracked && !isInParentChain) {
-      // Skip this component, but still traverse its children
-      if (fiberNode.child) {
-        walkFiberForUpdates(fiberNode.child, depth + 1);
+    if (traceOptions.skipNonTrackedBranches) {
+      const isInParentChain = isInParentChainOfTracked(fiberNode, depth);
+
+      if (!isTracked && !isInParentChain) {
+        // Skip this component, but still traverse its children
+        if (fiberNode.child) {
+          walkFiberForUpdates(fiberNode.child, depth + 1);
+        }
+        if (fiberNode.sibling) {
+          walkFiberForUpdates(fiberNode.sibling, depth);
+        }
+        return;
       }
-      if (fiberNode.sibling) {
-        walkFiberForUpdates(fiberNode.sibling, depth);
-      }
-      return;
     }
 
     // Determine render type using developer-friendly terms

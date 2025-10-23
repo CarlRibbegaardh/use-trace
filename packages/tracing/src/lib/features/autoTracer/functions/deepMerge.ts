@@ -24,13 +24,17 @@ export function deepMergeOptions(
     result.enabled = source.enabled;
   }
   if (source.enableAutoTracerInternalsLogging !== undefined) {
-    result.enableAutoTracerInternalsLogging = source.enableAutoTracerInternalsLogging;
+    result.enableAutoTracerInternalsLogging =
+      source.enableAutoTracerInternalsLogging;
   }
   if (source.maxFiberDepth !== undefined) {
     result.maxFiberDepth = source.maxFiberDepth;
   }
   if (source.showFunctionContentOnChange !== undefined) {
     result.showFunctionContentOnChange = source.showFunctionContentOnChange;
+  }
+  if (source.skipNonTrackedBranches !== undefined) {
+    result.skipNonTrackedBranches = source.skipNonTrackedBranches;
   }
 
   // Handle nested colors object

@@ -10,8 +10,9 @@ export const defaultAutoTracerOptions: AutoTracerOptions = {
   includeSkipped: false,
   showFlags: false,
   enableAutoTracerInternalsLogging: false,
-  maxFiberDepth: 1000, // Maximum fiber traversal depth to prevent stack overflow
+  maxFiberDepth: 100, // Maximum fiber traversal depth to prevent stack overflow
   showFunctionContentOnChange: false, // Show full function content in prop changes
+  skipNonTrackedBranches: true, // Skip non-tracked branches by default
 
   // Default styling (matching comments in AutoTracerOptions.ts)
   colors: {

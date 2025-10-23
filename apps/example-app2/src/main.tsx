@@ -7,6 +7,9 @@ autoTracer({
   includeReconciled: true,
   showFlags: false,
   includeSkipped: true,
+  enableAutoTracerInternalsLogging: true,
+  maxFiberDepth: 2,
+  skipNonTrackedBranches: false,
 });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
