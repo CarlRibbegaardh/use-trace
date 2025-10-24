@@ -3,6 +3,6 @@ export {
   isAutoTracerInitialized,
   stopAutoTracer,
   updateAutoTracerOptions,
-  useTrackRender,
+  useAutoTrace,
 } from "./autoTracer.js";
 export type { AutoTracerOptions } from "./interfaces/AutoTracerOptions.js";

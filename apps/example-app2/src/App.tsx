@@ -5,10 +5,10 @@ import "./App.css";
 import { Component } from "./Component";
 import { Component2 } from "./Component2";
 import { Component1 } from "./Component1";
-import { useTrackRender } from "use-trace";
+import { useAutoTrace } from "use-trace";
 
 function App() {
-  useTrackRender();
+  useAutoTrace();
   // When initializing the trace, you can pass a name and an optional object with the initial state.
   const [count1, setCount1] = useState(0);
   const [banana, setBanana] = useState("banana-value");

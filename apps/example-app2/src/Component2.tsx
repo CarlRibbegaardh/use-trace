@@ -1,4 +1,4 @@
-import { useTrackRender } from "use-trace";
+import { useAutoTrace } from "use-trace";
 import { Component1 } from "./Component1";
 
 export interface ComponentProps {
@@ -7,7 +7,7 @@ export interface ComponentProps {
 }
 
 export function Component2({ counter1, message }: ComponentProps) {
-  useTrackRender();
+  useAutoTrace();
   return (
     <>
       <h2>"Component2"</h2>
