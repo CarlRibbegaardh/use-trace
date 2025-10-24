@@ -24,7 +24,8 @@ interface TodoItemProps {
 }
 
 export const TodoItem: React.FC<TodoItemProps> = ({ todo, todoService }) => {
-  useAutoTrace();
+  const logger = useAutoTrace();
+  logger.log("TodoItem rendered for todo:", todo.title);
 
   const dispatch = useAppDispatch();
 

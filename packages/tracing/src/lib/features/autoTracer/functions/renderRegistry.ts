@@ -4,7 +4,9 @@
  * The tracer can find and match specific component instances via the hidden GUID.
  */
 
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
+import type { ComponentLogger } from "../interfaces/ComponentLogger.js";
+import { componentLogRegistry } from "./componentLogRegistry.js";
 
 // Registry of GUIDs that definitely rendered this cycle
 const trackedGUIDs = new Set<string>();
@@ -16,16 +18,18 @@ let guidCounter = 0;
  * Hook that registers a component instance for tracking.
  * Each component instance gets a unique GUID stored in a ref.
  * Call this hook to register the component as having executed.
+ * Returns a logger that stores messages until the component is rendered by autoTrace.
  *
  * Usage in component:
  * ```tsx
  * function MyComponent() {
- *   useAutoTrace(); // Call at top of component
+ *   const logger = useAutoTrace(); // Call at top of component
+ *   logger.log("Hello from MyComponent!");
  *   // ... rest of component logic
  * }
  * ```
  */
-export function useAutoTrace(): void {
+export function useAutoTrace(): ComponentLogger {
   const guidRef = useRef<string>();
 
   // Generate GUID on first render (stable across re-renders)
@@ -35,13 +39,31 @@ export function useAutoTrace(): void {
 
   // Register this instance as having rendered this cycle
   trackedGUIDs.add(guidRef.current);
+
+  // Create logger that stores messages for this component GUID
+  const logger = useMemo<ComponentLogger>(() => {
+    return {
+      log: (message: string, ...args: unknown[]) => {
+        console.log(
+          "AutoTracer: Storing log for component:",
+          guidRef.current,
+          message,
+          args
+        );
+        componentLogRegistry.addLog(guidRef.current!, message, ...args);
+      },
+    };
+  }, []);
+
+  return logger;
 }
 
 /**
- * Check if a fiber was registered as having rendered this cycle.
+ * Get the tracking GUID for a fiber if it was registered as having rendered this cycle.
  * Searches the fiber's memoizedState for a useRef with our GUID.
+ * @returns The GUID string if tracked, null if not tracked
  */
-export function wasTracked(fiber: unknown): boolean {
+export function getTrackingGUID(fiber: unknown): string | null {
   const fiberNode = fiber as { memoizedState?: unknown };
 
   // Walk the hooks chain to find our tracking ref
@@ -64,14 +86,14 @@ export function wasTracked(fiber: unknown): boolean {
 
       // Check if this ref contains one of our tracked GUIDs
       if (refValue.startsWith("render-track-") && trackedGUIDs.has(refValue)) {
-        return true;
+        return refValue;
       }
     }
 
     hook = hook.next as { memoizedState?: unknown; next?: unknown } | null;
   }
 
-  return false;
+  return null;
 }
 
 /**
@@ -79,6 +101,7 @@ export function wasTracked(fiber: unknown): boolean {
  */
 export function clearRenderRegistry(): void {
   trackedGUIDs.clear();
+  componentLogRegistry.clear();
 }
 
 /**

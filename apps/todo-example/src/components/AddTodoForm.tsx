@@ -17,7 +17,8 @@ interface AddTodoFormProps {
 }
 
 export const AddTodoForm: React.FC<AddTodoFormProps> = ({ todoService }) => {
-  useAutoTrace();
+  const logger = useAutoTrace();
+  logger.log("AddTodoForm component rendered");
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');

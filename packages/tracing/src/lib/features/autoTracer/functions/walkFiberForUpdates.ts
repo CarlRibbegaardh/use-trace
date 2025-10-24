@@ -15,8 +15,9 @@ import {
 } from "./log.js";
 import { traceOptions } from "../types/globalState.js";
 import { Placement, getFlagNames, hasRenderWork } from "./reactFiberFlags.js";
-import { wasTracked } from "./renderRegistry.js";
+import { getTrackingGUID } from "./renderRegistry.js";
 import { getSkippedProps } from "./getSkippedProps.js";
+import { componentLogRegistry } from "./componentLogRegistry.js";
 
 // Track the last depth we processed
 let lastDepth = -1;
@@ -40,7 +41,7 @@ function isInParentChainOfTracked(
     };
 
     // If this is a component and it's tracked, we found one
-    if (nodeAsFiber.elementType && wasTracked(node)) {
+    if (nodeAsFiber.elementType && getTrackingGUID(node)) {
       return true;
     }
 
@@ -146,7 +147,8 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
       realComponentName !== "Unknown" ? realComponentName : componentName;
 
     // Filter: only show tracked components or those in parent chain of tracked components
-    const isTracked = wasTracked(fiberNode);
+    const trackingGUID = getTrackingGUID(fiberNode);
+    const isTracked = trackingGUID !== null;
 
     if (traceOptions.skipNonTrackedBranches) {
       const isInParentChain = isInParentChainOfTracked(fiberNode, depth);
@@ -235,6 +237,21 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
         logSkipped(prefix, message);
       } else {
         log(`${prefix}${message}`); // Default styling for other types
+      }
+
+      // Show component logs if this component was tracked
+      if (isTracked && trackingGUID) {
+        const componentLogs = componentLogRegistry.consumeLogs(trackingGUID);
+        if (componentLogs.length > 0) {
+          componentLogs.forEach(({ message: logMessage, args }) => {
+            const logPrefix = `${indent}│   Log: `;
+            if (args.length > 0) {
+              log(`${logPrefix}${logMessage}`, ...args);
+            } else {
+              log(`${logPrefix}${logMessage}`);
+            }
+          });
+        }
       }
 
       // Extract and show useState changes only if they exist
