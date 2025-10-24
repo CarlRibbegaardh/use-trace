@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import {
   Box,
   Typography,
@@ -14,7 +14,14 @@ import {
 } from '@mui/icons-material';
 import { TodoItem } from './TodoItem';
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
-import { setFilter, clearError } from '../store/todoSlice';
+import {
+  setFilter,
+  clearError,
+  selectFilteredTodos,
+  selectTodosLoading,
+  selectTodosError,
+  selectTodosFilter
+} from '../store/todoSlice';
 import { TodoService } from '../domain/TodoService';
 import { useAutoTrace } from 'use-trace';
 
@@ -26,18 +33,10 @@ export const TodoList: React.FC<TodoListProps> = ({ todoService }) => {
   useAutoTrace();
 
   const dispatch = useAppDispatch();
-  const { todos, loading, error, filter } = useAppSelector(state => state.todos);
-
-  const filteredTodos = useMemo(() => {
-    switch (filter) {
-      case 'completed':
-        return todos.filter(todo => todo.completed);
-      case 'pending':
-        return todos.filter(todo => !todo.completed);
-      default:
-        return todos;
-    }
-  }, [todos, filter]);
+  const filteredTodos = useAppSelector(selectFilteredTodos);
+  const loading = useAppSelector(selectTodosLoading);
+  const error = useAppSelector(selectTodosError);
+  const filter = useAppSelector(selectTodosFilter);
 
   const handleFilterChange = (
     _: React.MouseEvent<HTMLElement>,
