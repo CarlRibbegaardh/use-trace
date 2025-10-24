@@ -16,6 +16,7 @@ import {
 import { traceOptions } from "../types/globalState.js";
 import { Placement, getFlagNames, hasRenderWork } from "./reactFiberFlags.js";
 import { wasTracked } from "./renderRegistry.js";
+import { getSkippedProps } from "./getSkippedProps.js";
 
 // Track the last depth we processed
 let lastDepth = -1;
@@ -254,7 +255,8 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
           memoizedProps?: Record<string, unknown>;
           pendingProps?: Record<string, unknown>;
           alternate?: { memoizedProps?: Record<string, unknown> };
-        }
+        },
+        displayName || undefined
       );
 
       // For Mount: Show initial values, for others: Show changes
@@ -274,8 +276,15 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
         // Show initial props
         const currentProps = fiberNode.memoizedProps || fiberNode.pendingProps;
         if (currentProps && typeof currentProps === "object") {
+          // Get skipped props for this component
+          const skippedProps = getSkippedProps(displayName || undefined);
+
           Object.entries(currentProps).forEach(([name, value]) => {
-            if (!isReactInternal(name) && name !== "children") {
+            if (
+              !isReactInternal(name) &&
+              name !== "children" &&
+              !skippedProps.has(name)
+            ) {
               logPropChange(
                 `${indent}│   `,
                 `Initial prop ${name}: ${formatPropValue(value)}`,

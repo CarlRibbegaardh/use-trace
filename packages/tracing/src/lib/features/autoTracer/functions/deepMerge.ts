@@ -36,6 +36,9 @@ export function deepMergeOptions(
   if (source.skipNonTrackedBranches !== undefined) {
     result.skipNonTrackedBranches = source.skipNonTrackedBranches;
   }
+  if (source.skippedObjectProps !== undefined) {
+    result.skippedObjectProps = source.skippedObjectProps;
+  }
 
   // Handle nested colors object
   if (source.colors) {

@@ -9,6 +9,11 @@ interface ColorOptions {
   lightMode?: ThemeOptions;
   icon?: string;
 }
+interface SkippedObjectProp {
+  objectName: string;
+  propNames: string[];
+}
+
 interface AutoTracerOptions {
   enabled?: boolean; // Enable/disable the entire autoTracer (default: true)
   includeReconciled?: boolean;
@@ -18,6 +23,7 @@ interface AutoTracerOptions {
   maxFiberDepth?: number; // Maximum fiber traversal depth (20-1000, default: 100)
   showFunctionContentOnChange?: boolean; // Show full function content in prop changes (default: false)
   skipNonTrackedBranches?: boolean; // Skip components that aren't tracked or in parent chain of tracked (default: true)
+  skippedObjectProps?: SkippedObjectProp[]; // Skip specific props for specific object types (default: [])
 
   // Styling options changed to colors object below
   // definitiveRenderColor?: string;
@@ -37,4 +43,9 @@ interface AutoTracerOptions {
   };
 }
 
-export type { AutoTracerOptions, ThemeOptions, ColorOptions };
+export type {
+  AutoTracerOptions,
+  ThemeOptions,
+  ColorOptions,
+  SkippedObjectProp,
+};

@@ -5,4 +5,7 @@ export {
   updateAutoTracerOptions,
   useAutoTrace,
 } from "./autoTracer.js";
-export type { AutoTracerOptions } from "./interfaces/AutoTracerOptions.js";
+export type {
+  AutoTracerOptions,
+  SkippedObjectProp,
+} from "./interfaces/AutoTracerOptions.js";

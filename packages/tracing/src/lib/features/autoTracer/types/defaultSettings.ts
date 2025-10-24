@@ -13,6 +13,7 @@ export const defaultAutoTracerOptions: AutoTracerOptions = {
   maxFiberDepth: 100, // Maximum fiber traversal depth to prevent stack overflow
   showFunctionContentOnChange: false, // Show full function content in prop changes
   skipNonTrackedBranches: true, // Skip non-tracked branches by default
+  skippedObjectProps: [], // Skip specific props for specific object types
 
   // Default styling (matching comments in AutoTracerOptions.ts)
   colors: {
