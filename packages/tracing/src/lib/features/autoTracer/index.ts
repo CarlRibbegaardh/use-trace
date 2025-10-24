@@ -2,7 +2,6 @@ export {
   autoTracer,
   isAutoTracerInitialized,
   stopAutoTracer,
-  trackRender,
   updateAutoTracerOptions,
   useTrackRender,
 } from "./autoTracer.js";

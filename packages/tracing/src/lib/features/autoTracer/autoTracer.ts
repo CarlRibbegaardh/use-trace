@@ -14,7 +14,7 @@ import {
 } from "./functions/devToolsUtils.js";
 
 // Re-export tracking functions for convenience
-export { trackRender, useTrackRender } from "./functions/renderRegistry.js";
+export { useTrackRender } from "./functions/renderRegistry.js";
 
 let isAutoTracerActive = false;
 let originalOnCommitFiberRoot: unknown = null;
@@ -45,9 +45,7 @@ export function autoTracer(options: AutoTracerOptions = {}): () => void {
 
   if (isAutoTracerActive) {
     if (currentOptions.enableAutoTracerInternalsLogging) {
-      logWarn(
-        "AutoTracer is already active. Call stopAutoTracer() first."
-      );
+      logWarn("AutoTracer is already active. Call stopAutoTracer() first.");
     }
     return stopAutoTracer;
   }

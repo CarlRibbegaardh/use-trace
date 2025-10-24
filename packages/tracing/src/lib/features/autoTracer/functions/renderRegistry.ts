@@ -38,40 +38,6 @@ export function useTrackRender(): void {
 }
 
 /**
- * Legacy function that tries to determine component from stack trace.
- * Kept for backward compatibility, but useTrackRender() is preferred.
- */
-export function trackRender(): void {
-  // Fallback to stack-based approach for non-hook usage
-  const stack = new Error().stack;
-  if (!stack) return;
-
-  const lines = stack.split("\n");
-  for (const line of lines) {
-    const match =
-      line.match(/at\s+([A-Z][a-zA-Z0-9]*)\s*\(/) ||
-      line.match(/([A-Z][a-zA-Z0-9]*)@/);
-
-    if (match?.[1]) {
-      const componentName = match[1];
-      if (
-        !componentName.startsWith("render") &&
-        !componentName.startsWith("update") &&
-        !componentName.startsWith("begin") &&
-        !componentName.startsWith("commit") &&
-        componentName !== "Object" &&
-        componentName !== "Function"
-      ) {
-        // Use component name + stack line as pseudo-GUID
-        const pseudoGUID = `legacy-${componentName}-${line.trim()}`;
-        trackedGUIDs.add(pseudoGUID);
-        return;
-      }
-    }
-  }
-}
-
-/**
  * Check if a fiber was registered as having rendered this cycle.
  * Searches the fiber's memoizedState for a useRef with our GUID.
  */
