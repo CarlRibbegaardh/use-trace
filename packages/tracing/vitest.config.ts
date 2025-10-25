@@ -1,13 +1,13 @@
-import { type ConfigEnv, type UserConfig, defineConfig } from "vitest/config";
+import { type ConfigEnv, ViteUserConfig, defineConfig } from "vitest/config";
 
 // https://vitest.dev/guide/#configuring-vitest
-const config = defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
+const config = defineConfig(({ command, mode }: ConfigEnv): ViteUserConfig => {
   console.log("command:", command); // Will  return "build" or "serve"
   console.log("mode:", mode); // Will return "production", "ci" or "development". We use --mode ci for coverage on ci builds.
 
   const ci = mode === "ci";
 
-  const result: UserConfig = {
+  const result: ViteUserConfig = {
     resolve: {
       alias: {
         "@src": new URL("./src", import.meta.url).pathname,
@@ -21,7 +21,6 @@ const config = defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
       environment: "jsdom",
       coverage: {
         provider: "v8",
-        all: true,
         include: ["src/**/*.{js,ts,jsx,tsx}"],
         exclude: [
           "**/node_modules/**",

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 // Note: we import the package dynamically inside tests so that mocks
 // (vi.doMock) can be applied before the module is evaluated.
