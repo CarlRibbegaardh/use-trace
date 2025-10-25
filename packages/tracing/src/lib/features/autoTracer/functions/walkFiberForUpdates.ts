@@ -239,21 +239,6 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
         log(`${prefix}${message}`); // Default styling for other types
       }
 
-      // Show component logs if this component was tracked
-      if (isTracked && trackingGUID) {
-        const componentLogs = componentLogRegistry.consumeLogs(trackingGUID);
-        if (componentLogs.length > 0) {
-          componentLogs.forEach(({ message: logMessage, args }) => {
-            const logPrefix = `${indent}│   Log: `;
-            if (args.length > 0) {
-              log(`${logPrefix}${logMessage}`, ...args);
-            } else {
-              log(`${logPrefix}${logMessage}`);
-            }
-          });
-        }
-      }
-
       // Extract and show useState changes only if they exist
       const useStateValues = extractUseStateValues(fiberNode);
       const meaningfulStateChanges = useStateValues.filter(
@@ -278,18 +263,6 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
 
       // For Mount: Show initial values, for others: Show changes
       if (isNewMount) {
-        // Show initial useState values
-        const allStateValues = extractUseStateValues(fiberNode);
-        allStateValues.forEach(({ name, value }) => {
-          if (!isReactInternal(name)) {
-            logStateChange(
-              `${indent}│   `,
-              `Initial state: ${formatStateValue(value)}`,
-              true
-            );
-          }
-        });
-
         // Show initial props
         const currentProps = fiberNode.memoizedProps || fiberNode.pendingProps;
         if (currentProps && typeof currentProps === "object") {
@@ -310,15 +283,19 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
             }
           });
         }
-      } else {
-        // Show useState changes if any
-        meaningfulStateChanges.forEach(({ name: _name, value, prevValue }) => {
-          logStateChange(
-            `${indent}│   `,
-            `State change: ${formatStateChange(prevValue, value)}`
-          );
-        });
 
+        // Show initial useState values
+        const allStateValues = extractUseStateValues(fiberNode);
+        allStateValues.forEach(({ name, value }) => {
+          if (!isReactInternal(name)) {
+            logStateChange(
+              `${indent}│   `,
+              `Initial state: ${formatStateValue(value)}`,
+              true
+            );
+          }
+        });
+      } else {
         // Show prop changes if any
         propChanges.forEach(({ name, value, prevValue }) => {
           logPropChange(
@@ -326,6 +303,29 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
             `Prop change ${name}: ${formatPropChange(prevValue, value)}`
           );
         });
+
+        // Show useState changes if any
+        meaningfulStateChanges.forEach(({ name: _name, value, prevValue }) => {
+          logStateChange(
+            `${indent}│   `,
+            `State change: ${formatStateChange(prevValue, value)}`
+          );
+        });
+      }
+
+      // Show component logs if this component was tracked
+      if (isTracked && trackingGUID) {
+        const componentLogs = componentLogRegistry.consumeLogs(trackingGUID);
+        if (componentLogs.length > 0) {
+          componentLogs.forEach(({ message: logMessage, args }) => {
+            const logPrefix = `${indent}│   Log: `;
+            if (args.length > 0) {
+              log(`${logPrefix}${logMessage}`, ...args);
+            } else {
+              log(`${logPrefix}${logMessage}`);
+            }
+          });
+        }
       }
 
       // Not interesting.
