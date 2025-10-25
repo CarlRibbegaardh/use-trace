@@ -42,6 +42,11 @@ export const defaultAutoTracerOptions: AutoTracerOptions = {
       lightMode: { text: "#df7f02" }, // Orange
       darkMode: { text: "#ffcf33" }, // Lighter orange for dark mode
     },
+    logStatements: {
+      icon: undefined, // Log statements
+      lightMode: { text: "#00aa00" }, // Green
+      darkMode: { text: "#4ade80" }, // Lighter green for dark mode
+    },
     reconciled: {
       lightMode: { text: "#9ca3af" }, // Gray-500
       darkMode: { text: "#9ca3af" }, // Gray-500

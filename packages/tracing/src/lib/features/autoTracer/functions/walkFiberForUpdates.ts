@@ -6,6 +6,7 @@ import { getRealComponentName } from "./getRealComponentName.js";
 import { isReactInternal } from "./isReactInternal.js";
 import {
   log,
+  logLogStatement,
   logPropChange,
   logReconciled,
   logSkipped,
@@ -318,11 +319,15 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
         const componentLogs = componentLogRegistry.consumeLogs(trackingGUID);
         if (componentLogs.length > 0) {
           componentLogs.forEach(({ message: logMessage, args }) => {
-            const logPrefix = `${indent}│   Log: `;
+            const logPrefix = `${indent}│   `;
             if (args.length > 0) {
-              log(`${logPrefix}${logMessage}`, ...args);
+              // For now, concatenate args into the message since logLogStatement doesn't support variadic args
+              const fullMessage = `Log: ${logMessage} ${args.map((arg) => {
+                return stringify(arg);
+              }).join(' ')}`;
+              logLogStatement(logPrefix, fullMessage);
             } else {
-              log(`${logPrefix}${logMessage}`);
+              logLogStatement(logPrefix, `Log: ${logMessage}`);
             }
           });
         }

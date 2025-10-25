@@ -37,6 +37,7 @@ interface AutoTracerOptions {
     propChange?: ColorOptions; // Light Default: #ff00f2
     stateInitial?: ColorOptions; // Light Default: #ff9100, Italic
     stateChange?: ColorOptions; // Light Default: #ff9100
+    logStatements?: ColorOptions; // Light Default: #00aa00
     reconciled?: ColorOptions; // Light Default: #6b7280 (Gray-500)
     skipped?: ColorOptions; // Light Default: #9ca3af (Gray-400)
     other?: ColorOptions; // Light Default: #000000

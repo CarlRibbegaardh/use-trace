@@ -120,6 +120,21 @@ export function deepMergeOptions(
       };
     }
 
+    if (source.colors.logStatements) {
+      result.colors.logStatements = {
+        ...target.colors?.logStatements,
+        ...source.colors.logStatements,
+        lightMode: {
+          ...target.colors?.logStatements?.lightMode,
+          ...source.colors.logStatements.lightMode,
+        },
+        darkMode: {
+          ...target.colors?.logStatements?.darkMode,
+          ...source.colors.logStatements.darkMode,
+        },
+      };
+    }
+
     if (source.colors.reconciled) {
       result.colors.reconciled = {
         ...target.colors?.reconciled,

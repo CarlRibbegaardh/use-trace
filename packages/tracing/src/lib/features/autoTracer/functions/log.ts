@@ -149,6 +149,22 @@ export function logStateChange(
 }
 
 /**
+ * Styled logging for log statements with theme-aware colors
+ * Prefix is monochrome, icon+message are styled: "  │   Log: Custom message"
+ */
+export function logLogStatement(
+  prefix: string,
+  message: string
+): void {
+  const colorOptions = traceOptions.colors?.logStatements;
+  const themeOptions = getThemeOptions(colorOptions);
+  const icon = colorOptions?.icon ? `${colorOptions.icon} ` : "";
+  const style = buildStyle(themeOptions);
+
+  log(`${prefix}%c${icon}${message}`, style);
+}
+
+/**
  * Styled logging for reconciled components
  * Prefix is monochrome, message+icon are styled: "  │   [Component] Reconciled ♻️"
  */
