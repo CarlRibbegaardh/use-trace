@@ -39,6 +39,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "postbuild": "tsc --project ./tests/tsconfig.json --noEmit",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix",
     "test": "vitest run",

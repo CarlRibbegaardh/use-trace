@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { defaultAutoTracerOptions } from "../../../../../src/lib/features/autoTracer/types/defaultSettings.js";
+import { defaultAutoTracerOptions } from "@src/lib/features/autoTracer/types/defaultSettings.js";
 
 describe("defaultSettings", () => {
   it("should have correct default values", () => {

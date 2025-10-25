@@ -7,9 +7,7 @@ import {
   setRenderStartTime,
   setTraceOptions,
   traceOptions
-} from "../../../../../src/lib/features/autoTracer/types/globalState.js";
-
-// Mock window.matchMedia for testing
+  } from "@src/lib/features/autoTracer/types/globalState.js";// Mock window.matchMedia for testing
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation(query => {

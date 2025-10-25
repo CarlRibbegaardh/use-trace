@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { deepMergeOptions } from "../../../../../src/lib/features/autoTracer/functions/deepMerge.js";
-import type { AutoTracerOptions } from "../../../../../src/lib/features/autoTracer/interfaces/AutoTracerOptions.js";
+import { deepMergeOptions } from "@src/lib/features/autoTracer/functions/deepMerge.js";
+import type { AutoTracerOptions } from "@src/lib/features/autoTracer/interfaces/AutoTracerOptions.js";
 
 describe("deepMergeOptions", () => {
   const defaultOptions: AutoTracerOptions = {
@@ -18,29 +18,29 @@ describe("deepMergeOptions", () => {
         lightMode: {
           background: "#E3F2FD",
           text: "#2196F3",
-          bold: true
-        }
+          bold: true,
+        },
       },
       propChange: {
         lightMode: {
           background: "#FFF3E0",
-          text: "#FF9800"
-        }
+          text: "#FF9800",
+        },
       },
       stateChange: {
         lightMode: {
           background: "#E8F5E8",
-          text: "#4CAF50"
-        }
-      }
-    }
+          text: "#4CAF50",
+        },
+      },
+    },
   };
 
   describe("shallow properties", () => {
     it("should merge shallow boolean properties", () => {
       const result = deepMergeOptions(defaultOptions, {
         includeReconciled: true,
-        includeSkipped: true
+        includeSkipped: true,
       });
 
       expect(result.includeReconciled).toBe(true);
@@ -50,7 +50,7 @@ describe("deepMergeOptions", () => {
 
     it("should merge shallow numeric properties", () => {
       const result = deepMergeOptions(defaultOptions, {
-        maxFiberDepth: 20
+        maxFiberDepth: 20,
       });
 
       expect(result.maxFiberDepth).toBe(20);
@@ -59,7 +59,7 @@ describe("deepMergeOptions", () => {
     it("should merge array properties", () => {
       const skippedProps = [{ objectName: "Component", propNames: ["test"] }];
       const result = deepMergeOptions(defaultOptions, {
-        skippedObjectProps: skippedProps
+        skippedObjectProps: skippedProps,
       });
 
       expect(result.skippedObjectProps).toBe(skippedProps);
@@ -67,7 +67,7 @@ describe("deepMergeOptions", () => {
 
     it("should preserve unchanged properties", () => {
       const result = deepMergeOptions(defaultOptions, {
-        enabled: false
+        enabled: false,
       });
 
       expect(result.enabled).toBe(false);
@@ -82,14 +82,16 @@ describe("deepMergeOptions", () => {
         colors: {
           definitiveRender: {
             lightMode: {
-              text: "#FF0000"
-            }
-          }
-        }
+              text: "#FF0000",
+            },
+          },
+        },
       });
 
       expect(result.colors?.definitiveRender?.lightMode?.text).toBe("#FF0000");
-      expect(result.colors?.definitiveRender?.lightMode?.background).toBe("#E3F2FD"); // preserved
+      expect(result.colors?.definitiveRender?.lightMode?.background).toBe(
+        "#E3F2FD"
+      ); // preserved
       expect(result.colors?.propChange?.lightMode?.text).toBe("#FF9800"); // unchanged
     });
 
@@ -99,40 +101,46 @@ describe("deepMergeOptions", () => {
           lightMode: {
             text: "#FF0000",
             background: "#FFEEEE",
-            bold: true
-          }
+            bold: true,
+          },
         },
         propChange: {
           lightMode: {
             text: "#00FF00",
-            background: "#EEFFEE"
-          }
-        }
+            background: "#EEFFEE",
+          },
+        },
       };
 
       const result = deepMergeOptions(defaultOptions, {
-        colors: newColors
+        colors: newColors,
       });
 
-      expect(result.colors?.definitiveRender?.lightMode).toEqual(newColors.definitiveRender.lightMode);
-      expect(result.colors?.propChange?.lightMode).toEqual(newColors.propChange.lightMode);
-      expect(result.colors?.stateChange?.lightMode).toEqual(defaultOptions.colors?.stateChange?.lightMode); // preserved
+      expect(result.colors?.definitiveRender?.lightMode).toEqual(
+        newColors.definitiveRender.lightMode
+      );
+      expect(result.colors?.propChange?.lightMode).toEqual(
+        newColors.propChange.lightMode
+      );
+      expect(result.colors?.stateChange?.lightMode).toEqual(
+        defaultOptions.colors?.stateChange?.lightMode
+      ); // preserved
     });
 
     it("should handle missing nested color properties", () => {
       const optionsWithoutColors: AutoTracerOptions = {
         ...defaultOptions,
-        colors: undefined
+        colors: undefined,
       };
 
       const result = deepMergeOptions(optionsWithoutColors, {
         colors: {
           definitiveRender: {
             lightMode: {
-              text: "#FF0000"
-            }
-          }
-        }
+              text: "#FF0000",
+            },
+          },
+        },
       });
 
       expect(result.colors?.definitiveRender?.lightMode?.text).toBe("#FF0000");
@@ -143,42 +151,48 @@ describe("deepMergeOptions", () => {
         definitiveRender: {
           lightMode: {
             text: "#CUSTOM1",
-            background: "#CUSTOMBG1"
-          }
+            background: "#CUSTOMBG1",
+          },
         },
         propChange: {
           lightMode: {
             text: "#CUSTOM2",
-            background: "#CUSTOMBG2"
-          }
+            background: "#CUSTOMBG2",
+          },
         },
         stateChange: {
           lightMode: {
             text: "#CUSTOM3",
-            background: "#CUSTOMBG3"
-          }
-        }
+            background: "#CUSTOMBG3",
+          },
+        },
       };
 
       const optionsWithCustomColors: AutoTracerOptions = {
         ...defaultOptions,
-        colors: customColors
+        colors: customColors,
       };
 
       const result = deepMergeOptions(optionsWithCustomColors, {
         colors: {
           definitiveRender: {
             lightMode: {
-              text: "#UPDATED"
-            }
-          }
-        }
+              text: "#UPDATED",
+            },
+          },
+        },
       });
 
       expect(result.colors?.definitiveRender?.lightMode?.text).toBe("#UPDATED");
-      expect(result.colors?.definitiveRender?.lightMode?.background).toBe("#CUSTOMBG1");
-      expect(result.colors?.propChange?.lightMode).toEqual(customColors.propChange.lightMode);
-      expect(result.colors?.stateChange?.lightMode).toEqual(customColors.stateChange.lightMode);
+      expect(result.colors?.definitiveRender?.lightMode?.background).toBe(
+        "#CUSTOMBG1"
+      );
+      expect(result.colors?.propChange?.lightMode).toEqual(
+        customColors.propChange.lightMode
+      );
+      expect(result.colors?.stateChange?.lightMode).toEqual(
+        customColors.stateChange.lightMode
+      );
     });
   });
 
@@ -194,7 +208,7 @@ describe("deepMergeOptions", () => {
       const result = deepMergeOptions(defaultOptions, {
         enabled: undefined,
         maxFiberDepth: 15,
-        colors: undefined
+        colors: undefined,
       });
 
       expect(result.enabled).toBe(defaultOptions.enabled); // unchanged
@@ -208,10 +222,10 @@ describe("deepMergeOptions", () => {
         colors: {
           definitiveRender: {
             lightMode: {
-              text: "#000000"
-            }
-          }
-        }
+              text: "#000000",
+            },
+          },
+        },
       });
 
       expect(result).not.toBe(defaultOptions);
@@ -222,7 +236,7 @@ describe("deepMergeOptions", () => {
       const result = deepMergeOptions(defaultOptions, {
         enabled: false,
         includeReconciled: false,
-        maxFiberDepth: 0
+        maxFiberDepth: 0,
       });
 
       expect(result.enabled).toBe(false);
