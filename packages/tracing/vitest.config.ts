@@ -10,19 +10,39 @@ const config = defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
   const result: UserConfig = {
     test: {
       globals: true,
-      include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+      include: ["tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+      exclude: ["**/node_modules/**", "**/dist/**", "**/coverage/**"],
       environment: "jsdom",
       coverage: {
         provider: "v8",
         all: true,
+        include: ["src/**/*.{js,ts,jsx,tsx}"],
+        exclude: [
+          "**/node_modules/**",
+          "**/dist/**",
+          "**/coverage/**",
+          "**/tests/**",
+          "**/*.test.*",
+          "**/*.spec.*",
+          "**/vitest.config.*",
+          "**/tsconfig.*",
+        ],
         reporter: ci
           ? [
               ["lcov", { projectRoot: "./src" }],
               ["json", { file: "coverage.json" }],
             ]
-          : ["html"],
+          : ["html", "text", "json-summary", "text-summary"],
+        thresholds: {
+          global: {
+            branches: 80,
+            functions: 80,
+            lines: 80,
+            statements: 80,
+          },
+        },
       },
-      reporters: ["junit", "basic"],
+      reporters: ["default"],
       outputFile: { junit: "test/junit.xml" },
     },
   };
