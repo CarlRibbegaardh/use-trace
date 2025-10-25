@@ -36,8 +36,8 @@ export function extractUseStateValues(
         | { memoizedState?: unknown; next?: unknown }
         | undefined;
 
-      // useState hooks have a memoizedState property and usually a queue for updates
-      if (typedHook.memoizedState !== undefined && typedHook.queue) {
+      // useState hooks have a queue for updates (memoizedState can be undefined)
+      if (typedHook.queue) {
         const currentValue = typedHook.memoizedState;
         const prevValue = typedPrevHook?.memoizedState;
 
