@@ -26,12 +26,12 @@ import { getTrackingGUID } from "./renderRegistry.js";
 import { getSkippedProps } from "./getSkippedProps.js";
 import { componentLogRegistry } from "./componentLogRegistry.js";
 
-// Track the last depth we processed
-let lastDepth = -1;
 
-export function resetDepthTracking(): void {
-  lastDepth = -1;
-}
+// Re-export resetDepthTracking from fiberTraversal module
+export { resetDepthTracking } from "./fiberTraversal.js";
+
+// Track the last depth we processed locally for visualization
+let lastDepth = -1;
 
 function isInParentChainOfTracked(
   fiber: unknown,
