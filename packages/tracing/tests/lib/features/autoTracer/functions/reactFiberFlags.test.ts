@@ -44,7 +44,7 @@ describe("reactFiberFlags", () => {
     it("should return multiple flag names for combined flags", () => {
       const combinedFlags = PerformedWork | Update | Placement;
       const result = getFlagNames(combinedFlags);
-      
+
       expect(result).toContain("PerformedWork");
       expect(result).toContain("Update");
       expect(result).toContain("Placement");
@@ -55,7 +55,9 @@ describe("reactFiberFlags", () => {
       expect(getFlagNames(Visibility)).toEqual([]);
       expect(getFlagNames(MountLayoutDev)).toEqual([]);
       expect(getFlagNames(MountPassiveDev)).toEqual([]);
-      expect(getFlagNames(ForceUpdateForLegacySuspense)).toEqual(["ShouldCapture"]);
+      expect(getFlagNames(ForceUpdateForLegacySuspense)).toEqual([
+        "ShouldCapture",
+      ]);
     });
 
     it("should handle overlapping flags correctly", () => {
@@ -73,7 +75,7 @@ describe("reactFiberFlags", () => {
     it("should handle complex flag combinations", () => {
       const complexFlags = PerformedWork | Update | Placement | Ref | Passive;
       const result = getFlagNames(complexFlags);
-      
+
       expect(result).toContain("PerformedWork");
       expect(result).toContain("Update");
       expect(result).toContain("Placement");
@@ -86,10 +88,10 @@ describe("reactFiberFlags", () => {
       // Test with a flag value that's not in FLAG_NAMES
       const unknownFlag = 0b1111111111111111111111111111111; // All bits set
       const result = getFlagNames(unknownFlag);
-      
+
       // Should only return known flag names, not crash
       expect(Array.isArray(result)).toBe(true);
-      result.forEach(name => {
+      result.forEach((name) => {
         expect(typeof name).toBe("string");
       });
     });
@@ -149,7 +151,9 @@ describe("reactFiberFlags", () => {
         expect(isLikelyMount(PlacementDEV, true)).toBe(false);
         expect(isLikelyMount(MountLayoutDev, true)).toBe(false);
         expect(isLikelyMount(MountPassiveDev, true)).toBe(false);
-        expect(isLikelyMount(Placement | PlacementDEV | MountLayoutDev, true)).toBe(false);
+        expect(
+          isLikelyMount(Placement | PlacementDEV | MountLayoutDev, true)
+        ).toBe(false);
       });
     });
 
@@ -176,8 +180,12 @@ describe("reactFiberFlags", () => {
 
       it("should return true for combinations of mount flags", () => {
         expect(isLikelyMount(Placement | PlacementDEV, false)).toBe(true);
-        expect(isLikelyMount(MountLayoutDev | MountPassiveDev, false)).toBe(true);
-        expect(isLikelyMount(Placement | MountLayoutDev | MountPassiveDev, false)).toBe(true);
+        expect(isLikelyMount(MountLayoutDev | MountPassiveDev, false)).toBe(
+          true
+        );
+        expect(
+          isLikelyMount(Placement | MountLayoutDev | MountPassiveDev, false)
+        ).toBe(true);
       });
 
       it("should return false for non-mount flags", () => {
@@ -191,9 +199,13 @@ describe("reactFiberFlags", () => {
       });
 
       it("should return true when mount flags are combined with other flags", () => {
-        expect(isLikelyMount(Placement | PerformedWork | Update, false)).toBe(true);
+        expect(isLikelyMount(Placement | PerformedWork | Update, false)).toBe(
+          true
+        );
         expect(isLikelyMount(PlacementDEV | Ref | Passive, false)).toBe(true);
-        expect(isLikelyMount(MountLayoutDev | ContentReset | ChildDeletion, false)).toBe(true);
+        expect(
+          isLikelyMount(MountLayoutDev | ContentReset | ChildDeletion, false)
+        ).toBe(true);
       });
 
       it("should handle edge cases", () => {
@@ -213,7 +225,7 @@ describe("reactFiberFlags", () => {
       const noFlags: Flags = NoFlags;
       const performedWork: Flags = PerformedWork;
       const combined: Flags = PerformedWork | Update | Placement;
-      
+
       expect(typeof noFlags).toBe("number");
       expect(typeof performedWork).toBe("number");
       expect(typeof combined).toBe("number");
@@ -238,10 +250,23 @@ describe("reactFiberFlags", () => {
     });
 
     it("should handle all flags combination", () => {
-      const allFlags = PerformedWork | Placement | Update | ChildDeletion | ContentReset | 
-                      Callback | ForceClientRender | Ref | Snapshot | Passive | Visibility | 
-                      StoreConsistency | PlacementDEV | MountLayoutDev | MountPassiveDev;
-      
+      const allFlags =
+        PerformedWork |
+        Placement |
+        Update |
+        ChildDeletion |
+        ContentReset |
+        Callback |
+        ForceClientRender |
+        Ref |
+        Snapshot |
+        Passive |
+        Visibility |
+        StoreConsistency |
+        PlacementDEV |
+        MountLayoutDev |
+        MountPassiveDev;
+
       const flagNames = getFlagNames(allFlags);
       expect(flagNames.length).toBeGreaterThan(10);
       expect(hasRenderWork(allFlags)).toBe(true);
