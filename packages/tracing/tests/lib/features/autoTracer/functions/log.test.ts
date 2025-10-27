@@ -334,10 +334,7 @@ describe("log functions", () => {
 
       logDefinitive("prefix", "message");
 
-      expect(mockConsole.log).toHaveBeenCalledWith(
-        "prefix%cmessage",
-        ""
-      );
+      expect(mockConsole.log).toHaveBeenCalledWith("prefixmessage");
     });
   });
 
@@ -349,8 +346,7 @@ describe("log functions", () => {
         logDefinitive("  │   ", "[Component] Rendering");
 
         expect(mockConsole.log).toHaveBeenCalledWith(
-          "  │   %c[Component] Rendering",
-          ""
+          "  │   [Component] Rendering"
         );
       });
 
@@ -382,8 +378,7 @@ describe("log functions", () => {
         logPropChange("  │   ", "prop: old → new", false);
 
         expect(mockConsole.log).toHaveBeenCalledWith(
-          "  │   %cprop: old → new",
-          ""
+          "  │   prop: old → new"
         );
       });
 
@@ -393,8 +388,7 @@ describe("log functions", () => {
         logPropChange("  │   ", "Initial prop: value", true);
 
         expect(mockConsole.log).toHaveBeenCalledWith(
-          "  │   %cInitial prop: value",
-          ""
+          "  │   Initial prop: value"
         );
       });
 
@@ -403,10 +397,7 @@ describe("log functions", () => {
 
         logPropChange("prefix", "message");
 
-        expect(mockConsole.log).toHaveBeenCalledWith(
-          "prefix%cmessage",
-          ""
-        );
+        expect(mockConsole.log).toHaveBeenCalledWith("prefixmessage");
       });
     });
 
@@ -417,8 +408,7 @@ describe("log functions", () => {
         logStateChange("  │   ", "state: 1 → 2", false);
 
         expect(mockConsole.log).toHaveBeenCalledWith(
-          "  │   %cstate: 1 → 2",
-          ""
+          "  │   state: 1 → 2"
         );
       });
 
@@ -428,8 +418,7 @@ describe("log functions", () => {
         logStateChange("  │   ", "Initial state: value", true);
 
         expect(mockConsole.log).toHaveBeenCalledWith(
-          "  │   %cInitial state: value",
-          ""
+          "  │   Initial state: value"
         );
       });
     });
@@ -441,8 +430,7 @@ describe("log functions", () => {
         logLogStatement("  │   ", "Custom log message");
 
         expect(mockConsole.log).toHaveBeenCalledWith(
-          "  │   %cCustom log message",
-          ""
+          "  │   Custom log message"
         );
       });
     });
@@ -454,8 +442,7 @@ describe("log functions", () => {
         logReconciled("  │   ", "[Component] Reconciled");
 
         expect(mockConsole.log).toHaveBeenCalledWith(
-          "  │   %c[Component] Reconciled",
-          ""
+          "  │   [Component] Reconciled"
         );
       });
     });
@@ -467,8 +454,7 @@ describe("log functions", () => {
         logSkipped("  │   ", "[Component] Skipped");
 
         expect(mockConsole.log).toHaveBeenCalledWith(
-          "  │   %c[Component] Skipped",
-          ""
+          "  │   [Component] Skipped"
         );
       });
     });
@@ -544,10 +530,7 @@ describe("log functions", () => {
 
       logDefinitive("prefix", "message");
 
-      expect(mockConsole.log).toHaveBeenCalledWith(
-        "prefix%cmessage ⚡",
-        ""
-      );
+      expect(mockConsole.log).toHaveBeenCalledWith("prefixmessage ⚡");
     });
 
     it("should handle boolean flags correctly", async () => {
