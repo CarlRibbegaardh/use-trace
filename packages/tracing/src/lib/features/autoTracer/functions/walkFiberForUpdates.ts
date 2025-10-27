@@ -5,6 +5,12 @@ import { getComponentName } from "./getComponentName.js";
 import { getRealComponentName } from "./getRealComponentName.js";
 import { isReactInternal } from "./isReactInternal.js";
 import {
+  formatPropChange,
+  formatPropValue,
+  formatStateChange,
+  formatStateValue,
+} from "./changeFormatting.js";
+import {
   log,
   logLogStatement,
   logPropChange,
@@ -66,53 +72,6 @@ function isInParentChainOfTracked(
   }
 
   return hasTrackedDescendant(fiber, currentDepth);
-}
-
-/**
- * Format a value for display in prop changes, respecting the showFunctionContentOnChange setting
- */
-function formatPropValue(value: unknown): string {
-  if (typeof value === "function") {
-    if (traceOptions.showFunctionContentOnChange) {
-      return stringify(value);
-    } else {
-      return "[Function]";
-    }
-  }
-  return stringify(value);
-}
-
-function formatPropChange(before: unknown, after: unknown): string {
-  if (
-    typeof before === "function" &&
-    !traceOptions.showFunctionContentOnChange
-  ) {
-    return "[Function changed]";
-  }
-
-  return `${stringify(before)} → ${stringify(after)}`;
-}
-
-function formatStateValue(value: unknown): string {
-  if (typeof value === "function") {
-    if (traceOptions.showFunctionContentOnChange) {
-      return stringify(value);
-    } else {
-      return "[Function]";
-    }
-  }
-  return stringify(value);
-}
-
-function formatStateChange(before: unknown, after: unknown): string {
-  if (
-    typeof before === "function" &&
-    !traceOptions.showFunctionContentOnChange
-  ) {
-    return "[Function changed]";
-  }
-
-  return `${stringify(before)} → ${stringify(after)}`;
 }
 
 export function walkFiberForUpdates(fiber: unknown, depth: number): void {
@@ -278,7 +237,7 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
             ) {
               logPropChange(
                 `${indent}│   `,
-                `Initial prop ${name}: ${formatPropValue(value)}`,
+                `Initial prop ${name}: ${formatPropValue(value, { showFunctionContent: traceOptions.showFunctionContentOnChange ?? false })}`,
                 true
               );
             }
@@ -291,7 +250,7 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
           if (!isReactInternal(name)) {
             logStateChange(
               `${indent}│   `,
-              `Initial state: ${formatStateValue(value)}`,
+              `Initial state: ${formatStateValue(value, { showFunctionContent: traceOptions.showFunctionContentOnChange ?? false })}`,
               true
             );
           }
@@ -301,7 +260,7 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
         propChanges.forEach(({ name, value, prevValue }) => {
           logPropChange(
             `${indent}│   `,
-            `Prop change ${name}: ${formatPropChange(prevValue, value)}`
+            `Prop change ${name}: ${formatPropChange(prevValue, value, { showFunctionContent: traceOptions.showFunctionContentOnChange ?? false })}`
           );
         });
 
@@ -309,7 +268,7 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
         meaningfulStateChanges.forEach(({ name: _name, value, prevValue }) => {
           logStateChange(
             `${indent}│   `,
-            `State change: ${formatStateChange(prevValue, value)}`
+            `State change: ${formatStateChange(prevValue, value, { showFunctionContent: traceOptions.showFunctionContentOnChange ?? false })}`
           );
         });
       }
@@ -322,9 +281,11 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
             const logPrefix = `${indent}│   `;
             if (args.length > 0) {
               // For now, concatenate args into the message since logLogStatement doesn't support variadic args
-              const fullMessage = `Log: ${logMessage} ${args.map((arg) => {
-                return stringify(arg);
-              }).join(' ')}`;
+              const fullMessage = `Log: ${logMessage} ${args
+                .map((arg) => {
+                  return stringify(arg);
+                })
+                .join(" ")}`;
               logLogStatement(logPrefix, fullMessage);
             } else {
               logLogStatement(logPrefix, `Log: ${logMessage}`);
