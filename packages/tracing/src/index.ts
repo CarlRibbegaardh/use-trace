@@ -3,7 +3,7 @@ export {
   isAutoTracerInitialized,
   stopAutoTracer,
   updateAutoTracerOptions,
-  useAutoTrace,
+  useAutoTracer,
 } from "./lib/features/autoTracer/index.js";
 export type {
   AutoTracerOptions,

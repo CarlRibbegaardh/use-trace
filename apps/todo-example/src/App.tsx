@@ -16,7 +16,7 @@ import { TodoService } from "./domain/TodoService";
 import { InMemoryTodoRepository } from "./infrastructure/InMemoryTodoRepository";
 import { useAppDispatch } from "./hooks/redux";
 import { fetchTodos } from "./store/todoSlice";
-import { useAutoTrace } from "use-trace";
+import { useAutoTracer } from "use-trace";
 
 // Create theme
 const theme = createTheme({
@@ -35,7 +35,7 @@ const todoRepository = new InMemoryTodoRepository();
 const todoService = new TodoService(todoRepository);
 
 const TodoApp: React.FC = () => {
-  useAutoTrace();
+  useAutoTracer();
 
   const dispatch = useAppDispatch();
 
@@ -66,7 +66,7 @@ const TodoApp: React.FC = () => {
 };
 
 function App() {
-  useAutoTrace();
+  useAutoTracer();
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

@@ -121,7 +121,7 @@ The E2E test suite covers:
 
 ## Integration with Tracing Library
 
-This app demonstrates the use of the `useAutoTrace` hook from the tracing library:
+This app demonstrates the use of the `useAutoTracer` hook from the tracing library:
 
 - Components are automatically tracked for render analysis
 - Helps identify performance bottlenecks and unnecessary re-renders

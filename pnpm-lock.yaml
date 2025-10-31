@@ -158,7 +158,7 @@ importers:
         specifier: ^5.3.1
         version: 5.3.3(@types/node@22.12.0)
 
-  apps/todo-example-injected:
+  apps/todo-example-injected-vite:
     dependencies:
       '@emotion/react':
         specifier: ^11.11.4
@@ -203,9 +203,9 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.3.1
         version: 4.3.1(vite@5.3.3(@types/node@22.12.0))
-      auto-trace-plugin-vite:
+      auto-tracer-plugin-vite:
         specifier: workspace:*
-        version: link:../../packages/auto-trace-plugin-vite
+        version: link:../../packages/auto-tracer-plugin-vite
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -225,7 +225,7 @@ importers:
         specifier: ^5.3.1
         version: 5.3.3(@types/node@22.12.0)
 
-  packages/auto-trace-inject-core:
+  packages/auto-tracer-inject-core:
     dependencies:
       '@babel/generator':
         specifier: ^7.23.0
@@ -256,11 +256,11 @@ importers:
         specifier: ^0.34.0
         version: 0.34.6(jsdom@24.1.0)(playwright@1.56.1)
 
-  packages/auto-trace-plugin-vite:
+  packages/auto-tracer-plugin-vite:
     dependencies:
-      auto-trace-inject-core:
+      auto-tracer-inject-core:
         specifier: workspace:*
-        version: link:../auto-trace-inject-core
+        version: link:../auto-tracer-inject-core
       unplugin:
         specifier: ^1.5.0
         version: 1.16.1

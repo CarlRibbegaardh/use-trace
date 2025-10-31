@@ -1,6 +1,6 @@
 /**
  * Render tracking registry for definitive component execution detection.
- * Components use useAutoTrace() hook to register themselves with a unique GUID.
+ * Components use useAutoTracer() hook to register themselves with a unique GUID.
  * The tracer can find and match specific component instances via the hidden GUID.
  */
 
@@ -18,18 +18,18 @@ let guidCounter = 0;
  * Hook that registers a component instance for tracking.
  * Each component instance gets a unique GUID stored in a ref.
  * Call this hook to register the component as having executed.
- * Returns a logger that stores messages until the component is rendered by autoTrace.
+ * Returns a logger that stores messages until the component is rendered by autoTracer.
  *
  * Usage in component:
  * ```tsx
  * function MyComponent() {
- *   const logger = useAutoTrace(); // Call at top of component
+ *   const logger = useAutoTracer(); // Call at top of component
  *   logger.log("Hello from MyComponent!");
  *   // ... rest of component logic
  * }
  * ```
  */
-export function useAutoTrace(): ComponentLogger {
+export function useAutoTracer(): ComponentLogger {
   const guidRef = useRef<string>();
 
   // Generate GUID on first render (stable across re-renders)

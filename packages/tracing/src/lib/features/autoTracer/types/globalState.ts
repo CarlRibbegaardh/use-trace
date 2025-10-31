@@ -34,7 +34,7 @@ export function setRenderStartTime(value: number): void {
   renderStartTime = value;
 }
 
-export function setTraceOptions(options: AutoTracerOptions): void {
+export function setTracerOptions(options: AutoTracerOptions): void {
   traceOptions = deepMergeOptions(traceOptions, options);
 
   // Debug logging to verify options are being applied

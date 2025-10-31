@@ -3,7 +3,7 @@ import generate from '@babel/generator';
 import traverse from '@babel/traverse';
 import * as t from '@babel/types';
 import type { TransformResult, TransformContext, ComponentInfo } from './types.js';
-import { isComponentFunction, extractComponentInfo, hasExistingUseAutoTraceImport } from './detect.js';
+import { isComponentFunction, extractComponentInfo, hasExistingUseAutoTracerImport } from './detect.js';
 
 // Fix for Babel traverse and generate default export issues
 const traverseDefault = typeof traverse === 'function' ? traverse : (traverse as any).default;
@@ -24,7 +24,7 @@ export function transform(code: string, context: TransformContext): TransformRes
     let needsImport = false;
 
     // Check if file has pragma controls
-    const hasTracePragma = hasPragma(code, '@trace');
+    const hasTracerPragma = hasPragma(code, '@trace');
     const hasDisablePragma = hasPragma(code, '@trace-disable');
 
     // Skip if disabled or doesn't match mode requirements
@@ -32,12 +32,12 @@ export function transform(code: string, context: TransformContext): TransformRes
       return { code, injected: false, components: [] };
     }
 
-    if (config.mode === 'opt-in' && !hasTracePragma) {
+    if (config.mode === 'opt-in' && !hasTracerPragma) {
       return { code, injected: false, components: [] };
     }
 
     // Check if import already exists
-    const hasImport = hasExistingUseAutoTraceImport(ast, config.importSource || 'use-trace');
+    const hasImport = hasExistingUseAutoTracerImport(ast, config.importSource || 'use-trace');
 
     // Traverse and transform
     traverseDefault(ast, {
@@ -46,7 +46,7 @@ export function transform(code: string, context: TransformContext): TransformRes
           const componentInfo = extractComponentInfo(path.node);
           if (componentInfo) {
             components.push(componentInfo);
-            injectUseAutoTrace(path, componentInfo.name);
+            injectUseAutoTracer(path, componentInfo.name);
             hasInjected = true;
             if (!hasImport) needsImport = true;
           }
@@ -57,7 +57,7 @@ export function transform(code: string, context: TransformContext): TransformRes
           const componentInfo = extractComponentInfo(path.node);
           if (componentInfo && path.node.init && t.isFunction(path.node.init)) {
             components.push(componentInfo);
-            injectUseAutoTraceIntoFunction(path.node.init, componentInfo.name);
+            injectUseAutoTracerIntoFunction(path.node.init, componentInfo.name);
             hasInjected = true;
             if (!hasImport) needsImport = true;
           }
@@ -67,7 +67,7 @@ export function transform(code: string, context: TransformContext): TransformRes
 
     // Add import if needed
     if (needsImport && hasInjected) {
-      addUseAutoTraceImport(ast, config.importSource || 'use-trace');
+      addUseAutoTracerImport(ast, config.importSource || 'use-trace');
     }
 
     // Generate transformed code
@@ -94,14 +94,14 @@ function hasPragma(code: string, pragma: string): boolean {
   return code.includes(`// ${pragma}`);
 }
 
-function injectUseAutoTrace(path: any, componentName: string) {
+function injectUseAutoTracer(path: any, componentName: string) {
   const func = path.node;
   if (t.isBlockStatement(func.body)) {
     injectIntoBlockStatement(func.body, componentName);
   }
 }
 
-function injectUseAutoTraceIntoFunction(func: t.Function, componentName: string) {
+function injectUseAutoTracerIntoFunction(func: t.Function, componentName: string) {
   // Convert arrow function expression body to block if needed
   if (t.isArrowFunctionExpression(func) && !t.isBlockStatement(func.body)) {
     const returnStatement = t.returnStatement(func.body);
@@ -114,21 +114,21 @@ function injectUseAutoTraceIntoFunction(func: t.Function, componentName: string)
 }
 
 function injectIntoBlockStatement(blockStatement: t.BlockStatement, componentName: string) {
-  const useAutoTraceCall = t.expressionStatement(
+  const useAutoTracerCall = t.expressionStatement(
     t.callExpression(
-      t.identifier('useAutoTrace'),
+      t.identifier('useAutoTracer'),
       [t.objectExpression([
         t.objectProperty(t.identifier('name'), t.stringLiteral(componentName))
       ])]
     )
   );
 
-  blockStatement.body.unshift(useAutoTraceCall);
+  blockStatement.body.unshift(useAutoTracerCall);
 }
 
-function addUseAutoTraceImport(ast: t.File, importSource: string) {
+function addUseAutoTracerImport(ast: t.File, importSource: string) {
   const importDeclaration = t.importDeclaration(
-    [t.importSpecifier(t.identifier('useAutoTrace'), t.identifier('useAutoTrace'))],
+    [t.importSpecifier(t.identifier('useAutoTracer'), t.identifier('useAutoTracer'))],
     t.stringLiteral(importSource)
   );
 

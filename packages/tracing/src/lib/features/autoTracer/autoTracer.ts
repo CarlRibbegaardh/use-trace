@@ -2,7 +2,7 @@ import type { AutoTracerOptions } from "./interfaces/AutoTracerOptions.js";
 import { detectUpdatedComponents } from "./functions/detectUpdatedComponents.js";
 import { log, logWarn } from "./functions/log.js";
 import { deepMergeOptions } from "./functions/deepMerge.js";
-import { setTraceOptions } from "./types/globalState.js";
+import { setTracerOptions } from "./types/globalState.js";
 import { defaultAutoTracerOptions } from "./types/defaultSettings.js";
 import { validateAutoTracerOptions } from "./functions/validateOptions.js";
 import {
@@ -14,7 +14,7 @@ import {
 } from "./functions/devToolsUtils.js";
 
 // Re-export tracking functions for convenience
-export { useAutoTrace } from "./functions/renderRegistry.js";
+export { useAutoTracer } from "./functions/renderRegistry.js";
 
 let isAutoTracerActive = false;
 let originalOnCommitFiberRoot: unknown = null;
@@ -33,7 +33,7 @@ export function autoTracer(options: AutoTracerOptions = {}): () => void {
   currentOptions = deepMergeOptions(currentOptions, validatedOptions);
 
   // Update global options
-  updateTraceOptions(currentOptions);
+  updateTracerOptions(currentOptions);
 
   // Early exit if autoTracer is disabled
   if (currentOptions.enabled === false) {
@@ -119,11 +119,11 @@ export function updateAutoTracerOptions(
     options as AutoTracerOptions
   );
   currentOptions = deepMergeOptions(currentOptions, validatedOptions);
-  updateTraceOptions(currentOptions);
+  updateTracerOptions(currentOptions);
 }
 
 // Helper function to update the global trace options
-function updateTraceOptions(options: AutoTracerOptions): void {
+function updateTracerOptions(options: AutoTracerOptions): void {
   // Pass the full options object to preserve all nested configurations
-  setTraceOptions(options);
+  setTracerOptions(options);
 }

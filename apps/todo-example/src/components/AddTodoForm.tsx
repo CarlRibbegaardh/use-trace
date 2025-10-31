@@ -10,14 +10,14 @@ import { Add as AddIcon } from '@mui/icons-material';
 import { useAppDispatch } from '../hooks/redux';
 import { createTodo } from '../store/todoSlice';
 import { TodoService } from '../domain/TodoService';
-import { useAutoTrace } from 'use-trace';
+import { useAutoTracer } from 'use-trace';
 
 interface AddTodoFormProps {
   todoService: TodoService;
 }
 
 export const AddTodoForm: React.FC<AddTodoFormProps> = ({ todoService }) => {
-  const logger = useAutoTrace();
+  const logger = useAutoTracer();
   logger.log("AddTodoForm component rendered");
 
   const [title, setTitle] = useState('');

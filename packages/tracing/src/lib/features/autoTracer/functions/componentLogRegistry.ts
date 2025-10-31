@@ -1,7 +1,7 @@
 import type { ComponentLogEntry } from "../interfaces/ComponentLogger.js";
 
 /**
- * Registry for storing component logs until they are displayed by autoTrace
+ * Registry for storing component logs until they are displayed by autoTracer
  */
 class ComponentLogRegistry {
   private logs = new Map<string, ComponentLogEntry[]>();

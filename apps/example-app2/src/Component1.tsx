@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
-import { useAutoTrace } from "use-trace";
+import { useAutoTracer } from "use-trace";
 
 export function Component1() {
-  useAutoTrace();
+  useAutoTracer();
   const [count, setCount] = useState(0);
 
   const handleClick = useCallback(() => {

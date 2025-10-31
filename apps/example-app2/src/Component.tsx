@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useAutoTrace } from "use-trace";
+import { useAutoTracer } from "use-trace";
 
 export function Component() {
-  useAutoTrace();
+  useAutoTracer();
   const [count, setCount] = useState(0);
 
   // This handleClick function is recreated every time the component is rendered.

@@ -5,7 +5,7 @@ import {
   renderStartTime,
   setIsGlobalTracerInstalled,
   setRenderStartTime,
-  setTraceOptions,
+  setTracerOptions,
   traceOptions
   } from "@src/lib/features/autoTracer/types/globalState.js";// Mock window.matchMedia for testing
 Object.defineProperty(window, 'matchMedia', {
@@ -84,7 +84,7 @@ describe("globalState", () => {
         enableAutoTracerInternalsLogging: true
       };
 
-      setTraceOptions(newOptions);
+      setTracerOptions(newOptions);
 
       expect(traceOptions.enabled).toBe(false);
       expect(traceOptions.enableAutoTracerInternalsLogging).toBe(true);
@@ -101,7 +101,7 @@ describe("globalState", () => {
         enableAutoTracerInternalsLogging: false
       };
 
-      setTraceOptions(newOptions);
+      setTracerOptions(newOptions);
 
       expect(consoleSpy).not.toHaveBeenCalled();
 

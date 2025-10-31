@@ -15,7 +15,7 @@ describe("index exports", () => {
     expect(typeof useTraceExports.isAutoTracerInitialized).toBe("function");
     expect(typeof useTraceExports.stopAutoTracer).toBe("function");
     expect(typeof useTraceExports.updateAutoTracerOptions).toBe("function");
-    expect(typeof useTraceExports.useAutoTrace).toBe("function");
+    expect(typeof useTraceExports.useAutoTracer).toBe("function");
   });
 
   it("should have all expected exports", async () => {
@@ -26,7 +26,7 @@ describe("index exports", () => {
       "isAutoTracerInitialized",
       "stopAutoTracer",
       "updateAutoTracerOptions",
-      "useAutoTrace",
+      "useAutoTracer",
     ];
 
     expectedExports.forEach((exportName) => {

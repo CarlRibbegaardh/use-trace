@@ -19,12 +19,12 @@ describe("renderRegistry", () => {
     clearRenderRegistry();
   });
 
-  describe("useAutoTrace", () => {
+  describe("useAutoTracer", () => {
     it("should generate a unique GUID on first render", async () => {
-      const { useAutoTrace } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
+      const { useAutoTracer } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
 
       const { result } = renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
 
       expect(result.current).toBeDefined();
@@ -32,10 +32,10 @@ describe("renderRegistry", () => {
     });
 
     it("should maintain the same GUID across re-renders", async () => {
-      const { useAutoTrace, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
+      const { useAutoTracer, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
 
       const { rerender } = renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
 
       const firstGuids = getTrackedGUIDs();
@@ -52,14 +52,14 @@ describe("renderRegistry", () => {
     });
 
     it("should generate different GUIDs for different component instances", async () => {
-      const { useAutoTrace, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
+      const { useAutoTracer, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
 
       renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
 
       renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
 
       const guids = getTrackedGUIDs();
@@ -77,10 +77,10 @@ describe("renderRegistry", () => {
       const { componentLogRegistry } = vi.mocked(
         await import("@src/lib/features/autoTracer/functions/componentLogRegistry.js")
       );
-      const { useAutoTrace } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
+      const { useAutoTracer } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
 
       const { result } = renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
 
       const logger = result.current;
@@ -96,10 +96,10 @@ describe("renderRegistry", () => {
     });
 
     it("should return the same logger instance on re-renders", async () => {
-      const { useAutoTrace } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
+      const { useAutoTracer } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
 
       const { result, rerender } = renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
 
       const firstLogger = result.current;
@@ -115,10 +115,10 @@ describe("renderRegistry", () => {
       const { componentLogRegistry } = vi.mocked(
         await import("@src/lib/features/autoTracer/functions/componentLogRegistry.js")
       );
-      const { useAutoTrace } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
+      const { useAutoTracer } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
 
       const { result } = renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
 
       const logger = result.current;
@@ -177,11 +177,11 @@ describe("renderRegistry", () => {
     });
 
     it("should return GUID when found in hook chain and tracked in registry", async () => {
-      const { useAutoTrace, getTrackingGUID, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
+      const { useAutoTracer, getTrackingGUID, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
 
       // First, create a tracked GUID
       renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
 
       const trackedGuids = getTrackedGUIDs();
@@ -265,14 +265,14 @@ describe("renderRegistry", () => {
     });
 
     it("should handle complex hook chain with multiple tracked GUIDs", async () => {
-      const { useAutoTrace, getTrackingGUID, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
+      const { useAutoTracer, getTrackingGUID, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
 
       // Create multiple tracked GUIDs
       renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
       renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
 
       const trackedGuids = Array.from(getTrackedGUIDs());
@@ -301,14 +301,14 @@ describe("renderRegistry", () => {
 
   describe("clearRenderRegistry", () => {
     it("should clear tracked GUIDs", async () => {
-      const { useAutoTrace, clearRenderRegistry, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
+      const { useAutoTracer, clearRenderRegistry, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
 
       // Add some tracked GUIDs
       renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
       renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
 
       expect(getTrackedGUIDs().size).toBe(2);
@@ -333,17 +333,17 @@ describe("renderRegistry", () => {
     });
 
     it("should allow new registrations after clearing", async () => {
-      const { useAutoTrace, clearRenderRegistry, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
+      const { useAutoTracer, clearRenderRegistry, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
 
       // Add and clear
       renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
       clearRenderRegistry();
 
       // Add new ones
       renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
 
       expect(getTrackedGUIDs().size).toBe(1);
@@ -361,10 +361,10 @@ describe("renderRegistry", () => {
     });
 
     it("should return copy of tracked GUIDs", async () => {
-      const { useAutoTrace, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
+      const { useAutoTracer, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
 
       renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
 
       const guids1 = getTrackedGUIDs();
@@ -376,10 +376,10 @@ describe("renderRegistry", () => {
     });
 
     it("should not affect internal state when modified", async () => {
-      const { useAutoTrace, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
+      const { useAutoTracer, getTrackedGUIDs } = await import("@src/lib/features/autoTracer/functions/renderRegistry.js");
 
       renderHook(() => {
-        return useAutoTrace();
+        return useAutoTracer();
       });
 
       const guids = getTrackedGUIDs();

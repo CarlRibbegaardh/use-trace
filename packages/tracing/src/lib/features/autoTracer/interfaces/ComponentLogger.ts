@@ -1,9 +1,9 @@
 /**
- * Logger interface for useAutoTrace components
+ * Logger interface for useAutoTracer components
  */
 export interface ComponentLogger {
   /**
-   * Log a message that will be displayed when the component is rendered by autoTrace
+   * Log a message that will be displayed when the component is rendered by autoTracer
    * @param message The message to log
    * @param args Additional arguments (similar to console.log)
    */

@@ -70,13 +70,13 @@ function returnsJSX(func: t.Function): boolean {
   return hasJSXReturn;
 }
 
-export function hasExistingUseAutoTraceImport(ast: t.File, importSource: string): boolean {
+export function hasExistingUseAutoTracerImport(ast: t.File, importSource: string): boolean {
   for (const stmt of ast.program.body) {
     if (t.isImportDeclaration(stmt) && stmt.source.value === importSource) {
       return stmt.specifiers.some((spec: t.ImportSpecifier | t.ImportDefaultSpecifier | t.ImportNamespaceSpecifier) =>
         t.isImportSpecifier(spec) &&
         t.isIdentifier(spec.imported) &&
-        spec.imported.name === 'useAutoTrace'
+        spec.imported.name === 'useAutoTracer'
       );
     }
   }

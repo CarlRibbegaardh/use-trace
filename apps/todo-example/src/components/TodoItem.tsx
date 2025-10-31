@@ -16,7 +16,7 @@ import { Todo } from '../domain/Todo';
 import { useAppDispatch } from '../hooks/redux';
 import { toggleTodo, deleteTodo } from '../store/todoSlice';
 import { TodoService } from '../domain/TodoService';
-import { useAutoTrace } from 'use-trace';
+import { useAutoTracer } from 'use-trace';
 
 interface TodoItemProps {
   todo: Todo;
@@ -24,7 +24,7 @@ interface TodoItemProps {
 }
 
 export const TodoItem: React.FC<TodoItemProps> = ({ todo, todoService }) => {
-  const logger = useAutoTrace();
+  const logger = useAutoTracer();
   logger.log("TodoItem rendered for todo:", todo.title);
 
   const dispatch = useAppDispatch();

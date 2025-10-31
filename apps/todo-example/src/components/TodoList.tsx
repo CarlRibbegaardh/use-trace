@@ -23,14 +23,14 @@ import {
   selectTodosFilter
 } from '../store/todoSlice';
 import { TodoService } from '../domain/TodoService';
-import { useAutoTrace } from 'use-trace';
+import { useAutoTracer } from 'use-trace';
 
 interface TodoListProps {
   todoService: TodoService;
 }
 
 export const TodoList: React.FC<TodoListProps> = ({ todoService }) => {
-  useAutoTrace();
+  useAutoTracer();
 
   const dispatch = useAppDispatch();
   const filteredTodos = useAppSelector(selectFilteredTodos);

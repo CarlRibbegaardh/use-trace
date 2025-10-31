@@ -22,13 +22,13 @@ import {
   isAutoTracerInitialized,
   stopAutoTracer,
   updateAutoTracerOptions,
-  useAutoTrace,
+  useAutoTracer,
 } from "@src/lib/features/autoTracer/autoTracer.js";
 
 // Mock global state
 vi.mock("@src/lib/features/autoTracer/types/globalState.js", () => {
   return {
-    setTraceOptions: vi.fn(),
+    setTracerOptions: vi.fn(),
   };
 });
 
@@ -116,7 +116,7 @@ vi.mock("@src/lib/features/autoTracer/functions/log.js", () => {
 // Mock render registry
 vi.mock("@src/lib/features/autoTracer/functions/renderRegistry.js", () => {
   return {
-    useAutoTrace: vi.fn(),
+    useAutoTracer: vi.fn(),
   };
 });
 
@@ -234,13 +234,13 @@ describe("autoTracer", () => {
       const { deepMergeOptions } = await import(
         "@src/lib/features/autoTracer/functions/deepMerge.js"
       );
-      const { setTraceOptions } = await import(
+      const { setTracerOptions } = await import(
         "@src/lib/features/autoTracer/types/globalState.js"
       );
 
       expect(validateAutoTracerOptions).toHaveBeenCalledWith(options);
       expect(deepMergeOptions).toHaveBeenCalled();
-      expect(setTraceOptions).toHaveBeenCalled();
+      expect(setTracerOptions).toHaveBeenCalled();
     });
   });
 
@@ -318,13 +318,13 @@ describe("autoTracer", () => {
       const { deepMergeOptions } = await import(
         "@src/lib/features/autoTracer/functions/deepMerge.js"
       );
-      const { setTraceOptions } = await import(
+      const { setTracerOptions } = await import(
         "@src/lib/features/autoTracer/types/globalState.js"
       );
 
       expect(validateAutoTracerOptions).toHaveBeenCalledWith(newOptions);
       expect(deepMergeOptions).toHaveBeenCalled();
-      expect(setTraceOptions).toHaveBeenCalled();
+      expect(setTracerOptions).toHaveBeenCalled();
     });
 
     it("should handle empty options", async () => {
@@ -337,10 +337,10 @@ describe("autoTracer", () => {
     });
   });
 
-  describe("useAutoTrace export", () => {
-    it("should re-export useAutoTrace from renderRegistry", () => {
-      expect(useAutoTrace).toBeDefined();
-      expect(typeof useAutoTrace).toBe("function");
+  describe("useAutoTracer export", () => {
+    it("should re-export useAutoTracer from renderRegistry", () => {
+      expect(useAutoTracer).toBeDefined();
+      expect(typeof useAutoTracer).toBe("function");
     });
   });
 });
