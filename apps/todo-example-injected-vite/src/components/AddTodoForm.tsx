@@ -10,7 +10,7 @@ import { Add as AddIcon } from '@mui/icons-material';
 import { useAppDispatch } from '../hooks/redux';
 import { createTodo } from '../store/todoSlice';
 import { TodoService } from '../domain/TodoService';
-import { useAutoTracer } from 'use-trace';
+import { useAutoTracer } from "auto-tracer";
 
 interface AddTodoFormProps {
   todoService: TodoService;

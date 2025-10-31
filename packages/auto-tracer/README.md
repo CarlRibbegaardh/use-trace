@@ -21,7 +21,7 @@ The gihub project contains an example project using the library.
 ### In main.tsx (before React rendering):
 
 ```typescript
-import { autoTracer } from "use-trace";
+import { autoTracer } from "auto-tracer";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 
@@ -54,7 +54,7 @@ const stopTracing = autoTracer({
 ### Dynamic Options Update:
 
 ```typescript
-import { updateAutoTracerOptions } from "use-trace";
+import { updateAutoTracerOptions } from "auto-tracer";
 
 // Change options while tracing is active
 updateAutoTracerOptions({ showFlags: true });
@@ -63,7 +63,7 @@ updateAutoTracerOptions({ showFlags: true });
 ### Check Status:
 
 ```typescript
-import { isAutoTracerInitialized } from "use-trace";
+import { isAutoTracerInitialized } from "auto-tracer";
 
 if (isAutoTracerInitialized()) {
   console.log("AutoTracer is active");

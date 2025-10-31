@@ -1,4 +1,4 @@
-import { useAutoTracer } from "use-trace";
+import { useAutoTracer } from "auto-tracer";
 import { Component1 } from "./Component1";
 
 export interface ComponentProps {

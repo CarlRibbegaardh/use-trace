@@ -16,7 +16,7 @@ import { TodoService } from "./domain/TodoService";
 import { InMemoryTodoRepository } from "./infrastructure/InMemoryTodoRepository";
 import { useAppDispatch } from "./hooks/redux";
 import { fetchTodos } from "./store/todoSlice";
-import { useAutoTracer } from "use-trace";
+import { useAutoTracer } from "auto-tracer";
 
 // Create theme
 const theme = createTheme({

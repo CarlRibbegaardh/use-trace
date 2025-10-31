@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { useAutoTracer } from "use-trace";
+import { useAutoTracer } from "auto-tracer";
 
 export function Component1() {
   useAutoTracer();

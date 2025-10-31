@@ -23,7 +23,7 @@ import {
   selectTodosFilter
 } from '../store/todoSlice';
 import { TodoService } from '../domain/TodoService';
-import { useAutoTracer } from 'use-trace';
+import { useAutoTracer } from "auto-tracer";
 
 interface TodoListProps {
   todoService: TodoService;

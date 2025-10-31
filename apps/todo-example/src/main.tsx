@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom/client";
-import { autoTracer } from "use-trace";
+import { autoTracer } from "auto-tracer";
 import App from "./App.tsx";
 
 // Initialize autoTracer before anything else

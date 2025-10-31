@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" &&
       autoTracer.vite({
         mode: "opt-out",
-        importSource: "use-trace",
+        importSource: "auto-tracer",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
       }),

@@ -5,7 +5,7 @@ export const DEFAULT_CONFIG: Required<TransformConfig> = {
   include: ['**/*.tsx', '**/*.jsx'],
   exclude: ['**/*.test.*', '**/*.spec.*', '**/node_modules/**'],
   serverComponents: false,
-  importSource: 'use-trace'
+  importSource: 'auto-tracer'
 };
 
 export function normalizeConfig(config: Partial<TransformConfig> = {}): Required<TransformConfig> {
