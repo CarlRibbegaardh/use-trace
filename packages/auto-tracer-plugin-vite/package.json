@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "vitest"
+    "_test": "vitest"
   },
   "dependencies": {
     "auto-tracer-inject-core": "workspace:*",

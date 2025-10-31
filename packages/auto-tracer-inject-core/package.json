@@ -16,8 +16,8 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage"
+    "_test": "vitest",
+    "_test:coverage": "vitest --coverage"
   },
   "dependencies": {
     "@babel/parser": "^7.23.0",
