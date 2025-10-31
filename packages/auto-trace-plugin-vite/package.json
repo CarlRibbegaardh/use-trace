@@ -1,0 +1,40 @@
+{
+  "name": "auto-trace-plugin-vite",
+  "version": "0.1.0",
+  "description": "Vite plugin for auto-injecting useAutoTrace via unplugin",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "auto-trace-inject-core": "workspace:*",
+    "unplugin": "^1.5.0"
+  },
+  "peerDependencies": {
+    "vite": "^4.0.0 || ^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.2.0",
+    "vitest": "^0.34.0",
+    "vite": "^5.3.1"
+  },
+  "sideEffects": false
+}
