@@ -178,6 +178,25 @@ export function transform(
 }
 
 // Try to unwrap nested HOC calls up to depth 2-3 to find an inner function expression
+/**
+ * Attempts to unwrap nested Higher-Order Component (HOC) calls to find the inner function.
+ *
+ * This function recursively traverses HOC call expressions (like `memo()`, `forwardRef()`, etc.)
+ * to extract the actual function component that should be transformed. It handles common
+ * patterns like `memo(Component)`, `forwardRef(Component)`, and nested combinations.
+ *
+ * @param expr - The expression to unwrap (typically a call expression)
+ * @param depth - Current recursion depth to prevent infinite loops
+ * @returns The unwrapped function expression, or null if not found or depth exceeded
+ *
+ * @example
+ * ```typescript
+ * // Input: memo(forwardRef(function MyComponent() { ... }))
+ * // Output: function MyComponent() { ... }
+ * ```
+ *
+ * @internal
+ */
 function unwrapFunctionFromHOCs(
   expr: t.Expression,
   depth: number
@@ -203,6 +222,19 @@ function hasPragma(code: string, pragma: string): boolean {
   return code.includes(`// ${pragma}`);
 }
 
+/**
+ * Initiates injection of auto-tracing logic into a React component function.
+ *
+ * This function serves as the entry point for injecting tracing into a component
+ * by delegating to the appropriate injection method based on the function type.
+ *
+ * @param path - Babel NodePath for the function declaration
+ * @param componentName - Name of the React component
+ * @param hookNameSet - Set of hook names to label
+ * @param hookNameRegex - Regex pattern for hook names to label
+ *
+ * @internal
+ */
 function injectUseAutoTracer(
   path: any,
   componentName: string,
@@ -413,6 +445,24 @@ function injectIntoBlockStatement(
   });
 }
 
+/**
+ * Adds an import statement for useAutoTracer to the top of the AST file.
+ *
+ * This function creates and prepends an ES6 import statement for the useAutoTracer
+ * hook from the configured import source. The import is added at the beginning
+ * of the program body to ensure it's available for injected code.
+ *
+ * @param ast - The Babel AST file to modify
+ * @param importSource - The module path to import useAutoTracer from
+ *
+ * @example
+ * ```typescript
+ * // Before: empty file
+ * // After: import { useAutoTracer } from 'auto-tracer';
+ * ```
+ *
+ * @internal
+ */
 function addUseAutoTracerImport(ast: t.File, importSource: string) {
   const importDeclaration = t.importDeclaration(
     [

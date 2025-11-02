@@ -1,3 +1,7 @@
+---
+applyTo: "**"
+---
+
 EVERYTHING IN THIS FILE IS MANDATORY FOR COPILOT TO FOLLOW. EVERYTHING!!!
 
 # Monorepo Instructions

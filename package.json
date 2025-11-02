@@ -6,6 +6,8 @@
     "dev": "pnpm -r dev",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
+    "list-packages": "pnpm list --depth 0 --json -r | node ./tools/list-packages.cjs",
+    "list-packages-duplicates": "pnpm list --depth 0 --json -r | node ./tools/list-packages-duplicates.cjs",
     "publish-please": "pnpm --filter use-trace publish"
   }
 }
