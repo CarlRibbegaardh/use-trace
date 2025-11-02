@@ -19,11 +19,46 @@ const traverseDefault =
 const generateDefault =
   typeof generate === "function" ? generate : (generate as any).default;
 
+/**
+ * Transforms React component code to inject auto-tracing functionality.
+ *
+ * This function parses the provided TypeScript/JSX code, identifies React components,
+ * and injects `useAutoTracer` hooks along with `labelState` calls for configured hooks.
+ * The transformation enables automatic tracking of component renders and state changes.
+ *
+ * @param code - The source code to transform
+ * @param context - Transformation context containing filename and configuration
+ * @returns The transformed code with injected tracing, or original code on error
+ *
+ * @example
+ * ```typescript
+ * const result = transform(`
+ *   function MyComponent() {
+ *     const [count, setCount] = useState(0);
+ *     return <div>{count}</div>;
+ *   }
+ * `, {
+ *   filename: 'MyComponent.tsx',
+ *   config: {
+ *     mode: 'opt-out',
+ *     labelHooks: ['useState'],
+ *     importSource: 'auto-tracer'
+ *   }
+ * });
+ * // Result includes injected useAutoTracer and labelState calls
+ * ```
+ */
 export function transform(
   code: string,
   context: TransformContext
 ): TransformResult {
   const { filename, config } = context;
+  const hookNameSet = new Set(
+    (config.labelHooks || []).map((s) => s.trim()).filter(Boolean)
+  );
+  const hookNameRegex = config.labelHooksPattern
+    ? new RegExp(config.labelHooksPattern)
+    : null;
 
   try {
     // Parse the code
@@ -37,6 +72,11 @@ export function transform(
     let needsImport = false;
 
     // Check if file has pragma controls
+    // Precedence rules (mirrors TSDoc and README):
+    // - File-level exclude is ultimate: excluded files are never processed
+    // - In opt-in mode, files must still match `include`; pragmas do not bypass include
+    // - A disable pragma wins over enable when both apply
+    // - Component-level pragma overrides file-level for that component
     const hasTracerPragma = hasPragma(code, "@trace");
     const hasDisablePragma = hasPragma(code, "@trace-disable");
 
@@ -62,7 +102,12 @@ export function transform(
           const componentInfo = extractComponentInfo(path.node);
           if (componentInfo) {
             components.push(componentInfo);
-            injectUseAutoTracer(path, componentInfo.name);
+            injectUseAutoTracer(
+              path,
+              componentInfo.name,
+              hookNameSet,
+              hookNameRegex
+            );
             hasInjected = true;
             if (!hasImport) needsImport = true;
           }
@@ -73,9 +118,36 @@ export function transform(
           const componentInfo = extractComponentInfo(path.node);
           if (componentInfo && path.node.init && t.isFunction(path.node.init)) {
             components.push(componentInfo);
-            injectUseAutoTracerIntoFunction(path.node.init, componentInfo.name);
+            injectUseAutoTracerIntoFunction(
+              path.node.init,
+              componentInfo.name,
+              hookNameSet,
+              hookNameRegex
+            );
             hasInjected = true;
             if (!hasImport) needsImport = true;
+          }
+        } else {
+          // Handle HOC-wrapped components: const Name = memo(forwardRef(fn)) or similar
+          const node = path.node as t.VariableDeclarator;
+          if (
+            t.isIdentifier(node.id) &&
+            node.init &&
+            t.isCallExpression(node.init)
+          ) {
+            const innerFn = unwrapFunctionFromHOCs(node.init, 0);
+            if (innerFn) {
+              const name = node.id.name;
+              components.push({ name, isAnonymous: false, node: innerFn });
+              injectUseAutoTracerIntoFunction(
+                innerFn,
+                name,
+                hookNameSet,
+                hookNameRegex
+              );
+              hasInjected = true;
+              if (!hasImport) needsImport = true;
+            }
           }
         }
       },
@@ -105,20 +177,54 @@ export function transform(
   }
 }
 
+// Try to unwrap nested HOC calls up to depth 2-3 to find an inner function expression
+function unwrapFunctionFromHOCs(
+  expr: t.Expression,
+  depth: number
+): t.Function | null {
+  if (depth > 3) return null;
+  if (t.isArrowFunctionExpression(expr) || t.isFunctionExpression(expr)) {
+    return expr;
+  }
+  if (t.isCallExpression(expr)) {
+    // Common shape: memo(fn), forwardRef(fn), HOC(fn), memo(forwardRef(fn))
+    const args = expr.arguments;
+    for (const arg of args) {
+      if (t.isExpression(arg)) {
+        const found = unwrapFunctionFromHOCs(arg, depth + 1);
+        if (found) return found;
+      }
+    }
+  }
+  return null;
+}
+
 function hasPragma(code: string, pragma: string): boolean {
   return code.includes(`// ${pragma}`);
 }
 
-function injectUseAutoTracer(path: any, componentName: string) {
+function injectUseAutoTracer(
+  path: any,
+  componentName: string,
+  hookNameSet: Set<string>,
+  hookNameRegex: RegExp | null
+) {
   const func = path.node;
   if (t.isBlockStatement(func.body)) {
-    injectIntoBlockStatement(func.body, componentName);
+    injectIntoBlockStatement(
+      path.get("body"),
+      componentName,
+      hookNameSet,
+      hookNameRegex
+    );
   }
 }
 
 function injectUseAutoTracerIntoFunction(
   func: t.Function,
-  componentName: string
+  componentName: string,
+  hookNameSet: Set<string>,
+  hookNameRegex: RegExp | null
 ) {
   // Convert arrow function expression body to block if needed
   if (t.isArrowFunctionExpression(func) && !t.isBlockStatement(func.body)) {
@@ -127,23 +233,184 @@ function injectUseAutoTracerIntoFunction(
   }
 
   if (t.isBlockStatement(func.body)) {
-    injectIntoBlockStatement(func.body, componentName);
+    // To get a path for the body, we traverse the function
+    traverse(func, {
+      BlockStatement(blockPath) {
+        if (blockPath.node === func.body) {
+          injectIntoBlockStatement(
+            blockPath,
+            componentName,
+            hookNameSet,
+            hookNameRegex
+          );
+          blockPath.stop();
+        }
+      },
+    });
   }
 }
 
+/**
+ * Injects auto-tracing logic into a React component's block statement.
+ *
+ * This function scans the component body for hook declarations and injects
+ * `labelState` calls immediately after each matching hook. It also ensures
+ * a `useAutoTracer` hook is available for state labeling.
+ *
+ * @param path - Babel NodePath for the BlockStatement to modify
+ * @param componentName - Name of the React component being transformed
+ * @param hookNameSet - Set of hook names that should be labeled (from labelHooks config)
+ * @param hookNameRegex - Regular expression for matching hook names (from labelHooksPattern config)
+ *
+ * @internal
+ */
 function injectIntoBlockStatement(
-  blockStatement: t.BlockStatement,
-  componentName: string
+  path: any, // Babel Path for the BlockStatement
+  componentName: string,
+  hookNameSet: Set<string>,
+  hookNameRegex: RegExp | null
 ) {
-  const useAutoTracerCall = t.expressionStatement(
-    t.callExpression(t.identifier("useAutoTracer"), [
+  const blockStatement = path.node as t.BlockStatement;
+
+  // Determine if there's a pre-existing tracer variable assignment, or a bare call
+  let existingTracerIdentifier: t.Identifier | null = null;
+  let hasBareUseAutoTracerCall = false;
+  for (const stmt of blockStatement.body) {
+    if (t.isVariableDeclaration(stmt)) {
+      for (const decl of stmt.declarations) {
+        if (decl.init && t.isCallExpression(decl.init)) {
+          const callee = decl.init.callee;
+          if (t.isIdentifier(callee, { name: "useAutoTracer" })) {
+            if (t.isIdentifier(decl.id)) {
+              existingTracerIdentifier = decl.id;
+            }
+          }
+        }
+      }
+    } else if (
+      t.isExpressionStatement(stmt) &&
+      t.isCallExpression(stmt.expression)
+    ) {
+      const callee = stmt.expression.callee;
+      if (t.isIdentifier(callee, { name: "useAutoTracer" })) {
+        hasBareUseAutoTracerCall = true;
+      }
+    }
+  }
+
+  // If any manual labelState calls already exist in this block, skip injecting labels to avoid duplicates
+  const hasExistingLabelStateCalls = blockStatement.body.some((stmt) => {
+    if (!t.isExpressionStatement(stmt)) return false;
+    const expr = stmt.expression;
+    if (!t.isCallExpression(expr)) return false;
+    const callee = expr.callee;
+    return (
+      (t.isMemberExpression(callee) &&
+        t.isIdentifier(callee.property, { name: "labelState" })) ||
+      (t.isOptionalMemberExpression(callee) &&
+        t.isIdentifier(callee.property, { name: "labelState" }))
+    );
+  });
+
+  // If we have a bare call (no identifier), we cannot safely inject labels without adding a new hook. Bail out.
+  if (hasBareUseAutoTracerCall && !existingTracerIdentifier) {
+    return;
+  }
+
+  // Resolve tracer identifier (will inject later)
+  let tracerId = existingTracerIdentifier;
+
+  // If labels already exist, do not inject duplicates
+  if (hasExistingLabelStateCalls) {
+    return;
+  }
+
+  // First pass: scan for hooks to label
+  let stateOrdinal = 0;
+  const hooksToLabel: Array<{ path: any; label: string }> = [];
+
+  // Iterate over the body statements safely
+  const body = path.node.body;
+  for (let i = 0; i < body.length; i++) {
+    const statementPath = path.get(`body.${i}`);
+    if (
+      statementPath.isVariableDeclaration() &&
+      statementPath.node.declarations.length === 1
+    ) {
+      const decl = statementPath.node.declarations[0];
+      const init = decl.init;
+      if (!init || !t.isCallExpression(init)) continue;
+
+      const callee = init.callee;
+      if (!t.isIdentifier(callee)) continue;
+
+      const hookName = callee.name;
+      const isKnownStateHook =
+        hookName === "useState" || hookName === "useReducer";
+      const isConfiguredHook =
+        hookNameSet.has(hookName) ||
+        (hookNameRegex && hookNameRegex.test(hookName));
+
+      // Skip useAutoTracer - it's the tracer hook itself
+      if (hookName === "useAutoTracer") continue;
+
+      if (!isKnownStateHook && !isConfiguredHook) continue;
+
+      let label: string | null = null;
+
+      // Pattern A: const [name] = useState(...)
+      if (t.isArrayPattern(decl.id) && decl.id.elements.length > 0) {
+        const firstElement = decl.id.elements[0];
+        if (t.isIdentifier(firstElement)) {
+          label = firstElement.name;
+        }
+      }
+      // Pattern B: const name = useSelector(...)
+      else if (t.isIdentifier(decl.id) && isConfiguredHook) {
+        label = decl.id.name;
+      }
+
+      if (label) {
+        hooksToLabel.push({ path: statementPath, label });
+      }
+    }
+  }
+
+  // If no hooks to label, nothing to do
+  if (hooksToLabel.length === 0) {
+    return;
+  }
+
+  // Resolve tracer identifier, injecting one if not present
+  if (!tracerId) {
+    tracerId = t.identifier("__autoTracer");
+    const useAutoTracerInit = t.callExpression(t.identifier("useAutoTracer"), [
       t.objectExpression([
         t.objectProperty(t.identifier("name"), t.stringLiteral(componentName)),
       ]),
-    ])
-  );
+    ]);
+    const tracerDecl = t.variableDeclaration("const", [
+      t.variableDeclarator(tracerId, useAutoTracerInit),
+    ]);
+    path.unshiftContainer("body", tracerDecl);
+  }
 
-  blockStatement.body.unshift(useAutoTracerCall);
+  // Create insertions for the hooks
+  const insertions: Array<{ path: any; node: t.Statement }> = [];
+  hooksToLabel.forEach(({ path: statementPath, label }) => {
+    const labelStateCall = t.expressionStatement(
+      t.callExpression(
+        t.memberExpression(tracerId, t.identifier("labelState")),
+        [t.stringLiteral(label), t.numericLiteral(stateOrdinal++)]
+      )
+    );
+    insertions.push({ path: statementPath, node: labelStateCall });
+  });
+
+  // Insert in reverse order to maintain positions
+  insertions.reverse().forEach(({ path: stmtPath, node: call }) => {
+    stmtPath.insertAfter(call);
+  });
 }
 
 function addUseAutoTracerImport(ast: t.File, importSource: string) {

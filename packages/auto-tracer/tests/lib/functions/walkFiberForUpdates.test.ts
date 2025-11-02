@@ -17,16 +17,13 @@ vi.mock("@src/lib/functions/extractPropChanges.js", () => {
   };
 });
 
-vi.mock(
-  "@src/lib/functions/extractUseStateValues.js",
-  () => {
-    return {
-      extractUseStateValues: vi.fn(() => {
-        return [];
-      }),
-    };
-  }
-);
+vi.mock("@src/lib/functions/extractUseStateValues.js", () => {
+  return {
+    extractUseStateValues: vi.fn(() => {
+      return [];
+    }),
+  };
+});
 
 vi.mock("@src/lib/functions/getComponentName.js", () => {
   return {
@@ -36,16 +33,13 @@ vi.mock("@src/lib/functions/getComponentName.js", () => {
   };
 });
 
-vi.mock(
-  "@src/lib/functions/getRealComponentName.js",
-  () => {
-    return {
-      getRealComponentName: vi.fn(() => {
-        return "RealTestComponent";
-      }),
-    };
-  }
-);
+vi.mock("@src/lib/functions/getRealComponentName.js", () => {
+  return {
+    getRealComponentName: vi.fn(() => {
+      return "RealTestComponent";
+    }),
+  };
+});
 
 vi.mock("@src/lib/functions/isReactInternal.js", () => {
   return {
@@ -109,26 +103,21 @@ vi.mock("@src/lib/functions/getSkippedProps.js", () => {
   };
 });
 
-vi.mock(
-  "@src/lib/functions/componentLogRegistry.js",
-  () => {
-    return {
-      componentLogRegistry: {
-        consumeLogs: vi.fn(() => {
-          return [];
-        }),
-      },
-    };
-  }
-);
+vi.mock("@src/lib/functions/componentLogRegistry.js", () => {
+  return {
+    componentLogRegistry: {
+      consumeLogs: vi.fn(() => {
+        return [];
+      }),
+    },
+  };
+});
 
 describe("walkFiberForUpdates", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     // Reset trace options between tests to avoid leakage
-    const { traceOptions } = await import(
-      "@src/lib/types/globalState.js"
-    );
+    const { traceOptions } = await import("@src/lib/types/globalState.js");
     traceOptions.maxFiberDepth = 1000;
     traceOptions.skipNonTrackedBranches = false;
     traceOptions.includeReconciled = true;
@@ -156,9 +145,7 @@ describe("walkFiberForUpdates", () => {
       const { walkFiberForUpdates } = await import(
         "@src/lib/functions/walkFiberForUpdates.js"
       );
-      const { logWarn } = vi.mocked(
-        await import("@src/lib/functions/log.js")
-      );
+      const { logWarn } = vi.mocked(await import("@src/lib/functions/log.js"));
 
       walkFiberForUpdates(null, 0);
       walkFiberForUpdates("string", 0);
@@ -174,9 +161,7 @@ describe("walkFiberForUpdates", () => {
       const { walkFiberForUpdates } = await import(
         "@src/lib/functions/walkFiberForUpdates.js"
       );
-      const { logWarn } = vi.mocked(
-        await import("@src/lib/functions/log.js")
-      );
+      const { logWarn } = vi.mocked(await import("@src/lib/functions/log.js"));
 
       traceOptions.maxFiberDepth = 5;
 
@@ -208,14 +193,10 @@ describe("walkFiberForUpdates", () => {
         "@src/lib/functions/walkFiberForUpdates.js"
       );
       const { getComponentName } = vi.mocked(
-        await import(
-          "@src/lib/functions/getComponentName.js"
-        )
+        await import("@src/lib/functions/getComponentName.js")
       );
       const { getRealComponentName } = vi.mocked(
-        await import(
-          "@src/lib/functions/getRealComponentName.js"
-        )
+        await import("@src/lib/functions/getRealComponentName.js")
       );
 
       getComponentName.mockReturnValue("TestComponent");
@@ -305,9 +286,7 @@ describe("walkFiberForUpdates", () => {
         "@src/lib/functions/walkFiberForUpdates.js"
       );
       const { hasRenderWork } = vi.mocked(
-        await import(
-          "@src/lib/functions/reactFiberFlags.js"
-        )
+        await import("@src/lib/functions/reactFiberFlags.js")
       );
 
       // Test Mount (no alternate + placement flags)
@@ -387,9 +366,7 @@ describe("walkFiberForUpdates", () => {
         "@src/lib/functions/walkFiberForUpdates.js"
       );
       const { hasRenderWork } = vi.mocked(
-        await import(
-          "@src/lib/functions/reactFiberFlags.js"
-        )
+        await import("@src/lib/functions/reactFiberFlags.js")
       );
 
       traceOptions.includeSkipped = false;
@@ -415,9 +392,7 @@ describe("walkFiberForUpdates", () => {
         "@src/lib/functions/walkFiberForUpdates.js"
       );
       const { getComponentName } = vi.mocked(
-        await import(
-          "@src/lib/functions/getComponentName.js"
-        )
+        await import("@src/lib/functions/getComponentName.js")
       );
 
       let callCount = 0;
@@ -461,9 +436,7 @@ describe("walkFiberForUpdates", () => {
         "@src/lib/functions/walkFiberForUpdates.js"
       );
       const { extractPropChanges } = vi.mocked(
-        await import(
-          "@src/lib/functions/extractPropChanges.js"
-        )
+        await import("@src/lib/functions/extractPropChanges.js")
       );
       const { getTrackingGUID } = vi.mocked(
         await import("@src/lib/functions/renderRegistry.js")
@@ -508,9 +481,7 @@ describe("walkFiberForUpdates", () => {
         "@src/lib/functions/walkFiberForUpdates.js"
       );
       const { extractUseStateValues } = vi.mocked(
-        await import(
-          "@src/lib/functions/extractUseStateValues.js"
-        )
+        await import("@src/lib/functions/extractUseStateValues.js")
       );
       const { getTrackingGUID } = vi.mocked(
         await import("@src/lib/functions/renderRegistry.js")
@@ -550,9 +521,7 @@ describe("walkFiberForUpdates", () => {
         "@src/lib/functions/walkFiberForUpdates.js"
       );
       const { componentLogRegistry } = vi.mocked(
-        await import(
-          "@src/lib/functions/componentLogRegistry.js"
-        )
+        await import("@src/lib/functions/componentLogRegistry.js")
       );
       const { getTrackingGUID } = vi.mocked(
         await import("@src/lib/functions/renderRegistry.js")
@@ -589,9 +558,7 @@ describe("walkFiberForUpdates", () => {
         "@src/lib/functions/walkFiberForUpdates.js"
       );
       const { extractPropChanges } = vi.mocked(
-        await import(
-          "@src/lib/functions/extractPropChanges.js"
-        )
+        await import("@src/lib/functions/extractPropChanges.js")
       );
       const { getTrackingGUID } = vi.mocked(
         await import("@src/lib/functions/renderRegistry.js")
@@ -630,9 +597,7 @@ describe("walkFiberForUpdates", () => {
         "@src/lib/functions/walkFiberForUpdates.js"
       );
       const { getComponentName } = vi.mocked(
-        await import(
-          "@src/lib/functions/getComponentName.js"
-        )
+        await import("@src/lib/functions/getComponentName.js")
       );
 
       let depth = 0;

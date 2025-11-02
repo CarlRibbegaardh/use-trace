@@ -8,6 +8,8 @@ autoTracer({
   showFlags: true,
   showFunctionContentOnChange: false,
   skipNonTrackedBranches: true,
+  includeReconciled: false,
+  includeSkipped: false,
   maxFiberDepth: 100,
   enableAutoTracerInternalsLogging: false,
   skippedObjectProps: [

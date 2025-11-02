@@ -1,15 +1,9 @@
-import React, { useState } from 'react';
-import {
-  TextField,
-  Button,
-  Paper,
-  Box,
-  Typography
-} from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
-import { useAppDispatch } from '../hooks/redux';
-import { createTodo } from '../store/todoSlice';
-import { TodoService } from '../domain/TodoService';
+import React, { useState } from "react";
+import { TextField, Button, Paper, Box, Typography } from "@mui/material";
+import { Add as AddIcon } from "@mui/icons-material";
+import { useAppDispatch } from "../hooks/redux";
+import { createTodo } from "../store/todoSlice";
+import { TodoService } from "../domain/TodoService";
 import { useAutoTracer } from "auto-tracer";
 
 interface AddTodoFormProps {
@@ -20,8 +14,8 @@ export const AddTodoForm: React.FC<AddTodoFormProps> = ({ todoService }) => {
   const logger = useAutoTracer();
   logger.log("AddTodoForm component rendered");
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const dispatch = useAppDispatch();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,18 +23,20 @@ export const AddTodoForm: React.FC<AddTodoFormProps> = ({ todoService }) => {
 
     if (title.trim()) {
       try {
-        await dispatch(createTodo({
-          todoService,
-          command: {
-            title: title.trim(),
-            description: description.trim() || undefined
-          }
-        })).unwrap();
+        await dispatch(
+          createTodo({
+            todoService,
+            command: {
+              title: title.trim(),
+              description: description.trim() || undefined,
+            },
+          })
+        ).unwrap();
 
-        setTitle('');
-        setDescription('');
+        setTitle("");
+        setDescription("");
       } catch (error) {
-        console.error('Failed to create todo:', error);
+        console.error("Failed to create todo:", error);
       }
     }
   };

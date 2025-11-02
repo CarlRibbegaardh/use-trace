@@ -14,7 +14,7 @@ import {
 } from "./functions/devToolsUtils.js";
 
 // Re-export tracking functions for convenience
-export { useAutoTracer } from "./functions/renderRegistry.js";
+export { useAutoTracer } from "./hooks/useAutoTracer.js";
 
 let isAutoTracerActive = false;
 let originalOnCommitFiberRoot: unknown = null;

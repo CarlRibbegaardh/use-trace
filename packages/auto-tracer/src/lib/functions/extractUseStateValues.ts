@@ -47,6 +47,7 @@ export function extractUseStateValues(
         //   currentValue,
         //   hookIndex
         // );
+        // Name states by their global hook position to match test expectations
         const hookName = `state${hookIndex}`;
 
         stateValues.push({

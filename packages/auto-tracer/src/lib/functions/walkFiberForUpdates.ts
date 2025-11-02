@@ -23,9 +23,10 @@ import {
 import { traceOptions } from "../types/globalState.js";
 import { Placement, getFlagNames, hasRenderWork } from "./reactFiberFlags.js";
 import { getTrackingGUID } from "./renderRegistry.js";
+import { getLabelsForGuid } from "./hookLabels.js";
+import { AUTOTRACER_STATE_MARKER } from "../types/marker.js";
 import { getSkippedProps } from "./getSkippedProps.js";
 import { componentLogRegistry } from "./componentLogRegistry.js";
-
 
 // Re-export resetDepthTracking from fiberTraversal module
 export { resetDepthTracking } from "./fiberTraversal.js";
@@ -237,7 +238,10 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
             ) {
               logPropChange(
                 `${indent}│   `,
-                `Initial prop ${name}: ${formatPropValue(value, { showFunctionContent: traceOptions.showFunctionContentOnChange ?? false })}`,
+                `Initial prop ${name}: ${formatPropValue(value, {
+                  showFunctionContent:
+                    traceOptions.showFunctionContentOnChange ?? false,
+                })}`,
                 true
               );
             }
@@ -250,7 +254,10 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
           if (!isReactInternal(name)) {
             logStateChange(
               `${indent}│   `,
-              `Initial state: ${formatStateValue(value, { showFunctionContent: traceOptions.showFunctionContentOnChange ?? false })}`,
+              `Initial state: ${formatStateValue(value, {
+                showFunctionContent:
+                  traceOptions.showFunctionContentOnChange ?? false,
+              })}`,
               true
             );
           }
@@ -260,16 +267,40 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
         propChanges.forEach(({ name, value, prevValue }) => {
           logPropChange(
             `${indent}│   `,
-            `Prop change ${name}: ${formatPropChange(prevValue, value, { showFunctionContent: traceOptions.showFunctionContentOnChange ?? false })}`
+            `Prop change ${name}: ${formatPropChange(prevValue, value, {
+              showFunctionContent:
+                traceOptions.showFunctionContentOnChange ?? false,
+            })}`
           );
         });
 
-        // Show useState changes if any
-        meaningfulStateChanges.forEach(({ name: _name, value, prevValue }) => {
-          logStateChange(
-            `${indent}│   `,
-            `State change: ${formatStateChange(prevValue, value, { showFunctionContent: traceOptions.showFunctionContentOnChange ?? false })}`
+        // Show useState changes if any, attach labels when available
+        const allLabels = trackingGUID ? getLabelsForGuid(trackingGUID) : [];
+
+        // Map each state change to its label using its original hook index.
+        meaningfulStateChanges.forEach(({ name, value, prevValue }) => {
+          // Find the original index of this state hook to get the correct label.
+          const originalHookIndex = useStateValues.findIndex(
+            (s) => s.name === name
           );
+
+          // The first state hook is the tracer's own, so we subtract 1 to align labels.
+          const labelIndex = originalHookIndex - 1;
+
+          const label =
+            labelIndex >= 0 && allLabels[labelIndex]
+              ? allLabels[labelIndex]
+              : name; // Fallback to the original generic name
+
+          const msg = `State change ${label}: ${formatStateChange(
+            prevValue,
+            value,
+            {
+              showFunctionContent:
+                traceOptions.showFunctionContentOnChange ?? false,
+            }
+          )}`;
+          logStateChange(`${indent}│   `, msg);
         });
       }
 

@@ -16,6 +16,7 @@
   ],
   "scripts": {
     "build": "tsc",
+    "test": "vitest run",
     "_test": "vitest",
     "_test:coverage": "vitest --coverage"
   },

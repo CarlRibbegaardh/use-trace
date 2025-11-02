@@ -12,6 +12,10 @@ import { Provider } from "react-redux";
 import { store } from "./store/store";
 import { AddTodoForm } from "./components/AddTodoForm";
 import { TodoList } from "./components/TodoList";
+import {
+  LabelHooksTestComponent,
+  LabelHooksPatternTestComponent,
+} from "./components/LabelHooksTestComponents";
 import { TodoService } from "./domain/TodoService";
 import { InMemoryTodoRepository } from "./infrastructure/InMemoryTodoRepository";
 import { useAppDispatch } from "./hooks/redux";
@@ -60,6 +64,19 @@ const TodoApp: React.FC = () => {
 
         <AddTodoForm todoService={todoService} />
         <TodoList todoService={todoService} />
+
+        {/* Test components for manual labeling verification */}
+        <Typography
+          variant="h4"
+          component="h2"
+          gutterBottom
+          textAlign="center"
+          sx={{ mt: 6 }}
+        >
+          Hook Labeling Test Components
+        </Typography>
+        <LabelHooksTestComponent />
+        <LabelHooksPatternTestComponent />
       </Container>
     </>
   );

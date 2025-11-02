@@ -14,6 +14,7 @@ import { store } from "./store/store";
 import { AddTodoForm } from "./components/AddTodoForm";
 import { TodoList } from "./components/TodoList";
 import { TestComponent } from "./components/TestComponent";
+import { LabelHooksTestComponent, LabelHooksPatternTestComponent } from "./components/LabelHooksTestComponents";
 import { TodoService } from "./domain/TodoService";
 import { InMemoryTodoRepository } from "./infrastructure/InMemoryTodoRepository";
 import { useAppDispatch } from "./hooks/redux";
@@ -68,6 +69,20 @@ const TodoApp: React.FC = () => {
             label="Click me (auto-traced!)"
             onClick={() => console.log("TestComponent clicked!")}
           />
+        </Box>
+
+        <Box sx={{ mt: 4, p: 2, border: "1px dashed #999", borderRadius: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Label Hooks Test:
+          </Typography>
+          <LabelHooksTestComponent />
+        </Box>
+
+        <Box sx={{ mt: 4, p: 2, border: "1px dashed #666", borderRadius: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Label Hooks Pattern Test:
+          </Typography>
+          <LabelHooksPatternTestComponent />
         </Box>
       </Container>
     </>

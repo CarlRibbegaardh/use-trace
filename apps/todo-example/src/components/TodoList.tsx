@@ -1,28 +1,28 @@
-import React from 'react';
+import React from "react";
 import {
   Box,
   Typography,
   ToggleButtonGroup,
   ToggleButton,
   CircularProgress,
-  Alert
-} from '@mui/material';
+  Alert,
+} from "@mui/material";
 import {
   List as ListIcon,
   CheckCircle as CheckCircleIcon,
-  RadioButtonUnchecked as PendingIcon
-} from '@mui/icons-material';
-import { TodoItem } from './TodoItem';
-import { useAppSelector, useAppDispatch } from '../hooks/redux';
+  RadioButtonUnchecked as PendingIcon,
+} from "@mui/icons-material";
+import { TodoItem } from "./TodoItem";
+import { useAppSelector, useAppDispatch } from "../hooks/redux";
 import {
   setFilter,
   clearError,
   selectFilteredTodos,
   selectTodosLoading,
   selectTodosError,
-  selectTodosFilter
-} from '../store/todoSlice';
-import { TodoService } from '../domain/TodoService';
+  selectTodosFilter,
+} from "../store/todoSlice";
+import { TodoService } from "../domain/TodoService";
 import { useAutoTracer } from "auto-tracer";
 
 interface TodoListProps {
@@ -30,20 +30,26 @@ interface TodoListProps {
 }
 
 export const TodoList: React.FC<TodoListProps> = ({ todoService }) => {
-  useAutoTracer();
+  const logger = useAutoTracer();
 
   const dispatch = useAppDispatch();
   const filteredTodos = useAppSelector(selectFilteredTodos);
+  logger.log("About to call labelState for filteredTodos");
+  logger.labelState("filteredTodos");
   const loading = useAppSelector(selectTodosLoading);
+  logger.log("About to call labelState for loading");
+  logger.labelState("loading");
   const error = useAppSelector(selectTodosError);
+  logger.labelState("error");
   const filter = useAppSelector(selectTodosFilter);
+  logger.labelState("filter");
 
   const handleFilterChange = (
     _: React.MouseEvent<HTMLElement>,
     newFilter: string | null
   ) => {
     if (newFilter !== null) {
-      dispatch(setFilter(newFilter as 'all' | 'pending' | 'completed'));
+      dispatch(setFilter(newFilter as "all" | "pending" | "completed"));
     }
   };
 
@@ -72,10 +78,13 @@ export const TodoList: React.FC<TodoListProps> = ({ todoService }) => {
         </Alert>
       )}
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h5">
-          Todos ({filteredTodos.length})
-        </Typography>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
+        <Typography variant="h5">Todos ({filteredTodos.length})</Typography>
 
         <ToggleButtonGroup
           value={filter}
@@ -107,19 +116,14 @@ export const TodoList: React.FC<TodoListProps> = ({ todoService }) => {
           py={4}
           data-testid="empty-todos-message"
         >
-          {filter === 'all'
-            ? 'No todos yet. Add your first todo above!'
-            : `No ${filter} todos.`
-          }
+          {filter === "all"
+            ? "No todos yet. Add your first todo above!"
+            : `No ${filter} todos.`}
         </Typography>
       ) : (
         <Box data-testid="todos-list">
-          {filteredTodos.map(todo => (
-            <TodoItem
-              key={todo.id}
-              todo={todo}
-              todoService={todoService}
-            />
+          {filteredTodos.map((todo) => (
+            <TodoItem key={todo.id} todo={todo} todoService={todoService} />
           ))}
         </Box>
       )}

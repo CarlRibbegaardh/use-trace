@@ -7,6 +7,8 @@
 import { useMemo, useRef } from "react";
 import type { ComponentLogger } from "../interfaces/ComponentLogger.js";
 import { componentLogRegistry } from "./componentLogRegistry.js";
+import { addLabelForGuid, clearAllHookLabels } from "./hookLabels.js";
+import { log, logWarn } from "./log.js";
 
 // Registry of GUIDs that definitely rendered this cycle
 const trackedGUIDs = new Set<string>();
@@ -45,6 +47,36 @@ export function useAutoTracer(): ComponentLogger {
     return {
       log: (message: string, ...args: unknown[]) => {
         componentLogRegistry.addLog(guidRef.current!, message, ...args);
+      },
+      /**
+       * **Internal API - Not intended for direct developer use**
+       *
+       * Associates a human-readable label with a state hook for debugging purposes.
+       * This method is primarily used by the auto-tracer Vite plugin during build-time
+       * AST transformation to automatically label useState/useSelector hooks.
+       *
+       * While always available at runtime, developers should generally not call this
+       * method directly as the Vite plugin handles labeling automatically.
+       *
+       * @param label Human-readable name for the state hook (e.g., "filteredTodos", "loading")
+       *
+       * @example
+       * ```tsx
+       * // Automatically handled by Vite plugin:
+       * const todos = useSelector(selectTodos);
+       * // Plugin injects: logger.labelState("todos");
+       *
+       * // Manual usage (not recommended):
+       * const [count, setCount] = useState(0);
+       * logger.labelState("count");
+       * ```
+       */
+      labelState: (label: string) => {
+        try {
+          addLabelForGuid(guidRef.current!, label);
+        } catch (error) {
+          logWarn(`AutoTracer: Error storing label ${label}:`, error);
+        }
       },
     };
   }, []);
@@ -96,6 +128,7 @@ export function getTrackingGUID(fiber: unknown): string | null {
 export function clearRenderRegistry(): void {
   trackedGUIDs.clear();
   componentLogRegistry.clear();
+  clearAllHookLabels(); // Clear labels to prevent accumulation across render cycles
 }
 
 /**
