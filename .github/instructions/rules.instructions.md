@@ -51,6 +51,7 @@ This is a TypeScript monorepo workspace using pnpm workspaces. The project conta
 - One top level function, interface or type per file for clarity
 - Named exports only, no default exports
 - TSDoc comments for all functions and types!
+- Casts and type assertions must be avoided! Use proper typing and type guards if needed. If you see casts in the code, report it!
 
 ## Verification
 

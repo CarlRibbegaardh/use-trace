@@ -6,7 +6,7 @@ import type {
   TransformResult,
   TransformContext,
   ComponentInfo,
-} from "./types.js";
+} from "../interfaces/types.js";
 import {
   isComponentFunction,
   extractComponentInfo,
@@ -243,8 +243,8 @@ function injectUseAutoTracer(
 ) {
   const func = path.node;
   if (t.isBlockStatement(func.body)) {
-    injectIntoBlockStatement(
-      path.get("body"),
+    injectIntoBlockStatementDirect(
+      func.body,
       componentName,
       hookNameSet,
       hookNameRegex
@@ -265,48 +265,39 @@ function injectUseAutoTracerIntoFunction(
   }
 
   if (t.isBlockStatement(func.body)) {
-    // To get a path for the body, we traverse the function
-    traverse(func, {
-      BlockStatement(blockPath) {
-        if (blockPath.node === func.body) {
-          injectIntoBlockStatement(
-            blockPath,
-            componentName,
-            hookNameSet,
-            hookNameRegex
-          );
-          blockPath.stop();
-        }
-      },
-    });
+    injectIntoBlockStatementDirect(
+      func.body,
+      componentName,
+      hookNameSet,
+      hookNameRegex
+    );
   }
 }
 
 /**
- * Injects auto-tracing logic into a React component's block statement.
+ * Injects auto-tracing logic into a React component's block statement using plain AST manipulation.
  *
  * This function scans the component body for hook declarations and injects
  * `labelState` calls immediately after each matching hook. It also ensures
  * a `useAutoTracer` hook is available for state labeling.
  *
- * @param path - Babel NodePath for the BlockStatement to modify
+ * @param blockStatement - Babel BlockStatement AST node to modify
  * @param componentName - Name of the React component being transformed
  * @param hookNameSet - Set of hook names that should be labeled (from labelHooks config)
  * @param hookNameRegex - Regular expression for matching hook names (from labelHooksPattern config)
  *
  * @internal
  */
-function injectIntoBlockStatement(
-  path: any, // Babel Path for the BlockStatement
+function injectIntoBlockStatementDirect(
+  blockStatement: t.BlockStatement,
   componentName: string,
   hookNameSet: Set<string>,
   hookNameRegex: RegExp | null
 ) {
-  const blockStatement = path.node as t.BlockStatement;
-
   // Determine if there's a pre-existing tracer variable assignment, or a bare call
   let existingTracerIdentifier: t.Identifier | null = null;
   let hasBareUseAutoTracerCall = false;
+
   for (const stmt of blockStatement.body) {
     if (t.isVariableDeclaration(stmt)) {
       for (const decl of stmt.declarations) {
@@ -358,18 +349,14 @@ function injectIntoBlockStatement(
   }
 
   // First pass: scan for hooks to label
-  let stateOrdinal = 0;
-  const hooksToLabel: Array<{ path: any; label: string }> = [];
+  const hooksToLabel: Array<{ index: number; label: string }> = [];
 
-  // Iterate over the body statements safely
-  const body = path.node.body;
-  for (let i = 0; i < body.length; i++) {
-    const statementPath = path.get(`body.${i}`);
-    if (
-      statementPath.isVariableDeclaration() &&
-      statementPath.node.declarations.length === 1
-    ) {
-      const decl = statementPath.node.declarations[0];
+  // Iterate over the body statements
+  for (let i = 0; i < blockStatement.body.length; i++) {
+    const stmt = blockStatement.body[i];
+
+    if (t.isVariableDeclaration(stmt) && stmt.declarations.length === 1) {
+      const decl = stmt.declarations[0];
       const init = decl.init;
       if (!init || !t.isCallExpression(init)) continue;
 
@@ -403,7 +390,7 @@ function injectIntoBlockStatement(
       }
 
       if (label) {
-        hooksToLabel.push({ path: statementPath, label });
+        hooksToLabel.push({ index: i, label });
       }
     }
   }
@@ -424,25 +411,23 @@ function injectIntoBlockStatement(
     const tracerDecl = t.variableDeclaration("const", [
       t.variableDeclarator(tracerId, useAutoTracerInit),
     ]);
-    path.unshiftContainer("body", tracerDecl);
+    blockStatement.body.unshift(tracerDecl);
+
+    // Adjust indices after prepending tracer declaration
+    hooksToLabel.forEach((hook) => hook.index++);
   }
 
-  // Create insertions for the hooks
-  const insertions: Array<{ path: any; node: t.Statement }> = [];
-  hooksToLabel.forEach(({ path: statementPath, label }) => {
+  // Create and insert labelState calls in reverse order to maintain positions
+  for (let i = hooksToLabel.length - 1; i >= 0; i--) {
+    const { index, label } = hooksToLabel[i];
     const labelStateCall = t.expressionStatement(
       t.callExpression(
         t.memberExpression(tracerId, t.identifier("labelState")),
-        [t.stringLiteral(label), t.numericLiteral(stateOrdinal++)]
+        [t.stringLiteral(label), t.numericLiteral(i)]
       )
     );
-    insertions.push({ path: statementPath, node: labelStateCall });
-  });
-
-  // Insert in reverse order to maintain positions
-  insertions.reverse().forEach(({ path: stmtPath, node: call }) => {
-    stmtPath.insertAfter(call);
-  });
+    blockStatement.body.splice(index + 1, 0, labelStateCall);
+  }
 }
 
 /**

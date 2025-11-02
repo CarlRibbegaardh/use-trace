@@ -168,6 +168,21 @@ Supports detection of:
 - **Error handling**: Parse/transform errors return original code unchanged
 - **Pragma respect**: Honors disable pragmas to prevent unwanted injection
 
+### Implementation Architecture
+
+The package uses a **pure AST manipulation approach** for maximum reliability:
+
+- **Direct AST Operations**: Works directly with Babel AST nodes without NodePath dependencies
+- **Robust Traversal**: Uses standard Babel traversal patterns for component detection
+- **Clean Injection**: Direct manipulation of BlockStatement bodies for hook injection
+- **No Mock Objects**: Eliminated all brittle mock implementations for better maintainability
+
+This approach ensures:
+- **Future-proof**: No dependency on maintaining mock NodePath interfaces
+- **Performant**: Direct AST manipulation without object creation overhead
+- **Maintainable**: Clear, straightforward code without complex workarounds
+- **Reliable**: No risk of mock object method compatibility issues
+
 ### Performance Considerations
 
 - **Lazy evaluation**: Hook scanning only occurs for detected components

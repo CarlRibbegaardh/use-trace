@@ -1,5 +1,5 @@
-import * as t from '@babel/types';
-import type { ComponentInfo } from './types.js';
+import * as t from "@babel/types";
+import type { ComponentInfo } from "../interfaces/types.js";
 
 export function isComponentFunction(node: t.Node): boolean {
   // Function declarations with PascalCase names
@@ -10,8 +10,10 @@ export function isComponentFunction(node: t.Node): boolean {
   // Variable declarators with function expressions
   if (t.isVariableDeclarator(node) && node.id && t.isIdentifier(node.id)) {
     const init = node.init;
-    if ((t.isFunctionExpression(init) || t.isArrowFunctionExpression(init)) &&
-        isPascalCase(node.id.name)) {
+    if (
+      (t.isFunctionExpression(init) || t.isArrowFunctionExpression(init)) &&
+      isPascalCase(node.id.name)
+    ) {
       return returnsJSX(init);
     }
   }
@@ -26,7 +28,7 @@ export function extractComponentInfo(node: t.Node): ComponentInfo | null {
       isAnonymous: false,
       node,
       start: node.start ?? undefined,
-      end: node.end ?? undefined
+      end: node.end ?? undefined,
     };
   }
 
@@ -36,7 +38,7 @@ export function extractComponentInfo(node: t.Node): ComponentInfo | null {
       isAnonymous: false,
       node,
       start: node.start ?? undefined,
-      end: node.end ?? undefined
+      end: node.end ?? undefined,
     };
   }
 
@@ -70,13 +72,22 @@ function returnsJSX(func: t.Function): boolean {
   return hasJSXReturn;
 }
 
-export function hasExistingUseAutoTracerImport(ast: t.File, importSource: string): boolean {
+export function hasExistingUseAutoTracerImport(
+  ast: t.File,
+  importSource: string
+): boolean {
   for (const stmt of ast.program.body) {
     if (t.isImportDeclaration(stmt) && stmt.source.value === importSource) {
-      return stmt.specifiers.some((spec: t.ImportSpecifier | t.ImportDefaultSpecifier | t.ImportNamespaceSpecifier) =>
-        t.isImportSpecifier(spec) &&
-        t.isIdentifier(spec.imported) &&
-        spec.imported.name === 'useAutoTracer'
+      return stmt.specifiers.some(
+        (
+          spec:
+            | t.ImportSpecifier
+            | t.ImportDefaultSpecifier
+            | t.ImportNamespaceSpecifier
+        ) =>
+          t.isImportSpecifier(spec) &&
+          t.isIdentifier(spec.imported) &&
+          spec.imported.name === "useAutoTracer"
       );
     }
   }

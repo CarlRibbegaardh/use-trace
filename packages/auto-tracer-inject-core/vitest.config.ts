@@ -31,6 +31,8 @@ const config = defineConfig(({ command, mode }: ConfigEnv): ViteUserConfig => {
           "**/*.spec.*",
           "**/vitest.config.*",
           "**/tsconfig.*",
+          "**/index.*",
+          "**/interfaces/**",
         ],
         reporter: ci
           ? [
