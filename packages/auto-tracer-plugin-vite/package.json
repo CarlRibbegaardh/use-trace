@@ -16,7 +16,8 @@
   ],
   "scripts": {
     "build": "tsc",
-    "_test": "vitest"
+    "postbuild": "tsc --project ./tests/tsconfig.json --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "auto-tracer-inject-core": "workspace:*",
