@@ -1,21 +1,15 @@
 import { describe, it, expect } from "vitest";
-import { transform } from "../../src/functions/transform.js";
-import type {
-  TransformContext,
-  TransformConfig,
-  TransformResult,
-  ComponentInfo
-} from "../../src/interfaces/types.js";
-import {
-  normalizeConfig,
-  matchesPattern,
-  shouldProcessFile,
-} from "../../src/functions/config.js";
-import {
-  isComponentFunction,
-  extractComponentInfo,
-  hasExistingUseAutoTracerImport,
-} from "../../src/functions/detect.js";
+import { transform } from "../../src/functions/transform/transform.js";
+import type { TransformConfig } from "../../src/interfaces/TransformConfig.js";
+import type { TransformContext } from "../../src/interfaces/TransformContext.js";
+import type { TransformResult } from "../../src/interfaces/TransformResult.js";
+import type { ComponentInfo } from "../../src/interfaces/ComponentInfo.js";
+import { normalizeConfig } from "../../src/functions/config/normalizeConfig.js";
+import { matchesPattern } from "../../src/functions/config/matchesPattern.js";
+import { shouldProcessFile } from "../../src/functions/config/shouldProcessFile.js";
+import { isComponentFunction } from "../../src/functions/detect/isComponentFunction.js";
+import { extractComponentInfo } from "../../src/functions/detect/extractComponentInfo.js";
+import { hasExistingUseAutoTracerImport } from "../../src/functions/detect/hasExistingUseAutoTracerImport.js";
 import * as t from "@babel/types";
 
 function makeComponentSource(): string {

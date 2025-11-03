@@ -18,7 +18,7 @@ describe("babel interop native function paths", () => {
       default: () => ({ code: "// gen-native", map: undefined as unknown }),
     }));
 
-    const { transform } = await import("../../src/functions/transform.js");
+  const { transform } = await import("../../src/functions/transform/transform.js");
 
     const code = `
       function MyComponent() {

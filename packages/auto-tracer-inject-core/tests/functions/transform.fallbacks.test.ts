@@ -15,7 +15,7 @@ describe("babel interop fallbacks", () => {
       default: () => ({ code: "// generated", map: undefined as unknown }),
     }));
 
-    const { transform } = await import("../../src/functions/transform.js");
+  const { transform } = await import("../../src/functions/transform/transform.js");
 
     const code = `
       function MyComponent() {

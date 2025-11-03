@@ -17,6 +17,7 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
+    "postbuild": "tsc --project ./tests/tsconfig.json --noEmit",
     "_test": "vitest",
     "_test:coverage": "vitest --coverage"
   },

@@ -14,7 +14,7 @@ describe("babel interop branch coverage in one test", () => {
       default: () => ({ code: "// gen-default-obj", map: undefined as unknown }),
     }));
 
-    const { transform: transformA } = await import("../../src/functions/transform.js");
+  const { transform: transformA } = await import("../../src/functions/transform/transform.js");
     const resA = transformA("function A(){ return <div/> }", {
       filename: "src/A.tsx",
       config: { mode: "opt-out", importSource: "auto-tracer", include: ["**/*.tsx"], exclude: [], labelHooks: ["useState"], labelHooksPattern: "" },
@@ -35,7 +35,7 @@ describe("babel interop branch coverage in one test", () => {
       default: () => ({ code: "// gen-func", map: undefined as unknown }),
     }));
 
-    const { transform: transformB } = await import("../../src/functions/transform.js");
+  const { transform: transformB } = await import("../../src/functions/transform/transform.js");
     const resB = transformB("function B(){ return <div/> }", {
       filename: "src/B.tsx",
       config: { mode: "opt-out", importSource: "auto-tracer", include: ["**/*.tsx"], exclude: [], labelHooks: ["useState"], labelHooksPattern: "" },

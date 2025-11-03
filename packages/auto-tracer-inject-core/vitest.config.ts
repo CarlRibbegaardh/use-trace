@@ -15,6 +15,8 @@ const config = defineConfig(({ command, mode }: ConfigEnv): ViteUserConfig => {
       },
     },
     test: {
+      maxConcurrency: 1,
+      maxWorkers: 1,
       globals: true,
       include: ["tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
       exclude: ["**/node_modules/**", "**/dist/**", "**/coverage/**"],

@@ -4,10 +4,10 @@ describe("transform variable declarator branch (mocked detect)", () => {
   it("treats variable declarator as component but skips when init is not a function", async () => {
     vi.resetModules();
 
-    // Mock detect to force isComponentFunction true while init is not a function
-    vi.doMock("../../src/functions/detect.js", async () => {
-      const real = await vi.importActual<typeof import("../../src/functions/detect.js")>(
-        "../../src/functions/detect.js"
+    // Mock detect pieces to force isComponentFunction true while init is not a function
+    vi.doMock("../../src/functions/detect/isComponentFunction.js", async () => {
+      const real = await vi.importActual<typeof import("../../src/functions/detect/isComponentFunction.js")>(
+        "../../src/functions/detect/isComponentFunction.js"
       );
       return {
         __esModule: true,
@@ -17,16 +17,25 @@ describe("transform variable declarator branch (mocked detect)", () => {
           return real.isComponentFunction(node) ||
             (node && node.type === "VariableDeclarator" && node.id?.name === "ForcedComp");
         },
+      } as any;
+    });
+    vi.doMock("../../src/functions/detect/extractComponentInfo.js", async () => {
+      const real = await vi.importActual<typeof import("../../src/functions/detect/extractComponentInfo.js")>(
+        "../../src/functions/detect/extractComponentInfo.js"
+      );
+      return {
+        __esModule: true,
+        ...real,
         extractComponentInfo: (node: any) => {
           if (node && node.type === "VariableDeclarator" && node.id?.name === "ForcedComp") {
             return { name: "ForcedComp", isAnonymous: false, node } as any;
           }
-          return real.extractComponentInfo(node as any) as any;
+          return (real as any).extractComponentInfo(node);
         },
-      };
+      } as any;
     });
 
-    const { transform } = await import("../../src/functions/transform.js");
+  const { transform } = await import("../../src/functions/transform/transform.js");
 
     const code = `
       // Variable declarator that our mock will mark as a component, but init is not a function
@@ -53,9 +62,9 @@ describe("transform variable declarator branch (mocked detect)", () => {
   it("FunctionDeclaration: isComponentFunction true but extractComponentInfo returns null", async () => {
     vi.resetModules();
 
-    vi.doMock("../../src/functions/detect.js", async () => {
-      const real = await vi.importActual<typeof import("../../src/functions/detect.js")>(
-        "../../src/functions/detect.js"
+    vi.doMock("../../src/functions/detect/isComponentFunction.js", async () => {
+      const real = await vi.importActual<typeof import("../../src/functions/detect/isComponentFunction.js")>(
+        "../../src/functions/detect/isComponentFunction.js"
       );
       return {
         __esModule: true,
@@ -66,16 +75,25 @@ describe("transform variable declarator branch (mocked detect)", () => {
             (node?.type === "FunctionDeclaration" && node?.id?.name === "Ghost")
           );
         },
+      } as any;
+    });
+    vi.doMock("../../src/functions/detect/extractComponentInfo.js", async () => {
+      const real = await vi.importActual<typeof import("../../src/functions/detect/extractComponentInfo.js")>(
+        "../../src/functions/detect/extractComponentInfo.js"
+      );
+      return {
+        __esModule: true,
+        ...real,
         extractComponentInfo: (node: any) => {
           if (node?.type === "FunctionDeclaration" && node?.id?.name === "Ghost") {
             return null as any;
           }
-          return real.extractComponentInfo(node as any) as any;
+          return (real as any).extractComponentInfo(node);
         },
-      };
+      } as any;
     });
 
-    const { transform } = await import("../../src/functions/transform.js");
+  const { transform } = await import("../../src/functions/transform/transform.js");
 
     const code = `
       function Ghost(){ return <div/> }

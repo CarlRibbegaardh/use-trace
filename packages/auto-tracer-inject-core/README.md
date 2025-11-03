@@ -75,6 +75,35 @@ console.log(result.code);
 // }
 ```
 
+### Internal Modules and Helpers
+
+This package follows a strict one-export-per-file convention. Key modules:
+
+- Component detection
+  - `src/functions/detect/isComponentFunction.ts`
+  - `src/functions/detect/extractComponentInfo.ts`
+  - `src/functions/detect/hasExistingUseAutoTracerImport.ts`
+- Transform helpers
+  - `src/functions/transform/helpers/hasPragma.ts`
+  - `src/functions/transform/helpers/unwrapFunctionFromHOCs.ts`
+  - `src/functions/transform/helpers/injectIntoBlockStatementDirect.ts`
+  - `src/functions/transform/helpers/injectUseAutoTracer.ts`
+  - `src/functions/transform/helpers/injectUseAutoTracerIntoFunction.ts`
+  - `src/functions/transform/helpers/addUseAutoTracerImport.ts`
+
+- Transform entry
+  - `src/functions/transform/transform.ts`
+
+- Config utilities
+  - `src/functions/config/DEFAULT_CONFIG.ts`
+  - `src/functions/config/normalizeConfig.ts`
+  - `src/functions/config/matchesPattern.ts`
+  - `src/functions/config/shouldProcessFile.ts`
+
+Notes:
+- The legacy barrel `src/functions/detect.ts` has been removed. Tests enforce its absence.
+- The legacy barrel `src/functions/config.ts` has been removed/neutralized and must not be used. Import from the per-file config modules listed above.
+
 ### Configuration Options
 
 ```typescript
@@ -178,6 +207,7 @@ The package uses a **pure AST manipulation approach** for maximum reliability:
 - **No Mock Objects**: Eliminated all brittle mock implementations for better maintainability
 
 This approach ensures:
+
 - **Future-proof**: No dependency on maintaining mock NodePath interfaces
 - **Performant**: Direct AST manipulation without object creation overhead
 - **Maintainable**: Clear, straightforward code without complex workarounds

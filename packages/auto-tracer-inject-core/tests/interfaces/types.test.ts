@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import type { TransformConfig, ComponentInfo, TransformResult, TransformContext } from "../../src/interfaces/types.js";
+import type { TransformContext } from "../../src/interfaces/TransformContext.js";
+import type { TransformConfig } from "../../src/interfaces/TransformConfig.js";
+import type { TransformResult } from "../../src/interfaces/TransformResult.js";
+import type { ComponentInfo } from "../../src/interfaces/ComponentInfo.js";
 
 describe("types.ts coverage", () => {
   it("should use all exported types", () => {
