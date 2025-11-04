@@ -33,3 +33,13 @@ coverage
 test-results/
 playwright-report/
 /playwright/.cache/
+
+# Next.js
+.next/
+out/
+
+# Environment files
+.env*.local
+
+# Vercel
+.vercel

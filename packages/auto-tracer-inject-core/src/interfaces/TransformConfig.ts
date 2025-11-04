@@ -90,7 +90,31 @@ export interface TransformConfig {
    */
   exclude?: string[];
   /**
-   * Whether to consider Server Components when transforming (experimental).
+  * Enable React Server Components (RSC) safety checks.
+  *
+  * When `true`, the transformer will treat files as Server Modules by default
+  * and will NOT inject anything unless the module is explicitly marked as a
+  * Client Component via the standard directive:
+  *
+  *   "use client";
+  *
+  * Implementation details:
+  * - We parse top-level directives and consider a module a Client Component
+  *   only if it contains a literal directive whose value is exactly
+  *   `"use client"`.
+  * - If the directive is present, normal transform rules (mode/include/
+  *   exclude/pragma) apply and injection can occur.
+  * - If the directive is NOT present, the transform returns the original
+  *   code unmodified to avoid injecting client-only hooks into server code.
+  *
+  * When `false` (default), no special RSC gating is applied; the transform
+  * proceeds based on `mode`, `include`, `exclude`, and pragmas.
+  *
+  * Notes:
+  * - This flag does not auto-detect framework environments; it is a
+  *   conservative guard you should enable in RSC-aware toolchains (e.g.,
+  *   Next.js App Router) to prevent accidental client code injection.
+  * - Behavior is intentionally minimal and safe-by-default when enabled.
    */
   serverComponents?: boolean;
   /**

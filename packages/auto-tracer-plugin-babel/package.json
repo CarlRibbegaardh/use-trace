@@ -1,0 +1,35 @@
+{
+  "name": "auto-tracer-plugin-babel",
+  "version": "0.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "postbuild": "tsc --project ./tests/tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "@babel/core": "^7.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.0",
+    "@babel/parser": "^7.28.5",
+    "@babel/types": "^7.25.0",
+    "@types/babel__core": "^7.20.0",
+    "@types/babel__traverse": "^7.20.0",
+    "@types/node": "^20.11.0",
+    "rollup": "^4.52.5",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-commonjs": "^29.0.0",
+    "@rollup/plugin-json": "^6.1.0",
+    "typescript": "^5.2.2",
+    "vitest": "^4.0.3"
+  },
+  "dependencies": {
+    "auto-tracer-inject-core": "workspace:*"
+  }
+}

@@ -2,11 +2,20 @@
 applyTo: "**"
 ---
 
-EVERYTHING IN THIS FILE IS MANDATORY FOR COPILOT TO FOLLOW. EVERYTHING!!!
+EVERYTHING IN THIS FILE IS MANDATORY FOR COPILOT TO FOLLOW. EVERYTHING!
+
+# Background
+
+This is a public library for automated tracing of React component renders by listening to react rendering lifecycle events through the developer tools attachment points.
+It has supporting code for resolving variable names that is added by injecting a custom hook into React components at build time.
+The packages are the deliverables.
+The apps are only examples and demos of how to use the packages.
 
 # Monorepo Instructions
 
-- Always run commands from the project root (`c:\Projects\tracing`) unless specifically instructed otherwise. This is a monorepo managed with pnpm workspaces.
+- Always run commands from the project root (`c:\Projects\tracing`) unless specifically instructed otherwise.
+- This is a monorepo managed with pnpm workspaces.
+- Do not change directories using "cd" or any other tool.
 - Do not run node commands or ad hoc js scripts. It is explicitly forbidden!
 - All troublehooting must be done test first. You must create a failing test that reproduces the issue before attempting to fix it.
 - Do small tight focused changes. Verify each change with tests, and explain the steps done, before moving on.
@@ -16,6 +25,17 @@ EVERYTHING IN THIS FILE IS MANDATORY FOR COPILOT TO FOLLOW. EVERYTHING!!!
 - NEVER CHANGE CODE WHILE DOCUMENTING.
 - NEVER CHANGE CODE WHEN ASKED A QUESTION. ONLY ANSWER THE QUESTION BASED ON THE CURRENT CODE.
 - NEVER CHANGE CODE WHEN ADDING TESTS. ONLY ADD TESTS. IF YOU SEE BROKEN CODE WHILE CREATING TESTS, REPORT IT, DO NOT FIX IT.
+
+# Tools and libraries
+
+- PNPM
+- TypeScript (Strictest possible)
+- React
+- Vite (For example apps)
+- Next.js (For demo apps)
+- Babel
+- Vitest
+- Playwright
 
 ## Project Structure
 
@@ -49,7 +69,7 @@ This is a TypeScript monorepo workspace using pnpm workspaces. The project conta
 - Redux Toolkit is used for state management in examples
 - All TypeScript code should follow strict typing practices
 - One top level function, interface or type per file for clarity
-- Named exports only, no default exports
+- Named exports only, no default exports, except for the babel plugin which must be a default export.
 - TSDoc comments for all functions and types!
 - Casts and type assertions must be avoided! Use proper typing and type guards if needed. If you see casts in the code, report it!
 

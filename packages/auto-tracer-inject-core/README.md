@@ -84,6 +84,7 @@ This package follows a strict one-export-per-file convention. Key modules:
   - `src/functions/detect/extractComponentInfo.ts`
   - `src/functions/detect/hasExistingUseAutoTracerImport.ts`
 - Transform helpers
+
   - `src/functions/transform/helpers/hasPragma.ts`
   - `src/functions/transform/helpers/unwrapFunctionFromHOCs.ts`
   - `src/functions/transform/helpers/injectIntoBlockStatementDirect.ts`
@@ -92,6 +93,7 @@ This package follows a strict one-export-per-file convention. Key modules:
   - `src/functions/transform/helpers/addUseAutoTracerImport.ts`
 
 - Transform entry
+
   - `src/functions/transform/transform.ts`
 
 - Config utilities
@@ -101,6 +103,7 @@ This package follows a strict one-export-per-file convention. Key modules:
   - `src/functions/config/shouldProcessFile.ts`
 
 Notes:
+
 - The legacy barrel `src/functions/detect.ts` has been removed. Tests enforce its absence.
 - The legacy barrel `src/functions/config.ts` has been removed/neutralized and must not be used. Import from the per-file config modules listed above.
 
@@ -196,6 +199,20 @@ Supports detection of:
 - **Idempotent**: Multiple transformations don't create duplicates
 - **Error handling**: Parse/transform errors return original code unchanged
 - **Pragma respect**: Honors disable pragmas to prevent unwanted injection
+
+### React Server Components (RSC)
+
+If your app uses React Server Components (e.g., Next.js App Router), enable the RSC safety guard by setting `serverComponents: true` in the transform config (via the Vite plugin or direct usage). When enabled, a module is considered a Server Module unless it has a top-level directive:
+
+"use client";
+
+Only Client Components receive injections; Server Modules are returned unchanged. This avoids injecting client-only hooks into server code.
+
+Key points:
+
+- Default is `serverComponents: false` to avoid surprising changes in non-RSC setups.
+- With `serverComponents: true`, normal `mode/include/exclude/pragma` rules apply only to files with the "use client" directive.
+- The check is conservative and literal: the directive must be exactly "use client" at the top level.
 
 ### Implementation Architecture
 

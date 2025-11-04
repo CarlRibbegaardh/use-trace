@@ -1,5 +1,5 @@
 {
-  "name": "todo-example",
+  "name": "todo-example-vite-injected",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test": "playwright test --reporter=list"
+    "test": "playwright test --reporter=list && npm run test:explicit && npm run test:pattern",
+    "test:explicit": "playwright test --config playwright.explicit.config.ts --reporter=list",
+    "test:pattern": "playwright test --config playwright.pattern.config.ts --reporter=list"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -27,6 +29,7 @@
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
     "@vitejs/plugin-react": "^4.3.1",
+    "auto-tracer-plugin-vite": "workspace:*",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",

@@ -8,6 +8,7 @@ import type { ComponentInfo } from "../../interfaces/ComponentInfo.js";
 import { isComponentFunction } from "../detect/isComponentFunction.js";
 import { extractComponentInfo } from "../detect/extractComponentInfo.js";
 import { hasExistingUseAutoTracerImport } from "../detect/hasExistingUseAutoTracerImport.js";
+import { isClientComponentModule } from "../detect/isClientComponentModule.js";
 import { hasPragma } from "./helpers/hasPragma.js";
 import { unwrapFunctionFromHOCs } from "./helpers/unwrapFunctionFromHOCs.js";
 import { injectUseAutoTracer } from "./helpers/injectUseAutoTracer.js";
@@ -67,6 +68,11 @@ export function transform(
       sourceType: "module",
       plugins: ["typescript", "jsx"],
     });
+
+    // RSC safety check: If serverComponents mode is on, only transform client components.
+    if (config.serverComponents && !isClientComponentModule(ast)) {
+      return { code, injected: false, components: [] };
+    }
 
     const components: ComponentInfo[] = [];
     let hasInjected = false;

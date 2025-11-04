@@ -3,29 +3,38 @@
   "version": "0.1.0",
   "description": "Shared AST transform logic for auto-injecting useAutoTracer",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "pnpm run build:esm && pnpm run build:cjs",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
     "test": "vitest run",
     "postbuild": "tsc --project ./tests/tsconfig.json --noEmit",
     "_test": "vitest",
     "_test:coverage": "vitest --coverage"
   },
   "dependencies": {
-    "@babel/parser": "^7.23.0",
-    "@babel/types": "^7.23.0",
     "@babel/generator": "^7.23.0",
-    "@babel/traverse": "^7.23.0"
+    "@babel/parser": "^7.23.0",
+    "@babel/traverse": "^7.23.0",
+    "@babel/types": "^7.23.0"
   },
   "devDependencies": {
     "@types/babel__generator": "^7.6.0",
@@ -33,6 +42,7 @@
     "@types/node": "^22.12.0",
     "@vitest/coverage-v8": "^4.0.3",
     "typescript": "^5.2.0",
+    "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.0.3"
   },
   "sideEffects": false

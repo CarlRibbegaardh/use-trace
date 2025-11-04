@@ -26,6 +26,7 @@ test.describe("Auto-tracer labels", () => {
     page,
     pageLogs,
   }) => {
+    await page.goto("/");
     // Add one todo and toggle to generate selector changes
     await page.locator('[data-testid="todo-title-input"] input').fill("Item");
     await page.locator('[data-testid="add-todo-button"]').click();

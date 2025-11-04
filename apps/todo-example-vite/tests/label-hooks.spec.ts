@@ -45,13 +45,13 @@ test.describe("Hook Labeling E2E Tests", () => {
     );
     expect(customLogs.length).toBeGreaterThan(0);
 
-    // Test nested hook internal state - looking for unlabeled state changes from nested hooks
-    const unlabeledStateLogs = pageLogs.filter(
+    // Test nested hook internal state - ensure nested changes are labeled
+    const nestedLabeledStateLogs = pageLogs.filter(
       (log: string) =>
-        log.includes("State change: 2 → 4") ||
-        log.includes("State change: 2 → 3")
+        log.includes("State change customHookResult:") ||
+        log.includes("State change nestedHookResult:")
     );
-    expect(unlabeledStateLogs.length).toBeGreaterThan(0);
+    expect(nestedLabeledStateLogs.length).toBeGreaterThan(0);
 
     // Pattern test component hooks
     const descriptionLogs = pageLogs.filter((log: string) =>
@@ -68,6 +68,50 @@ test.describe("Hook Labeling E2E Tests", () => {
       log.includes("State change nestedHookResult:")
     );
     expect(nestedHookResultLogs.length).toBeGreaterThan(0);
+
+    // Also assert exact value transitions for labeled hooks (old → new)
+    // Built-in hooks in LabelHooksTestComponent
+    expect(
+      pageLogs.some((log: string) =>
+        log.includes("State change title: test-title → updated-title")
+      )
+    ).toBe(true);
+    expect(
+      pageLogs.some((log: string) => log.includes("State change count: 0 → 1"))
+    ).toBe(true);
+    expect(
+      pageLogs.some((log: string) =>
+        log.includes("State change custom: test-custom → updated-custom")
+      )
+    ).toBe(true);
+
+    // Pattern-matched hooks in LabelHooksPatternTestComponent
+    expect(
+      pageLogs.some((log: string) =>
+        log.includes(
+          "State change description: pattern-test → pattern-updated"
+        )
+      )
+    ).toBe(true);
+    expect(
+      pageLogs.some((log: string) =>
+        log.includes("State change counter: 10 → 15")
+      )
+    ).toBe(true);
+    expect(
+      pageLogs.some((log: string) =>
+        log.includes(
+          "State change customHookResult: pattern-custom → pattern-updated"
+        )
+      )
+    ).toBe(true);
+    expect(
+      pageLogs.some((log: string) =>
+        log.includes(
+          "State change nestedHookResult: nested-custom → nested-updated"
+        )
+      )
+    ).toBe(true);
 
     console.log("Hook labeling test - Sample relevant logs:");
     const relevantLogs = pageLogs.filter((log: string) =>

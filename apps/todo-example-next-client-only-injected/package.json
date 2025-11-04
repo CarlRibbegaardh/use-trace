@@ -1,0 +1,29 @@
+{
+  "name": "todo-example-next-client-only-injected",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -p 5176",
+    "build": "next build",
+    "start": "next start -p 5176",
+    "test:e2e": "playwright test --config=playwright.config.mjs --reporter=list"
+  },
+  "dependencies": {
+    "next": "^14.2.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "auto-tracer": "workspace:*",
+    "auto-tracer-plugin-babel": "workspace:*",
+    "@mui/material": "^5.15.15",
+    "@mui/icons-material": "^5.15.15",
+    "@reduxjs/toolkit": "^2.2.3",
+    "react-redux": "^9.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.2.2",
+    "@playwright/test": "^1.43.1"
+  }
+}

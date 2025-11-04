@@ -7,65 +7,112 @@
   </a>
 </p>
 
-# autoTracer
+# auto-tracer
 
-## Tracing Library to understand state changes
+React render tracing for humans. This package attaches to the React DevTools hook and prints structured logs for component render cycles and labeled state/prop changes. It’s framework-agnostic at runtime and works with both Vite and Next.js apps.
 
-This library is built to help understanding state changes triggering rerenders.
-The gihub project contains an example project using the library.
+Important: autoTracer() performs the tracing. useAutoTracer is a helper hook that improves labeling and is typically auto-injected by a build plugin.
 
-# AutoTracer Usage Examples
+## Quickstart
 
-## Basic Usage
+Initialize before React renders on the client.
 
-### In main.tsx (before React rendering):
-
-```typescript
+```ts
 import { autoTracer } from "auto-tracer";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 
-// Initialize autoTracer BEFORE React starts rendering
-// This captures the initial render and all subsequent renders
+// Start tracing early
 const stopTracing = autoTracer();
 
-const root = createRoot(document.getElementById("root")!);
-root.render(<App />);
+createRoot(document.getElementById("root")!).render(<App />);
 
-// Optional: Stop tracing when done (e.g., in cleanup)
+// Later, if needed:
 // stopTracing();
 ```
 
-### With Options:
+Options
 
-```typescript
-const stopTracing = autoTracer({
-  enabled: true, // Enable/disable the entire autoTracer (default: true)
-  includeReconciled: false, // Hide reconciled components (default: false)
-  includeSkipped: false, // Hide skipped renders (default: false)
-  showFlags: false, // Hide React internal flags (default: false)
-  enableAutoTracerInternalsLogging: true, // Enable console logging (default: false)
-  maxFiberDepth: 100, // Maximum traversal depth (default: 100, range: 20-1000)
-  showFunctionContentOnChange: false, // Show full function content vs "* function changed *" (default: false)
-  skipNonTrackedBranches: true, // Skip non-tracked branches (default: true)
+```ts
+const stop = autoTracer({
+  enabled: true,
+  includeReconciled: false,
+  includeSkipped: false,
+  showFlags: false,
+  enableAutoTracerInternalsLogging: true,
+  maxFiberDepth: 100,
+  showFunctionContentOnChange: false,
+  skipNonTrackedBranches: true,
 });
 ```
 
-### Dynamic Options Update:
+Live updates
 
-```typescript
-import { updateAutoTracerOptions } from "auto-tracer";
-
-// Change options while tracing is active
-updateAutoTracerOptions({ showFlags: true });
-```
-
-### Check Status:
-
-```typescript
-import { isAutoTracerInitialized } from "auto-tracer";
+```ts
+import { updateAutoTracerOptions, isAutoTracerInitialized } from "auto-tracer";
 
 if (isAutoTracerInitialized()) {
-  console.log("AutoTracer is active");
+  updateAutoTracerOptions({ showFlags: true });
 }
 ```
+
+## What you’ll see
+
+- Component render cycle …
+- State change <label>: <old> → <new>
+
+Labels come from the helper hook useAutoTracer, which can be auto-injected into your components by our Babel/Vite plugins. Without injection, you still get lifecycle logs but with fewer labels.
+
+## API
+
+Contract
+
+- autoTracer(options?): () => void
+  - Starts tracing; returns a stop function.
+- updateAutoTracerOptions(partial): void
+  - Changes options at runtime.
+- isAutoTracerInitialized(): boolean
+  - Returns true if tracing is currently active.
+- useAutoTracer(labels?): Helper hook returning a logger. Optional; intended for build-time injection.
+
+Type notes
+
+- All TypeScript is strict. No casts.
+- Options include bounds checking (e.g., maxFiberDepth practical range 20–1000).
+
+## Integration guides
+
+Vite
+
+- Call autoTracer() at the very top of src/main.tsx before createRoot().
+- To get labeled logs automatically, enable packages/auto-tracer-plugin-vite in your Vite config.
+
+Next.js
+
+- Add the Babel plugin (packages/auto-tracer-plugin-babel) to auto-inject labels in client components.
+- Ensure autoTracer() executes on the client before components mount.
+  - Pages Router: initialize in pages/\_app.tsx.
+  - App Router: include a minimal "use client" bootstrap component rendered first that runs autoTracer().
+  - SSR cannot be traced; hydration and subsequent renders are.
+
+## Internals overview
+
+```mermaid
+graph TD
+  A[Your app] -->|autoTracer| B[Attach to DevTools hook]
+  B --> C[Subscribe to renderer events]
+  C --> D[Compute diffs and labels]
+  D --> E[Console group + logs]
+```
+
+The auto-tracer-inject-core with Babel/Vite plugins augments your source so useAutoTracer can expose variable names and hook labels in these logs.
+
+## Troubleshooting
+
+- No logs? Verify autoTracer() runs before React renders and that you’re in a client context.
+- Unlabeled logs? Ensure the injection plugin is configured and active in your build.
+- Too verbose? Tweak options like includeReconciled/includeSkipped and maxFiberDepth.
+
+## License
+
+MIT

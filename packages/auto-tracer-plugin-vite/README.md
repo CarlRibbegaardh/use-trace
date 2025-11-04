@@ -26,6 +26,9 @@ export default defineConfig(({ mode }) => ({
         importSource: "auto-tracer",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.spec.*", "**/*.test.*"],
+        // Enable this when using React Server Components (e.g., Next.js App Router)
+        // to ensure we only inject into modules marked with "use client".
+        // serverComponents: true,
       }),
     react(),
   ].filter(Boolean),
@@ -80,6 +83,17 @@ This augments built-ins (useState/useReducer) by labeling identifiers assigned f
 ## Dev-only behavior
 
 The plugin runs in development and is disabled in production builds. You can also turn it off via `TRACE_INJECT=0`.
+
+## React Server Components (RSC)
+
+If you're using an RSC-enabled framework (like Next.js App Router), set `serverComponents: true` in the plugin options. When enabled, the transform will:
+
+- Treat modules as Server Modules by default
+- Only inject into modules that have the top-level directive:
+
+  "use client";
+
+This prevents injecting client-only hooks where they don't belong. All other transform rules (mode/include/exclude/pragma) still apply to Client Components.
 
 ## License
 
