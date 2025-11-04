@@ -1,6 +1,6 @@
 {
   "name": "auto-tracer-inject-core",
-  "version": "0.1.0",
+  "version": "1.0.0-alpha.0",
   "description": "Shared AST transform logic for auto-injecting useAutoTracer",
   "type": "module",
   "main": "./dist/cjs/index.js",
