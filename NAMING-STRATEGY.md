@@ -10,7 +10,7 @@ This document outlines the package naming strategy for the @auto-tracer organiza
 
 - **Package names** use framework identifiers with version suffixes (e.g., `@auto-tracer/react18`)
 - **Version numbers** are vanilla semantic (e.g., `@auto-tracer/react18@1.0.0` for React 18)
-- **Folder names** include version suffixes to enable active multi-version maintenance without forgotten branches (e.g., `packages/react18/`)
+- **Folder names** include version suffixes to enable active multi-version maintenance without forgotten branches (e.g., `packages/auto-tracer-react18/`)
 - **Supporting packages** specific versions for every package. Possibly a shared core, future will tell. For now, all specific. (e.g., `@auto-tracer/inject-react18`, `@auto-tracer/vite-plugin-react18`)
 
 ### Runtime Packages (Framework+Version Specific)
@@ -82,18 +82,18 @@ This package remains separate as it represents a fundamentally different approac
 
 ```
 packages/
-  react18/                      # @auto-tracer/react18
-  react19/                      # @auto-tracer/react19 (future)
-  inject-core/                  # @auto-tracer/inject-core
-  inject-react18/               # @auto-tracer/inject-react18
-  inject-react19/               # @auto-tracer/inject-react19 (future)
-  vite-plugin-react18/          # @auto-tracer/vite-plugin-react18
-  vite-plugin-react19/          # @auto-tracer/vite-plugin-react19 (future)
-  babel-plugin-react18/         # @auto-tracer/babel-plugin-react18
-  babel-plugin-react19/         # @auto-tracer/babel-plugin-react19 (future)
-  vue3/                         # @auto-tracer/vue3 (future)
-  inject-vue3/                  # @auto-tracer/inject-vue3 (future)
-  types/                        # @auto-tracer/types (future)
+  auto-tracer-react18/                      # @auto-tracer/react18
+  auto-tracer-react19/                      # @auto-tracer/react19 (future)
+  auto-tracer-inject-core/                  # @auto-tracer/inject-core
+  auto-tracer-inject-react18/               # @auto-tracer/inject-react18
+  auto-tracer-inject-react19/               # @auto-tracer/inject-react19 (future)
+  auto-tracer-vite-plugin-react18/          # @auto-tracer/vite-plugin-react18
+  auto-tracer-vite-plugin-react19/          # @auto-tracer/vite-plugin-react19 (future)
+  auto-tracer-babel-plugin-react18/         # @auto-tracer/babel-plugin-react18
+  auto-tracer-babel-plugin-react19/         # @auto-tracer/babel-plugin-react19 (future)
+  auto-tracer-vue3/                         # @auto-tracer/vue3 (future)
+  auto-tracer-inject-vue3/                  # @auto-tracer/inject-vue3 (future)
+  auto-tracer-types/                        # @auto-tracer/types (future)
 
 apps/
   todo-example-vite5-react18-injected/            # Uses @auto-tracer/react18@^1.0.0
@@ -115,200 +115,39 @@ apps/
 
 ## Migration Plan
 
-### Phase 1: Preparation (No Breaking Changes)
+### Simplified Migration Plan (Actionable Checklists)
 
-**Goal:** Set up infrastructure without breaking existing usage.
+Follow these steps in order. Keep commits small and test at each step.
 
-1. **Reserve npm package names**
+#### Step 1 — Rename folders
 
-   - Publish placeholder packages for:
-     - `@auto-tracer/react18`
-     - `@auto-tracer/inject-react18`
-     - `@auto-tracer/babel-plugin-react18`
-     - `@auto-tracer/vite-plugin-react18`
-     - `@auto-tracer/inject-core`
-   - Initial version: `0.0.0-reserved` with README pointing to migration plan
+- [ ] Rename package folders to the new convention shown under Monorepo Structure
+- [ ] Update any paths in tsconfig, vite, babel, and import paths if folder names are referenced directly
 
-2. **Create new package folders**
+#### Step 2 — Rename packages and references
 
-   ```bash
-   # From project root
-   mkdir -p packages/react18
-   mkdir -p packages/inject-react18
-   mkdir -p packages/babel-plugin-react18
-   mkdir -p packages/vite-plugin-react18
-   ```
+- [ ] Update "name" fields in each package.json (e.g., `@auto-tracer/react18`)
+- [ ] Update all internal dependency references using VS Code Search & Replace
+  - [ ] Replace old names (e.g., `auto-tracer`, `auto-tracer-plugin-vite`) with new names
+  - [ ] Ensure example apps depend on the new names via `workspace:*`
+- [ ] Update imports/usages in code and build configs
+  - [ ] Imports: `@auto-tracer/react18`
+  - [ ] Vite plugin: `@auto-tracer/vite-plugin-react18`
+  - [ ] Babel plugin: `@auto-tracer/babel-plugin-react18`
 
-3. **Update documentation**
-   - Add this `docs/naming.md` file
-   - Update root README.md to reference new naming scheme
-   - Add deprecation notices to existing package READMEs
+#### Step 3 — Build and test until green
 
-### Phase 2: Code Migration (Test-First)
+- [ ] Run `pnpm build` at the repo root (build all)
+- [ ] Run unit tests for affected packages via filters
+- [ ] Fix any missing/incorrect references, rebuild and retest
+- [ ] Run E2E tests one app at a time
+  - [ ] `pnpm --filter todo-example-vite5-react18-injected test:e2e`
+  - [ ] `pnpm --filter todo-example-next14-client-only-react18-injected test:e2e`
 
-**Goal:** Move code to new packages while maintaining 100% test coverage.
+#### Step 4 — Publish alpha versions
 
-1. **Migrate package by package with tests**
-
-   For each package:
-
-   a. **Copy package code to new location**
-
-   ```bash
-   # Example for auto-tracer → @auto-tracer/react18
-   cp -r packages/auto-tracer/* packages/react18/
-   ```
-
-   b. **Update package.json in new location**
-
-   ```json
-   {
-     "name": "@auto-tracer/react18",
-     "version": "1.0.0",
-     "publishConfig": {
-       "access": "public"
-     },
-     "peerDependencies": {
-       "react": "^18.0.0"
-     }
-   }
-   ```
-
-   c. **Update internal dependencies**
-
-   ```json
-   {
-     "dependencies": {
-       "@auto-tracer/inject-core": "workspace:*"
-     }
-   }
-   ```
-
-   d. **Run tests for new package**
-
-   ```bash
-   pnpm --filter @auto-tracer/react18 test
-   ```
-
-   e. **Build and verify**
-
-   ```bash
-   pnpm build
-   ```
-
-2. **Update example apps to use new packages**
-
-   For each app:
-
-   a. **Update package.json dependencies**
-
-   ```json
-   {
-     "dependencies": {
-       "@auto-tracer/react18": "workspace:*"
-     },
-     "devDependencies": {
-       "@auto-tracer/babel-plugin-react18": "workspace:*",
-       "@auto-tracer/vite-plugin-react18": "workspace:*"
-     }
-   }
-   ```
-
-   b. **Update imports**
-
-   ```typescript
-   // Before
-   import { autoTracer } from "auto-tracer";
-
-   // After
-   import { autoTracer } from "@auto-tracer/react18";
-   ```
-
-   c. **Update build configuration**
-
-   ```javascript
-   // vite.config.ts - Before
-   import autoTracer from "auto-tracer-plugin-vite";
-
-   // After
-   import autoTracer from "@auto-tracer/vite-plugin-react18";
-   ```
-
-   ```json
-   // .babelrc - Before
-   {
-     "plugins": ["auto-tracer-plugin-babel"]
-   }
-
-   // After
-   {
-     "plugins": ["@auto-tracer/babel-plugin-react18"]
-   }
-   ```
-
-   d. **Run E2E tests**
-
-   ```bash
-   pnpm --filter todo-example-vite5-react18-injected test:e2e
-   pnpm --filter todo-example-next14-client-only-react18-injected test:e2e
-   ```
-
-3. **Verify full monorepo**
-   ```bash
-   pnpm build
-   pnpm test
-   ```
-
-### Phase 3: Deprecation and Cleanup
-
-**Goal:** Mark old packages as deprecated and remove legacy code.
-
-1. **Publish new packages to npm**
-
-   ```bash
-   # Publish new scoped packages with v1.0.0
-   pnpm --filter "@auto-tracer/*" publish --access public
-   ```
-
-2. **Deprecate old packages on npm**
-
-Packages are not yet published.
-
-3. **Remove old package folders**
-
-   ```bash
-   # After confirmation that new packages work
-   rm -rf packages/auto-tracer
-   rm -rf packages/auto-tracer-inject-core
-   rm -rf packages/auto-tracer-plugin-babel
-   rm -rf packages/auto-tracer-plugin-vite
-   ```
-
-4. **Update CI/CD pipelines**
-   - Update build scripts to reference new package names
-   - Update release workflows
-   - Update badges in README files
-
-### Phase 4: Documentation and Communication
-
-**Goal:** Ensure users can migrate smoothly.
-
-1. **Create migration guide for users**
-
-   - Add `docs/migration-guide.md` with step-by-step instructions
-   - Include code examples for common migration scenarios
-   - Document breaking changes and upgrade path
-
-2. **Update website/documentation**
-
-   - Update installation instructions
-   - Update all code examples
-   - Add migration notice banner
-
-3. **Announce migration**
-   - Create GitHub release with migration instructions
-   - Update package README files with prominent migration notices
-   - Consider blog post explaining the change
+- [ ] Set prerelease versions in package.json (e.g., `1.0.0-alpha.0`)
+- [ ] Publish with `--access public`
 
 ## Version Strategy
 
