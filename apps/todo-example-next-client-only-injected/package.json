@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev -p 5176",
     "build": "next build",
+    "prebuild": "pnpm run clean",
+    "clean": "rimraf .next",
     "start": "next start -p 5176",
     "test:e2e": "playwright test --config=playwright.config.mjs --reporter=list"
   },
@@ -22,6 +24,7 @@
   "devDependencies": {
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "rimraf": "^6.0.1",
     "typescript": "^5.2.2",
     "@playwright/test": "^1.43.1"
   }

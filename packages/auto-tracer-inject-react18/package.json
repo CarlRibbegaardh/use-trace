@@ -23,8 +23,10 @@
   ],
   "scripts": {
     "build": "pnpm run build:esm && pnpm run build:cjs",
+    "prebuild": "pnpm run clean",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:cjs": "tsc -p tsconfig.cjs.json",
+    "clean": "rimraf dist coverage",
     "test": "vitest run",
     "postbuild": "tsc --project ./tests/tsconfig.json --noEmit",
     "_test": "vitest",
@@ -41,6 +43,7 @@
     "@types/babel__traverse": "^7.18.0",
     "@types/node": "^22.12.0",
     "@vitest/coverage-v8": "^4.0.3",
+    "rimraf": "^6.0.1",
     "typescript": "^5.2.0",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.0.3"

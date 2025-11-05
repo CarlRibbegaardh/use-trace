@@ -34,12 +34,15 @@
     "jsdom": "^24.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "rimraf": "^6.0.1",
     "typescript": "~5.5.3",
     "vitest": "^4.0.3"
   },
   "scripts": {
     "build": "tsc",
+    "prebuild": "pnpm run clean",
     "postbuild": "tsc --project ./tests/tsconfig.json --noEmit",
+    "clean": "rimraf dist coverage",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix",
     "test": "vitest run",

@@ -3,9 +3,11 @@
   "type": "module",
   "scripts": {
     "build": "pnpm -r build",
+    "clean": "pnpm -r clean",
     "dev": "pnpm -r dev",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
+    "test:e2e": "pnpm -r test:e2e",
     "list-packages": "pnpm list --depth 0 --json -r | node ./tools/list-packages.cjs",
     "list-packages-duplicates": "pnpm list --depth 0 --json -r | node ./tools/list-packages-duplicates.cjs",
     "publish-tracing": "pnpm --filter use-trace publish --no-git-checks",
@@ -13,5 +15,9 @@
     "publish-auto-tracer-inject-core": "pnpm --filter auto-tracer-inject-core publish --tag alpha --no-git-checks",
     "publish-auto-tracer-plugin-babel": "pnpm --filter auto-tracer-plugin-babel publish --tag alpha --no-git-checks",
     "publish-auto-tracer-plugin-vite": "pnpm --filter uto-tracer-plugin-vite publish --tag alpha --no-git-checks"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.0.3",
+    "vitest": "4.0.3"
   }
 }

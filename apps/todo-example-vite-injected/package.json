@@ -6,11 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "prebuild": "pnpm run clean",
+    "clean": "rimraf dist",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test": "playwright test --reporter=list && npm run test:explicit && npm run test:pattern",
-    "test:explicit": "playwright test --config playwright.explicit.config.ts --reporter=list",
-    "test:pattern": "playwright test --config playwright.pattern.config.ts --reporter=list"
+    "test:e2e": "playwright test --reporter=list && npm run test:e2e:explicit && npm run test:e2e:pattern",
+    "test:e2e:explicit": "playwright test --config playwright.explicit.config.ts --reporter=list",
+    "test:e2e:pattern": "playwright test --config playwright.pattern.config.ts --reporter=list"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -33,6 +35,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
+    "rimraf": "^6.0.1",
     "typescript": "^5.2.2",
     "@auto-tracer/react18": "workspace:*",
     "vite": "^5.3.1"

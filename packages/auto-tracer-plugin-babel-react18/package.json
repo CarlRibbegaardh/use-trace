@@ -8,7 +8,9 @@
   ],
   "scripts": {
     "build": "rollup -c",
+    "prebuild": "pnpm run clean",
     "postbuild": "tsc --project ./tests/tsconfig.json --noEmit",
+    "clean": "rimraf dist",
     "test": "vitest run"
   },
   "peerDependencies": {
@@ -21,11 +23,13 @@
     "@types/babel__core": "^7.20.0",
     "@types/babel__traverse": "^7.20.0",
     "@types/node": "^20.11.0",
+    "@vitest/coverage-v8": "^4.0.3",
     "rollup": "^4.52.5",
     "@rollup/plugin-typescript": "^12.3.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-json": "^6.1.0",
+    "rimraf": "^6.0.1",
     "typescript": "^5.2.2",
     "vitest": "^4.0.3"
   },

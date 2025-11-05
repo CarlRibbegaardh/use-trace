@@ -16,7 +16,9 @@
   ],
   "scripts": {
     "build": "tsc",
+    "prebuild": "pnpm run clean",
     "postbuild": "tsc --project ./tests/tsconfig.json --noEmit",
+    "clean": "rimraf dist coverage",
     "test": "vitest run"
   },
   "dependencies": {
@@ -40,6 +42,7 @@
   "devDependencies": {
     "@types/node": "^22.12.0",
     "@vitest/coverage-v8": "^4.0.3",
+    "rimraf": "^6.0.1",
     "typescript": "^5.2.0",
     "vitest": "^4.0.3",
     "vite": "^5.3.1"
