@@ -7,7 +7,7 @@
  * @example
  * import { defineConfig } from 'vite';
  * import react from '@vitejs/plugin-react';
- * import { autoTracer } from 'auto-tracer-plugin-vite';
+ * import { autoTracer } from '@auto-tracer/plugin-vite-react18';
  *
  * export default defineConfig(({ mode }) => ({
  *   plugins: [

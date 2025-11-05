@@ -12,7 +12,7 @@
     "prebuild": "pnpm run clean",
     "postbuild": "tsc --project ./tests/tsconfig.json --noEmit",
     "clean": "rimraf dist",
-    "test": "vitest run"
+    "_test": "vitest run"
   },
   "peerDependencies": {
     "@babel/core": "^7.0.0"

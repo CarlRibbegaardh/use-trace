@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { autoTracer } from 'auto-tracer-plugin-vite'
+import { autoTracer } from '@auto-tracer/plugin-vite-react18'
 
 // Test configuration: ONLY labelHooksPattern (regex matching) - no explicit list
 export default defineConfig({
