@@ -1,5 +1,5 @@
 {
-  "name": "auto-tracer-inject-core",
+  "name": "@auto-tracer/inject-react18",
   "version": "1.0.0-alpha.0",
   "description": "Shared AST transform logic for auto-injecting useAutoTracer",
   "type": "module",

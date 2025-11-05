@@ -60,6 +60,9 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
     devDependencies:
+      '@auto-tracer/react18':
+        specifier: workspace:*
+        version: link:../../packages/auto-tracer-react18
       '@types/react':
         specifier: ^18.3.3
         version: 18.3.3
@@ -75,9 +78,6 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.3.1
         version: 4.3.1(vite@5.3.3(@types/node@22.12.0))
-      auto-tracer:
-        specifier: workspace:*
-        version: link:../../packages/auto-tracer-react18
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -96,6 +96,12 @@ importers:
 
   apps/todo-example-next-client-only-injected:
     dependencies:
+      '@auto-tracer/plugin-babel-react18':
+        specifier: workspace:*
+        version: link:../../packages/auto-tracer-plugin-babel-react18
+      '@auto-tracer/react18':
+        specifier: workspace:*
+        version: link:../../packages/auto-tracer-react18
       '@mui/icons-material':
         specifier: ^5.15.15
         version: 5.18.0(@mui/material@5.18.0(@emotion/react@11.14.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
@@ -105,12 +111,6 @@ importers:
       '@reduxjs/toolkit':
         specifier: ^2.2.3
         version: 2.9.2(react-redux@9.2.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
-      auto-tracer:
-        specifier: workspace:*
-        version: link:../../packages/auto-tracer-react18
-      auto-tracer-plugin-babel:
-        specifier: workspace:*
-        version: link:../../packages/auto-tracer-plugin-babel-react18
       next:
         specifier: ^14.2.3
         version: 14.2.33(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -139,6 +139,9 @@ importers:
 
   apps/todo-example-next-mixed-mode-injected:
     dependencies:
+      '@auto-tracer/react18':
+        specifier: workspace:*
+        version: link:../../packages/auto-tracer-react18
       '@mui/icons-material':
         specifier: ^5.15.15
         version: 5.18.0(@mui/material@5.18.0(@emotion/react@11.14.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
@@ -148,9 +151,6 @@ importers:
       '@reduxjs/toolkit':
         specifier: ^2.2.3
         version: 2.9.2(react-redux@9.2.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
-      auto-tracer:
-        specifier: workspace:*
-        version: link:../../packages/auto-tracer-react18
       next:
         specifier: ^14.2.3
         version: 14.2.33(@playwright/test@1.56.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -204,6 +204,9 @@ importers:
         specifier: ^9.1.0
         version: 9.2.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1)
     devDependencies:
+      '@auto-tracer/react18':
+        specifier: workspace:*
+        version: link:../../packages/auto-tracer-react18
       '@playwright/test':
         specifier: ^1.43.1
         version: 1.56.1
@@ -222,9 +225,6 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.3.1
         version: 4.3.1(vite@5.3.3(@types/node@22.12.0))
-      auto-tracer:
-        specifier: workspace:*
-        version: link:../../packages/auto-tracer-react18
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -268,6 +268,12 @@ importers:
         specifier: ^9.1.0
         version: 9.2.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1)
     devDependencies:
+      '@auto-tracer/plugin-vite-react18':
+        specifier: workspace:*
+        version: link:../../packages/auto-tracer-plugin-vite-react18
+      '@auto-tracer/react18':
+        specifier: workspace:*
+        version: link:../../packages/auto-tracer-react18
       '@playwright/test':
         specifier: ^1.43.1
         version: 1.56.1
@@ -286,12 +292,6 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.3.1
         version: 4.3.1(vite@5.3.3(@types/node@22.12.0))
-      auto-tracer:
-        specifier: workspace:*
-        version: link:../../packages/auto-tracer-react18
-      auto-tracer-plugin-vite:
-        specifier: workspace:*
-        version: link:../../packages/auto-tracer-plugin-vite-react18
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -347,7 +347,7 @@ importers:
 
   packages/auto-tracer-plugin-babel-react18:
     dependencies:
-      auto-tracer-inject-core:
+      '@auto-tracer/inject-react18':
         specifier: workspace:*
         version: link:../auto-tracer-inject-react18
     devDependencies:
@@ -393,7 +393,7 @@ importers:
 
   packages/auto-tracer-plugin-vite-react18:
     dependencies:
-      auto-tracer-inject-core:
+      '@auto-tracer/inject-react18':
         specifier: workspace:*
         version: link:../auto-tracer-inject-react18
       unplugin:

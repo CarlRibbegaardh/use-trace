@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { transformSync } from "@babel/core";
 import * as babelCore from "@babel/core";
 
-describe("auto-tracer-plugin-babel reparsing path", () => {
+describe("@auto-tracer/plugin-babel-react18 reparsing path", () => {
   let coreParseSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
@@ -23,7 +23,7 @@ describe("auto-tracer-plugin-babel reparsing path", () => {
   it("reparses without invoking @babel/core.parse", async () => {
     // Reset module registry for this test and mock inject-core
     vi.resetModules();
-    vi.doMock("auto-tracer-inject-core", () => {
+    vi.doMock("@auto-tracer/inject-react18", () => {
       return {
         shouldProcessFile: () => true,
         normalizeConfig: (c: unknown) => c,

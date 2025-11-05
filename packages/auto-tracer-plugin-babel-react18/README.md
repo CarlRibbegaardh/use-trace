@@ -1,4 +1,4 @@
-# auto-tracer-plugin-babel (WIP)
+# @auto-tracer/plugin-babel-react18 (WIP)
 
 Babel plugin that delegates to `auto-tracer-inject-core` to inject `useAutoTracer()` into React components.
 
@@ -11,7 +11,7 @@ Usage (example .babelrc):
 ```json
 {
   "presets": ["next/babel"],
-  "plugins": [["auto-tracer-plugin-babel", { "serverComponents": true }]]
+  "plugins": [["@auto-tracer/plugin-babel-react18", { "serverComponents": true }]]
 }
 ```
 

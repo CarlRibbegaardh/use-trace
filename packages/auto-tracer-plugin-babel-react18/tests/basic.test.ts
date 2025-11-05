@@ -35,7 +35,7 @@ const clientComponentCode = `
   }
 `;
 
-describe("auto-tracer-plugin-babel", () => {
+describe("@auto-tracer/plugin-babel-react18", () => {
   it("injects useAutoTracer into a component with hooks (opt-out mode)", () => {
     // Set NODE_ENV to development to enable transformation
     const originalNodeEnv = process.env.NODE_ENV;

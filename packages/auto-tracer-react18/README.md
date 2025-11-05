@@ -18,7 +18,7 @@ Important: autoTracer() performs the tracing. useAutoTracer is a helper hook tha
 Initialize before React renders on the client.
 
 ```ts
-import { autoTracer } from "auto-tracer";
+import { autoTracer } from "@auto-tracer/react18";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 
@@ -49,7 +49,7 @@ const stop = autoTracer({
 Live updates
 
 ```ts
-import { updateAutoTracerOptions, isAutoTracerInitialized } from "auto-tracer";
+import { updateAutoTracerOptions, isAutoTracerInitialized } from "@auto-tracer/react18";
 
 if (isAutoTracerInitialized()) {
   updateAutoTracerOptions({ showFlags: true });
@@ -89,7 +89,7 @@ Vite
 
 Next.js
 
-- Add the Babel plugin (packages/auto-tracer-plugin-babel) to auto-inject labels in client components.
+- Add the Babel plugin (packages/@auto-tracer/plugin-babel-react18) to auto-inject labels in client components.
 - Ensure autoTracer() executes on the client before components mount.
   - Pages Router: initialize in pages/\_app.tsx.
   - App Router: include a minimal "use client" bootstrap component rendered first that runs autoTracer().

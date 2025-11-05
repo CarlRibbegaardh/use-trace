@@ -27,7 +27,7 @@ describe("babel interop fallbacks", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["**/*.tsx"],
         exclude: [],
         labelHooks: ["useState"],

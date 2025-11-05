@@ -46,7 +46,7 @@ describe("transform variable declarator branch (mocked detect)", () => {
       filename: "src/ForcedComp.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["**/*.tsx", "**/*.ts"],
         exclude: [],
         labelHooks: ["useState"],
@@ -103,7 +103,7 @@ describe("transform variable declarator branch (mocked detect)", () => {
       filename: "src/ghost.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["**/*.tsx"],
         exclude: [],
         labelHooks: ["useState"],

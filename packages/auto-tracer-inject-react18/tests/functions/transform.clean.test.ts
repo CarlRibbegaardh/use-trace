@@ -46,7 +46,7 @@ describe("transform core functionality", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: [],
         labelHooks: ["useState"],
@@ -67,7 +67,7 @@ describe("transform core functionality", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: [],
         labelHooks: ["useState", "useReducer", "useSelector", "useAppSelector"],
@@ -83,14 +83,14 @@ describe("transform core functionality", () => {
 
   it("does nothing when no components and import already exists", () => {
     const code = `
-      import { useAutoTracer } from 'auto-tracer';
+      import { useAutoTracer } from '@auto-tracer/react18';
       const x = 1;
     `;
     const result = transform(code, {
       filename: "src/none.ts",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["**/*"],
         exclude: [],
         labelHooks: ["useState"],
@@ -98,7 +98,7 @@ describe("transform core functionality", () => {
       },
     });
     expect(result.injected).toBe(false);
-    expect(result.code).toContain("import { useAutoTracer } from 'auto-tracer'");
+    expect(result.code).toContain("import { useAutoTracer } from '@auto-tracer/react18'");
   });
 
   it("opt-in with pragma but no components results in no changes", () => {
@@ -111,7 +111,7 @@ describe("transform core functionality", () => {
       filename: "src/nocomponents.ts",
       config: {
         mode: "opt-in",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["**/*"],
         exclude: [],
         labelHooks: ["useState"],

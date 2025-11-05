@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { transformSync, parse } from "@babel/core";
 import plugin from "../src/index";
 
-describe("auto-tracer-plugin-babel parse options", () => {
+describe("@auto-tracer/plugin-babel-react18 parse options", () => {
   it("reuses the file's parserOpts.plugins when reparsing transformed code", () => {
     const originalNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "development";

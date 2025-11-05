@@ -1,5 +1,5 @@
 {
-  "name": "auto-tracer-plugin-vite",
+  "name": "@auto-tracer/plugin-vite-react18",
   "version": "1.0.0-alpha.0",
   "description": "Vite plugin for auto-injecting useAutoTracer via unplugin",
   "type": "module",
@@ -20,17 +20,17 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "auto-tracer-inject-core": "workspace:*",
+    "@auto-tracer/inject-react18": "workspace:*",
     "unplugin": "^1.5.0"
   },
   "peerDependencies_later": {
-    "auto-tracer": "^0.1.0"
+    "@auto-tracer/react18": "^0.1.0"
   },
   "peerDependencies": {
     "vite": "^4.0.0 || ^5.0.0"
   },
   "peerDependenciesMeta": {
-    "auto-tracer": {
+    "@auto-tracer/react18": {
       "optional": false
     },
     "vite": {

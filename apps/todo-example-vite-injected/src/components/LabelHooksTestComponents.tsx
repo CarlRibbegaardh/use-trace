@@ -1,5 +1,5 @@
 import { useState, useReducer } from "react";
-import { useAutoTracer } from "auto-tracer";
+import { useAutoTracer } from "@auto-tracer/react18";
 // import { useSelector } from 'react-redux';
 // import { useAppSelector } from '../hooks/redux';
 import {

@@ -1,5 +1,5 @@
 {
-  "name": "auto-tracer-plugin-babel",
+  "name": "@auto-tracer/plugin-babel-react18",
   "version": "0.1.0-alpha.0",
   "private": true,
   "main": "dist/index.js",
@@ -30,6 +30,6 @@
     "vitest": "^4.0.3"
   },
   "dependencies": {
-    "auto-tracer-inject-core": "workspace:*"
+    "@auto-tracer/inject-react18": "workspace:*"
   }
 }

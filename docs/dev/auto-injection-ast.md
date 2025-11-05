@@ -52,7 +52,7 @@ packages/
     peerDeps: vite, unplugin
     deps: auto-tracer-inject-core
 
-  auto-tracer-plugin-babel/         # Babel plugin (alternative pipeline)
+  @auto-tracer/plugin-babel-react18/         # Babel plugin (alternative pipeline)
     src/index.ts                   # Babel visitor that calls core transform
     __tests__/                     # Fixture-based tests
     peerDeps: @babel/core
@@ -65,7 +65,7 @@ packages/
 - `tracing` (use-trace): runtime library; exports `useAutoTracer` and public API
 - `auto-tracer-inject-core`: pure AST transform logic; reused by adapters
 - `auto-tracer-plugin-vite`: primary Vite adapter (unplugin); dev-only application
-- `auto-tracer-plugin-babel`: alternative Babel plugin
+- `@auto-tracer/plugin-babel-react18`: alternative Babel plugin
 
 ### Dependency rules
 
@@ -113,7 +113,7 @@ Skipped by design:
 3. For each candidate component function:
    - Ensure the body is a block; for concise arrows, convert to `{ const __ret = (original expr); return __ret; }`
    - Insert `useAutoTracer()` as the first statement in the block
-   - If the import is missing, add: `import { useAutoTracer } from "auto-tracer";` (configurable via `importSource`)
+   - If the import is missing, add: `import { useAutoTracer } from "@auto-tracer/react18";` (configurable via `importSource`)
 4. Respect pragmas:
    - `// @trace-disable` → do not inject into this file or function
    - `// @trace` (opt-in mode) → inject only when present
@@ -130,7 +130,7 @@ const TodoItem = ({ title }) => <li>{title}</li>;
 After:
 
 ```tsx
-import { useAutoTracer } from "auto-tracer";
+import { useAutoTracer } from "@auto-tracer/react18";
 
 const TodoItem = ({ title }) => {
   useAutoTracer();
@@ -150,7 +150,7 @@ function Editor({ doc }) {
 After:
 
 ```tsx
-import { useAutoTracer } from "auto-tracer";
+import { useAutoTracer } from "@auto-tracer/react18";
 
 function Editor({ doc }) {
   useAutoTracer();
@@ -180,7 +180,7 @@ Use the unplugin-based adapter in development mode.
 ```ts
 // vite.config.ts
 import react from "@vitejs/plugin-react";
-import { autoTracer } from "auto-tracer-plugin-vite";
+import { autoTracer } from "@auto-tracer/plugin-vite-react18";
 
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -202,7 +202,7 @@ export default defineConfig(({ mode }) => ({
 module.exports = {
   plugins: [
     [
-      "auto-tracer-plugin-babel",
+      "@auto-tracer/plugin-babel-react18",
       { mode: "opt-in", importSource: "use-trace", include: ["src/**/*.tsx"] },
     ],
   ],
@@ -214,7 +214,7 @@ module.exports = {
 For custom integrations, use `auto-tracer-inject-core` directly:
 
 ```ts
-import { createTransform } from "auto-tracer-inject-core";
+import { createTransform } from "@auto-tracer/inject-react18";
 
 const transform = createTransform({
   mode: "opt-in",

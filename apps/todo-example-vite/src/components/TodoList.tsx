@@ -23,7 +23,7 @@ import {
   selectTodosFilter,
 } from "../store/todoSlice";
 import { TodoService } from "../domain/TodoService";
-import { useAutoTracer } from "auto-tracer";
+import { useAutoTracer } from "@auto-tracer/react18";
 
 interface TodoListProps {
   todoService: TodoService;

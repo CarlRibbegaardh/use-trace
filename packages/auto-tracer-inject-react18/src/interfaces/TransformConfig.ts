@@ -14,7 +14,7 @@
  *     mode === 'development' &&
  *       autoTracer.vite({
  *         mode: 'opt-out',
- *         importSource: 'auto-tracer',
+ *         importSource: '@auto-tracer/react18',
  *         include: ['src/**\/*.tsx'],
  *         exclude: ['**\/*.spec.*', '**\/*.test.*'],
  *         labelHooks: ['useState', 'useReducer', 'useSelector', 'useAppSelector'],

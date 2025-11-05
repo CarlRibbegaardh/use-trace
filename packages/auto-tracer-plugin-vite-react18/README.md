@@ -4,7 +4,7 @@ Vite plugin for auto-injecting `useAutoTracer()` into React function components 
 
 ## Installation
 
-Install in a monorepo where `auto-tracer` and `auto-tracer-inject-core` are available:
+Install in a monorepo where `@auto-tracer/react18` and `@auto-tracer/plugin-vite-react18` are available:
 
 ```bash
 pnpm add -D auto-tracer-plugin-vite
@@ -16,14 +16,14 @@ pnpm add -D auto-tracer-plugin-vite
 // vite.config.ts
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { autoTracer } from "auto-tracer-plugin-vite";
+import { autoTracer } from "@auto-tracer/plugin-vite-react18";
 
 export default defineConfig(({ mode }) => ({
   plugins: [
     mode === "development" &&
       autoTracer.vite({
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.spec.*", "**/*.test.*"],
         // Enable this when using React Server Components (e.g., Next.js App Router)

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useReducer } from "react";
-import { useAutoTracer } from "auto-tracer";
+import { useAutoTracer } from "@auto-tracer/react18";
 import {
   useCustomHook,
   useCustomHook2WithCustomHookInside,

@@ -42,3 +42,12 @@ graph TD
 	C --> D[Render client components]
 	D --> E[Labeled logs via injected useAutoTracer]
 ```
+
+## Babel Configuration
+
+The Babel plugin is configured in `babel.config.js` with overrides to ensure it only processes source files and not node_modules or build artifacts. This prevents module resolution errors during build.
+
+Key configuration:
+- Uses Babel overrides with a test function to filter files
+- Plugin only applies to source files in the project
+- Excludes node_modules, .next build directory, and test files

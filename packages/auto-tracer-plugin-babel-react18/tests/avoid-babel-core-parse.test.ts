@@ -3,7 +3,7 @@ import { transformSync } from "@babel/core";
 import * as babel from "@babel/core";
 import plugin from "../src/index";
 
-describe("auto-tracer-plugin-babel reparsing strategy", () => {
+describe("@auto-tracer/plugin-babel-react18 reparsing strategy", () => {
   it("does not call @babel/core.parse when reparsing transformed code", () => {
     const originalNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "development";

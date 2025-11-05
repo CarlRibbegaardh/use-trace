@@ -1,6 +1,6 @@
 "use client";
 
-import { autoTracer, isAutoTracerInitialized } from "auto-tracer";
+import { autoTracer, isAutoTracerInitialized } from "@auto-tracer/react18";
 
 // Initialize auto-tracing on the client as early as possible
 // Avoid duplicate initialization across HMR/strict mode

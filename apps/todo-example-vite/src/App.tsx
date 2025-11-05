@@ -20,7 +20,7 @@ import { TodoService } from "./domain/TodoService";
 import { InMemoryTodoRepository } from "./infrastructure/InMemoryTodoRepository";
 import { useAppDispatch } from "./hooks/redux";
 import { fetchTodos } from "./store/todoSlice";
-import { useAutoTracer } from "auto-tracer";
+import { useAutoTracer } from "@auto-tracer/react18";
 
 // Create theme
 const theme = createTheme({

@@ -1,10 +1,10 @@
 import { createUnplugin } from "unplugin";
-import type { TransformConfig } from "auto-tracer-inject-core";
+import type { TransformConfig } from "@auto-tracer/inject-react18";
 import {
   transform,
   normalizeConfig,
   shouldProcessFile,
-} from "auto-tracer-inject-core";
+} from "@auto-tracer/inject-react18";
 
 export interface AutoTracerOptions extends Partial<TransformConfig> {
   // Additional Vite-specific options can be added here

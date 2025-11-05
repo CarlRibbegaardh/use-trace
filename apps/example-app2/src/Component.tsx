@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAutoTracer } from "auto-tracer";
+import { useAutoTracer } from "@auto-tracer/react18";
 
 export function Component() {
   useAutoTracer();

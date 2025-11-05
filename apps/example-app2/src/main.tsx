@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
-import { autoTracer } from "auto-tracer";
+import { autoTracer } from "@auto-tracer/react18";
 autoTracer({
   enabled: true,
   includeReconciled: true,

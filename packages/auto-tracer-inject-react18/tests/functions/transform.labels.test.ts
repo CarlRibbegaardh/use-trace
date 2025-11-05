@@ -52,7 +52,7 @@ describe("labelHooks (list-based)", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState", "useReducer", "useSelector", "useAppSelector"],
@@ -104,7 +104,7 @@ describe("labelHooksPattern (regex-based)", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         // Intentionally leave list empty to rely on pattern
@@ -154,7 +154,7 @@ describe("labelHooksPattern (regex-based)", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: [],
@@ -183,7 +183,7 @@ describe("labelHooksPattern (regex-based)", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["**/*.tsx"],
         exclude: [],
         labelHooks: ["useSelector"],
@@ -205,7 +205,7 @@ describe("useAutoTracer exclusion", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: [],
@@ -242,7 +242,7 @@ describe("pragma controls", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -266,7 +266,7 @@ describe("pragma controls", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-in",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -290,7 +290,7 @@ describe("pragma controls", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-in",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -316,7 +316,7 @@ describe("pragma controls", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-in",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -341,7 +341,7 @@ describe("HOC-wrapped components", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -368,7 +368,7 @@ describe("HOC-wrapped components", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -395,7 +395,7 @@ describe("HOC-wrapped components", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -419,7 +419,7 @@ describe("HOC-wrapped components", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -441,7 +441,7 @@ describe("HOC-wrapped components", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -461,7 +461,7 @@ describe("HOC-wrapped components", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -481,7 +481,7 @@ describe("HOC-wrapped components", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -504,7 +504,7 @@ describe("HOC-wrapped components", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -528,7 +528,7 @@ describe("HOC-wrapped components", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -550,7 +550,7 @@ describe("HOC-wrapped components", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -570,7 +570,7 @@ describe("HOC-wrapped components", () => {
       filename: "src/C.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["**/*.tsx"],
         exclude: [],
         labelHooks: ["useState"],
@@ -589,7 +589,7 @@ describe("HOC-wrapped components", () => {
       filename: "src/C.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["**/*.tsx"],
         exclude: [],
         labelHooks: ["useState"],
@@ -608,7 +608,7 @@ describe("HOC-wrapped components", () => {
       filename: "src/C.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["**/*.tsx"],
         exclude: [],
         labelHooks: ["useState"],
@@ -636,7 +636,7 @@ describe("error handling", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -677,7 +677,7 @@ describe("non-component files", () => {
       filename: "src/utils.ts",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["**/*.ts", "**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -705,7 +705,7 @@ describe("edge cases in injectIntoBlockStatement", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -731,7 +731,7 @@ describe("edge cases in injectIntoBlockStatement", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -756,7 +756,7 @@ describe("edge cases in injectIntoBlockStatement", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -782,7 +782,7 @@ describe("edge cases in injectIntoBlockStatement", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -806,7 +806,7 @@ describe("edge cases in injectIntoBlockStatement", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"], // Only label useState, not custom hooks
@@ -832,7 +832,7 @@ describe("edge cases in injectIntoBlockStatement", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -862,7 +862,7 @@ describe("edge cases in injectIntoBlockStatement", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["**/*.tsx"],
         exclude: [],
         labelHooks: ["useState"],
@@ -886,7 +886,7 @@ describe("edge cases in injectIntoBlockStatement", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["**/*.tsx"],
         exclude: [],
         labelHooks: ["useState"],
@@ -913,7 +913,7 @@ describe("edge cases in injectIntoBlockStatement", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -936,7 +936,7 @@ describe("edge cases in injectIntoBlockStatement", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -959,7 +959,7 @@ describe("edge cases in injectIntoBlockStatement", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -982,7 +982,7 @@ describe("edge cases in injectIntoBlockStatement", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -1005,7 +1005,7 @@ describe("edge cases in injectIntoBlockStatement", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -1030,7 +1030,7 @@ describe("import handling", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -1040,13 +1040,13 @@ describe("import handling", () => {
     const result = transform(code, context);
     expect(result.injected).toBe(true);
     expect(result.code).toMatch(
-      /import { useAutoTracer } from ['"]auto-tracer['"]/
+      /import { useAutoTracer } from ['"]@auto-tracer\/react18['"]/
     );
   });
 
   it("does not add import when useAutoTracer is already imported", () => {
     const code = `
-      import { useAutoTracer } from 'auto-tracer';
+      import { useAutoTracer } from '@auto-tracer/react18';
 
       function MyComponent() {
         const [count, setCount] = useState(0);
@@ -1057,7 +1057,7 @@ describe("import handling", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -1072,7 +1072,7 @@ describe("import handling", () => {
 
   it("does not add a second import when no hooks to label and import already exists", () => {
     const code = `
-      import { useAutoTracer } from 'auto-tracer';
+      import { useAutoTracer } from '@auto-tracer/react18';
 
       function MyComponent() {
         const x = useCustomHook();
@@ -1083,7 +1083,7 @@ describe("import handling", () => {
       filename: "src/MyComponent.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: ["**/*.test.*", "**/*.spec.*"],
         labelHooks: ["useState"],
@@ -1131,7 +1131,7 @@ describe("import handling", () => {
       filename: "src/Multi.tsx",
       config: {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["**/*.tsx"],
         exclude: [],
         labelHooks: ["useState"],
@@ -1149,7 +1149,7 @@ describe("config utilities", () => {
     it("returns default config when no config provided", () => {
       const config = normalizeConfig();
       expect(config.mode).toBe("opt-in");
-      expect(config.importSource).toBe("auto-tracer");
+      expect(config.importSource).toBe("@auto-tracer/react18");
       expect(config.labelHooks).toEqual(["useState", "useReducer"]);
     });
 
@@ -1160,7 +1160,7 @@ describe("config utilities", () => {
       });
       expect(config.mode).toBe("opt-out");
       expect(config.labelHooks).toEqual(["useState"]);
-      expect(config.importSource).toBe("auto-tracer"); // default
+      expect(config.importSource).toBe("@auto-tracer/react18"); // default
     });
   });
 
@@ -1462,11 +1462,13 @@ describe("detect utilities", () => {
                 t.identifier("useAutoTracer")
               ),
             ],
-            t.stringLiteral("auto-tracer")
+            t.stringLiteral("@auto-tracer/react18")
           ),
         ])
       );
-      expect(hasExistingUseAutoTracerImport(ast, "auto-tracer")).toBe(true);
+      expect(hasExistingUseAutoTracerImport(ast, "@auto-tracer/react18")).toBe(
+        true
+      );
     });
 
     it("returns false when useAutoTracer is not imported", () => {
@@ -1483,7 +1485,9 @@ describe("detect utilities", () => {
           ),
         ])
       );
-      expect(hasExistingUseAutoTracerImport(ast, "auto-tracer")).toBe(false);
+      expect(hasExistingUseAutoTracerImport(ast, "@auto-tracer/react18")).toBe(
+        false
+      );
     });
 
     it("returns false for default import from source", () => {
@@ -1491,11 +1495,13 @@ describe("detect utilities", () => {
         t.program([
           t.importDeclaration(
             [t.importDefaultSpecifier(t.identifier("tracer"))],
-            t.stringLiteral("auto-tracer")
+            t.stringLiteral("@auto-tracer/react18")
           ),
         ])
       );
-      expect(hasExistingUseAutoTracerImport(ast, "auto-tracer")).toBe(false);
+      expect(hasExistingUseAutoTracerImport(ast, "@auto-tracer/react18")).toBe(
+        false
+      );
     });
 
     it("returns false for namespace import from source", () => {
@@ -1503,11 +1509,13 @@ describe("detect utilities", () => {
         t.program([
           t.importDeclaration(
             [t.importNamespaceSpecifier(t.identifier("TracerNS"))],
-            t.stringLiteral("auto-tracer")
+            t.stringLiteral("@auto-tracer/react18")
           ),
         ])
       );
-      expect(hasExistingUseAutoTracerImport(ast, "auto-tracer")).toBe(false);
+      expect(hasExistingUseAutoTracerImport(ast, "@auto-tracer/react18")).toBe(
+        false
+      );
     });
 
     it("returns true for named import with alias", () => {
@@ -1520,11 +1528,13 @@ describe("detect utilities", () => {
                 t.identifier("useAutoTracer")
               ),
             ],
-            t.stringLiteral("auto-tracer")
+            t.stringLiteral("@auto-tracer/react18")
           ),
         ])
       );
-      expect(hasExistingUseAutoTracerImport(ast, "auto-tracer")).toBe(true);
+      expect(hasExistingUseAutoTracerImport(ast, "@auto-tracer/react18")).toBe(
+        true
+      );
     });
 
     it("returns false when only other named imports exist from the source", () => {
@@ -1537,11 +1547,13 @@ describe("detect utilities", () => {
                 t.identifier("somethingElse")
               ),
             ],
-            t.stringLiteral("auto-tracer")
+            t.stringLiteral("@auto-tracer/react18")
           ),
         ])
       );
-      expect(hasExistingUseAutoTracerImport(ast, "auto-tracer")).toBe(false);
+      expect(hasExistingUseAutoTracerImport(ast, "@auto-tracer/react18")).toBe(
+        false
+      );
     });
 
     it("returns false when useAutoTracer is imported from a different source", () => {
@@ -1558,7 +1570,9 @@ describe("detect utilities", () => {
           ),
         ])
       );
-      expect(hasExistingUseAutoTracerImport(ast, "auto-tracer")).toBe(false);
+      expect(hasExistingUseAutoTracerImport(ast, "@auto-tracer/react18")).toBe(
+        false
+      );
     });
 
     it("returns false when named import uses StringLiteral for imported", () => {
@@ -1572,18 +1586,24 @@ describe("detect utilities", () => {
                 t.stringLiteral("useAutoTracer") as unknown as t.Identifier
               ),
             ],
-            t.stringLiteral("auto-tracer")
+            t.stringLiteral("@auto-tracer/react18")
           ),
         ])
       );
-      expect(hasExistingUseAutoTracerImport(ast, "auto-tracer")).toBe(false);
+      expect(hasExistingUseAutoTracerImport(ast, "@auto-tracer/react18")).toBe(
+        false
+      );
     });
 
     it("returns false for side-effect import from the source with no specifiers", () => {
       const ast = t.file(
-        t.program([t.importDeclaration([], t.stringLiteral("auto-tracer"))])
+        t.program([
+          t.importDeclaration([], t.stringLiteral("@auto-tracer/react18")),
+        ])
       );
-      expect(hasExistingUseAutoTracerImport(ast, "auto-tracer")).toBe(false);
+      expect(hasExistingUseAutoTracerImport(ast, "@auto-tracer/react18")).toBe(
+        false
+      );
     });
 
     it("returns false for mixed specifiers without named useAutoTracer", () => {
@@ -1597,11 +1617,13 @@ describe("detect utilities", () => {
                 t.identifier("something")
               ),
             ],
-            t.stringLiteral("auto-tracer")
+            t.stringLiteral("@auto-tracer/react18")
           ),
         ])
       );
-      expect(hasExistingUseAutoTracerImport(ast, "auto-tracer")).toBe(false);
+      expect(hasExistingUseAutoTracerImport(ast, "@auto-tracer/react18")).toBe(
+        false
+      );
     });
 
     it("returns true when mixed specifiers include named useAutoTracer", () => {
@@ -1615,11 +1637,13 @@ describe("detect utilities", () => {
                 t.identifier("useAutoTracer")
               ),
             ],
-            t.stringLiteral("auto-tracer")
+            t.stringLiteral("@auto-tracer/react18")
           ),
         ])
       );
-      expect(hasExistingUseAutoTracerImport(ast, "auto-tracer")).toBe(true);
+      expect(hasExistingUseAutoTracerImport(ast, "@auto-tracer/react18")).toBe(
+        true
+      );
     });
 
     it("returns false when earlier import from source lacks named useAutoTracer even if a later one has it (current behavior)", () => {
@@ -1631,7 +1655,7 @@ describe("detect utilities", () => {
           ),
           t.importDeclaration(
             [t.importDefaultSpecifier(t.identifier("X"))],
-            t.stringLiteral("auto-tracer")
+            t.stringLiteral("@auto-tracer/react18")
           ),
           t.importDeclaration(
             [
@@ -1640,11 +1664,13 @@ describe("detect utilities", () => {
                 t.identifier("useAutoTracer")
               ),
             ],
-            t.stringLiteral("auto-tracer")
+            t.stringLiteral("@auto-tracer/react18")
           ),
         ])
       );
-      expect(hasExistingUseAutoTracerImport(ast, "auto-tracer")).toBe(false);
+      expect(hasExistingUseAutoTracerImport(ast, "@auto-tracer/react18")).toBe(
+        false
+      );
     });
   });
 
@@ -1678,7 +1704,7 @@ describe("detect utilities", () => {
         filename: "src/ComplexComponent.tsx",
         config: {
           mode: "opt-out",
-          importSource: "auto-tracer",
+          importSource: "@auto-tracer/react18",
           include: ["src/**/*.tsx"],
           exclude: [],
           labelHooks: ["useState"],
@@ -1721,7 +1747,7 @@ describe("detect utilities", () => {
         filename: "src/ComponentWithComplexStructure.tsx",
         config: {
           mode: "opt-out",
-          importSource: "auto-tracer",
+          importSource: "@auto-tracer/react18",
           include: ["src/**/*.tsx"],
           exclude: [],
           labelHooks: ["useState"],
@@ -1762,7 +1788,7 @@ describe("detect utilities", () => {
         filename: "src/NotAComponent.tsx",
         config: {
           mode: "opt-out",
-          importSource: "auto-tracer",
+          importSource: "@auto-tracer/react18",
           include: ["src/**/*.tsx"],
           exclude: [],
           labelHooks: ["useState"],
@@ -1787,7 +1813,7 @@ describe("detect utilities", () => {
         filename: "src/MyComponent.tsx",
         config: {
           mode: "opt-out",
-          importSource: "auto-tracer",
+          importSource: "@auto-tracer/react18",
           include: ["src/**/*.tsx"],
           exclude: [],
           labelHooks: ["useState"],
@@ -1815,7 +1841,7 @@ describe("detect utilities", () => {
         filename: "src/DeeplyWrapped.tsx",
         config: {
           mode: "opt-out",
-          importSource: "auto-tracer",
+          importSource: "@auto-tracer/react18",
           include: ["src/**/*.tsx"],
           exclude: [],
           labelHooks: ["useState"],
@@ -1840,7 +1866,7 @@ describe("detect utilities", () => {
         filename: "src/WithConfig.tsx",
         config: {
           mode: "opt-out",
-          importSource: "auto-tracer",
+          importSource: "@auto-tracer/react18",
           include: ["src/**/*.tsx"],
           exclude: [],
           labelHooks: ["useState"],
@@ -1865,7 +1891,7 @@ describe("detect utilities", () => {
         filename: "src/NotAComponent.tsx",
         config: {
           mode: "opt-out",
-          importSource: "auto-tracer",
+          importSource: "@auto-tracer/react18",
           include: ["src/**/*.tsx"],
           exclude: [],
           labelHooks: ["useState"],
@@ -1910,7 +1936,7 @@ describe("detect utilities", () => {
         filename: "src/MyComponent.tsx",
         config: {
           mode: "opt-out",
-          importSource: "auto-tracer",
+          importSource: "@auto-tracer/react18",
           include: ["src/**/*.tsx"],
           exclude: [],
           labelHooks: ["useState"],
@@ -1948,7 +1974,7 @@ describe("detect utilities", () => {
       // Create instances that use the types to ensure coverage
       const config: TransformConfig = {
         mode: "opt-out",
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         include: ["src/**/*.tsx"],
         exclude: [],
         labelHooks: ["useState"],

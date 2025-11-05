@@ -44,7 +44,7 @@ const generateDefault =
  *   config: {
  *     mode: 'opt-out',
  *     labelHooks: ['useState'],
- *     importSource: 'auto-tracer'
+ *     importSource: '@auto-tracer/react18'
  *   }
  * });
  * // Result includes injected useAutoTracer and labelState calls
@@ -99,7 +99,7 @@ export function transform(
     // Check if import already exists
     const hasImport = hasExistingUseAutoTracerImport(
       ast,
-      config.importSource || "auto-tracer"
+      config.importSource || "@auto-tracer/react18"
     );
 
     // Traverse and transform
@@ -162,7 +162,7 @@ export function transform(
 
     // Add import if needed
     if (needsImport && hasInjected) {
-      addUseAutoTracerImport(ast, config.importSource || "auto-tracer");
+      addUseAutoTracerImport(ast, config.importSource || "@auto-tracer/react18");
     }
 
     // Generate transformed code

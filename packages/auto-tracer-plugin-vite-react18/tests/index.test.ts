@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { autoTracer } from "../src/index";
 import type { AutoTracerOptions } from "../src/index";
-import type { TransformConfig, ComponentInfo } from "auto-tracer-inject-core";
+import type { TransformConfig, ComponentInfo } from "@auto-tracer/inject-react18";
 
 // Mock the auto-tracer-inject-core module
-vi.mock("auto-tracer-inject-core", () => ({
+vi.mock("@auto-tracer/inject-react18", () => ({
   transform: vi.fn(),
   normalizeConfig: vi.fn(),
   shouldProcessFile: vi.fn(),
@@ -14,9 +14,9 @@ import {
   transform,
   normalizeConfig,
   shouldProcessFile,
-} from "auto-tracer-inject-core";
+} from "@auto-tracer/inject-react18";
 
-describe("auto-tracer-plugin-vite", () => {
+describe("@auto-tracer/plugin-vite-react18", () => {
   const mockTransform = vi.mocked(transform);
   const mockNormalizeConfig = vi.mocked(normalizeConfig);
   const mockShouldProcessFile = vi.mocked(shouldProcessFile);
@@ -33,7 +33,7 @@ describe("auto-tracer-plugin-vite", () => {
       include: ["**/*.tsx"],
       exclude: [],
       serverComponents: false,
-      importSource: "auto-tracer",
+      importSource: "@auto-tracer/react18",
       labelHooks: [],
       labelHooksPattern: "",
     };
@@ -106,7 +106,7 @@ describe("auto-tracer-plugin-vite", () => {
         include: ["custom/**/*.tsx"],
         exclude: ["**/*.spec.*"],
         serverComponents: false,
-        importSource: "auto-tracer",
+        importSource: "@auto-tracer/react18",
         labelHooks: [],
         labelHooksPattern: "",
       };

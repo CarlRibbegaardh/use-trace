@@ -43,7 +43,7 @@ graph TD
 ### Basic Transformation
 
 ```typescript
-import { transform } from "auto-tracer-inject-core";
+import { transform } from "@auto-tracer/inject-react18";
 
 const sourceCode = `
   function MyComponent() {
@@ -57,14 +57,14 @@ const result = transform(sourceCode, {
   filename: "MyComponent.tsx",
   config: {
     mode: "opt-out",
-    importSource: "auto-tracer",
+    importSource: "@auto-tracer/react18",
     labelHooks: ["useState"],
   },
 });
 
 console.log(result.code);
 // Output:
-// import { useAutoTracer } from 'auto-tracer';
+// import { useAutoTracer } from '@auto-tracer/react18';
 // function MyComponent() {
 //   const __autoTracer = useAutoTracer({ name: "MyComponent" });
 //   const [count, setCount] = useState(0);

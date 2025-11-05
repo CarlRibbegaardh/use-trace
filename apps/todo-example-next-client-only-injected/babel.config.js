@@ -13,14 +13,14 @@ module.exports = {
       },
       plugins: [
         [
-          'module:auto-tracer-plugin-babel',
+          'module:@auto-tracer/plugin-babel-react18',
           {
             mode: 'opt-out',
             include: ['src/**/*.tsx', 'src/**/*.jsx', 'pages/**/*.tsx', 'pages/**/*.jsx', 'components/**/*.tsx', 'components/**/*.jsx'],
             exclude: ['**/*.test.*', '**/*.spec.*', '**/node_modules/**', '**/.next/**', '**/build/**', '**/dist/**', '**/emotion-is-prop-valid/**', 'unknown.tsx'],
             serverComponents: false,
             labelHooks: ['useState', 'useReducer'],
-            importSource: 'auto-tracer'
+            importSource: '@auto-tracer/react18'
           }
         ]
       ]

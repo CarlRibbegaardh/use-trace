@@ -13,7 +13,7 @@ import * as t from "@babel/types";
  * @example
  * ```typescript
  * // Before: empty file
- * // After: import { useAutoTracer } from 'auto-tracer';
+ * // After: import { useAutoTracer } from '@auto-tracer/react18';
  * ```
  *
  * @internal

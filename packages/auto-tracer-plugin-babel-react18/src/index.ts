@@ -5,7 +5,7 @@ import {
   normalizeConfig,
   shouldProcessFile,
   type TransformConfig,
-} from "auto-tracer-inject-core";
+} from "@auto-tracer/inject-react18";
 
 export interface AutoTracerOptions extends Partial<TransformConfig> {
   // Additional Babel-specific options can be added here
@@ -27,7 +27,7 @@ function autoTracerBabelPlugin(
   const config = normalizeConfig(options);
 
   return {
-    name: "auto-tracer-plugin-babel",
+    name: "@auto-tracer/plugin-babel-react18",
     visitor: {},
     parserOverride(code: string, parserOpts: ParserOptions, parse: (code: string, parserOpts: ParserOptions) => ParseResult | null) {
       const anyOpts = parserOpts as unknown as { sourceFilename?: string; filename?: string };

@@ -121,23 +121,23 @@ Follow these steps in order. Keep commits small and test at each step.
 
 #### Step 1 — Rename folders
 
-- [ ] Rename package folders to the new convention shown under Monorepo Structure
-- [ ] Update any paths in tsconfig, vite, babel, and import paths if folder names are referenced directly
+- [x] Rename package folders to the new convention shown under Monorepo Structure
+- [x] Update any paths in tsconfig, vite, babel, and import paths if folder names are referenced directly
 
 #### Step 2 — Rename packages and references
 
-- [ ] Update "name" fields in each package.json (e.g., `@auto-tracer/react18`)
-- [ ] Update all internal dependency references using VS Code Search & Replace
-  - [ ] Replace old names (e.g., `auto-tracer`, `auto-tracer-plugin-vite`) with new names
-  - [ ] Ensure example apps depend on the new names via `workspace:*`
-- [ ] Update imports/usages in code and build configs
-  - [ ] Imports: `@auto-tracer/react18`
-  - [ ] Vite plugin: `@auto-tracer/vite-plugin-react18`
-  - [ ] Babel plugin: `@auto-tracer/babel-plugin-react18`
+- [x] Update "name" fields in each package.json (e.g., `@auto-tracer/react18`)
+- [x] Update all internal dependency references using VS Code Search & Replace
+  - [x] Replace old names (e.g., `auto-tracer`, `auto-tracer-plugin-vite`) with new names
+  - [x] Ensure example apps depend on the new names via `workspace:*`
+- [x] Update imports/usages in code and build configs
+  - [x] Imports: `@auto-tracer/react18`
+  - [x] Vite plugin: `@auto-tracer/vite-plugin-react18`
+  - [x] Babel plugin: `@auto-tracer/babel-plugin-react18`
 
 #### Step 3 — Build and test until green
 
-- [ ] Run `pnpm build` at the repo root (build all)
+- [x] Run `pnpm build` at the repo root (build all)
 - [ ] Run unit tests for affected packages via filters
 - [ ] Fix any missing/incorrect references, rebuild and retest
 - [ ] Run E2E tests one app at a time

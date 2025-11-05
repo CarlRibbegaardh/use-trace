@@ -4,7 +4,7 @@ import * as babelCore from "@babel/core";
 import * as babelParser from "@babel/parser";
 import plugin from "../src/index";
 
-describe("auto-tracer-plugin-babel reparsing implementation", () => {
+describe("@auto-tracer/plugin-babel-react18 reparsing implementation", () => {
   it("uses @babel/parser.parse and never @babel/core.parse", () => {
     const originalNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "development";
