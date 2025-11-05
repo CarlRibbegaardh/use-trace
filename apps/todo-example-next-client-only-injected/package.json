@@ -2,6 +2,8 @@
   "name": "todo-example-next-client-only-injected",
   "private": true,
   "version": "0.0.0",
+  "author": "Carl Ribbegårdh",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev -p 5176",
     "build": "next build",

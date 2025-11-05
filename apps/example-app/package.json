@@ -2,6 +2,8 @@
   "name": "example-app",
   "private": true,
   "version": "0.0.0",
+  "author": "Carl Ribbegårdh",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -1,7 +1,8 @@
 {
   "name": "@auto-tracer/plugin-babel-react18",
-  "version": "0.1.0-alpha.0",
-  "private": true,
+  "version": "1.0.0-alpha.0",
+  "author": "Carl Ribbegårdh",
+  "license": "MIT",
   "main": "dist/index.js",
   "files": [
     "dist"

@@ -1,5 +1,7 @@
 {
   "private": true,
+  "author": "Carl Ribbegårdh",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "build": "pnpm -r build",
