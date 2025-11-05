@@ -9,7 +9,7 @@
     "list-packages": "pnpm list --depth 0 --json -r | node ./tools/list-packages.cjs",
     "list-packages-duplicates": "pnpm list --depth 0 --json -r | node ./tools/list-packages-duplicates.cjs",
     "publish-tracing": "pnpm --filter use-trace publish --no-git-checks",
-    "publish-auto-tracer": "pnpm --filter auto-tracer publish --tag alpha --no-git-checks",
+    "publish-auto-tracer": "pnpm --filter auto-tracer publish --tag alpha --no-git-checks --access=public",
     "publish-auto-tracer-inject-core": "pnpm --filter auto-tracer-inject-core publish --tag alpha --no-git-checks",
     "publish-auto-tracer-plugin-babel": "pnpm --filter auto-tracer-plugin-babel publish --tag alpha --no-git-checks",
     "publish-auto-tracer-plugin-vite": "pnpm --filter uto-tracer-plugin-vite publish --tag alpha --no-git-checks"
