@@ -1,0 +1,51 @@
+{
+  "name": "@auto-tracer/plugin-vite-react18",
+  "version": "1.0.0-alpha.0",
+  "description": "Vite plugin for auto-injecting useAutoTracer via unplugin",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prebuild": "pnpm run clean",
+    "postbuild": "tsc --project ./tests/tsconfig.json --noEmit",
+    "clean": "rimraf dist coverage",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@auto-tracer/inject-react18": "workspace:*",
+    "unplugin": "^1.5.0"
+  },
+  "peerDependencies_later": {
+    "@auto-tracer/react18": "^0.1.0"
+  },
+  "peerDependencies": {
+    "vite": "^4.0.0 || ^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@auto-tracer/react18": {
+      "optional": false
+    },
+    "vite": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.12.0",
+    "@vitest/coverage-v8": "^4.0.3",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.2.0",
+    "vitest": "^4.0.3",
+    "vite": "^5.3.1"
+  },
+  "sideEffects": false
+}

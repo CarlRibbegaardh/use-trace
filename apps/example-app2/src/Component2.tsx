@@ -1,4 +1,4 @@
-import { useAutoTracer } from "auto-tracer";
+import { useAutoTracer } from "@auto-tracer/react18";
 import { Component1 } from "./Component1";
 
 export interface ComponentProps {

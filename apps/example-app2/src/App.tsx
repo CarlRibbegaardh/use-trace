@@ -5,7 +5,7 @@ import "./App.css";
 import { Component } from "./Component";
 import { Component2 } from "./Component2";
 import { Component1 } from "./Component1";
-import { useAutoTracer } from "auto-tracer";
+import { useAutoTracer } from "@auto-tracer/react18";
 
 function App() {
   useAutoTracer();
