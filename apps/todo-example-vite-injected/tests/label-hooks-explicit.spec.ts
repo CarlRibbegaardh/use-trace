@@ -39,5 +39,33 @@ test.describe('Explicit labelHooks Configuration Tests', () => {
 
     // Verify we have the expected labeled state changes
     expect(relevantLogs.length).toBeGreaterThan(2); // At least title, count, custom
+
+    // EXPANDED TEST: Check that dispatch should NOT be logged (it's a function, not state)
+    const dispatchLogs = pageLogs.filter((log: string) => log.includes('State change dispatch:'));
+    expect(dispatchLogs.length).toBe(0); // Dispatch should NEVER be logged as state!
+
+    // EXPANDED TEST: Check that filteredTodos has ARRAY values, not boolean
+    const filteredTodosLogs = pageLogs.filter((log: string) => log.includes('State change filteredTodos:'));
+    if (filteredTodosLogs.length > 0) {
+      // Should contain array notation [[]] not boolean
+      const hasArrayValues = filteredTodosLogs.some((log: string) => log.includes('[[]]'));
+      const hasBooleanValues = filteredTodosLogs.some((log: string) =>
+        log.includes('false → true') || log.includes('true → false')
+      );
+      expect(hasArrayValues).toBe(true);
+      expect(hasBooleanValues).toBe(false);
+    }
+
+    // EXPANDED TEST: Check that loading has BOOLEAN values, not array
+    const loadingLogs = pageLogs.filter((log: string) => log.includes('State change loading:'));
+    if (loadingLogs.length > 0) {
+      // Should contain boolean true/false not array
+      const hasBooleanValues = loadingLogs.some((log: string) =>
+        log.includes('true') || log.includes('false')
+      );
+      const hasArrayValues = loadingLogs.some((log: string) => log.includes('[[]]'));
+      expect(hasBooleanValues).toBe(true);
+      expect(hasArrayValues).toBe(false);
+    }
   });
 });
