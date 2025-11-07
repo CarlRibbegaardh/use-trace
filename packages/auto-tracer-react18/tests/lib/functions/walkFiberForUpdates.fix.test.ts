@@ -62,11 +62,14 @@ describe("walkFiberForUpdates with correct label mapping", () => {
     const guid = "test-guid-123";
     // Map labels to the actual _debugHookTypes indices where stateful hooks appear
     // From the fixture analysis: useState at 0, useSyncExternalStore at 9, 18, 27, 36
-    addLabelForGuid(guid, "dispatch", 0); // useState at index 0
-    addLabelForGuid(guid, "filteredTodos", 9); // useSyncExternalStore at index 9
-    addLabelForGuid(guid, "loading", 18); // useSyncExternalStore at index 18
-    addLabelForGuid(guid, "error", 27); // useSyncExternalStore at index 27
-    addLabelForGuid(guid, "filter", 36); // useSyncExternalStore at index 36
+    // Simulate the current render where loading changed from false to true
+    const emptyArray: unknown[] = [];
+    // Current render values (what's in the fiber now):
+    addLabelForGuid(guid, { label: "dispatch", index: 0, value: null }); // useState at index 0
+    addLabelForGuid(guid, { label: "filteredTodos", index: 9, value: emptyArray }); // useSyncExternalStore at index 9
+    addLabelForGuid(guid, { label: "loading", index: 18, value: true }); // useSyncExternalStore at index 18 - NOW TRUE
+    addLabelForGuid(guid, { label: "error", index: 27, value: null }); // useSyncExternalStore at index 27
+    addLabelForGuid(guid, { label: "filter", index: 36, value: 'all' }); // useSyncExternalStore at index 36
 
     // This is a mock GUID that we pretend is attached to the fiber
     vi.spyOn(renderRegistry, "getTrackingGUID").mockReturnValue(guid);

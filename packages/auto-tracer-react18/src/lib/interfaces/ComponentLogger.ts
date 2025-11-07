@@ -13,12 +13,14 @@ export interface ComponentLogger {
    * INTERNAL: Associates a human-readable label with a state hook using its stable index
    * in React's _debugHookTypes ordering. Intended for code injection only.
    *
-   * NOTE: The index is REQUIRED. Manual use without the injector is unsupported.
+   * NOTE: The index AND value are REQUIRED. Manual use without the injector is unsupported.
    *
    * @param label Human-readable name for the state hook (e.g., "filteredTodos", "loading")
    * @param index Stable index of the state hook within the component (0-based)
+   * @param value Current state value for value-based matching (REQUIRED)
+   * @param additionalValues Additional values for multi-value hooks (optional)
    */
-  labelState: (label: string, index: number) => void;
+  labelState: (label: string, index: number, value: unknown, ...additionalValues: unknown[]) => void;
 }
 
 /**

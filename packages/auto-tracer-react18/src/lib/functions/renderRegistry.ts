@@ -7,7 +7,7 @@
 import { useMemo, useRef } from "react";
 import type { ComponentLogger } from "../interfaces/ComponentLogger.js";
 import { componentLogRegistry } from "./componentLogRegistry.js";
-import { addLabelForGuid, clearAllHookLabels } from "./hookLabels.js";
+import { addLabelForGuid, clearLabelsForGuid, clearAllHookLabels } from "./hookLabels.js";
 import { log, logWarn } from "./log.js";
 
 // Registry of GUIDs that definitely rendered this cycle
@@ -59,25 +59,34 @@ export function useAutoTracer(): ComponentLogger {
        * method directly as the Vite plugin handles labeling automatically.
        *
        * @param label Human-readable name for the state hook (e.g., "filteredTodos", "loading")
+       * @param index Build-time ordinal position (source order)
+       * @param value Current state value for matching (REQUIRED)
+       * @param additionalValues Additional values for multi-value hooks (optional)
        *
        * @example
        * ```tsx
        * // Automatically handled by Vite plugin:
        * const todos = useSelector(selectTodos);
-       * // Plugin injects: logger.labelState("todos");
+       * // Plugin injects: logger.labelState("todos", 0, todos);
        *
        * // Manual usage (not recommended):
        * const [count, setCount] = useState(0);
-       * logger.labelState("count");
+       * logger.labelState("count", 1, count);
        * ```
        */
-      labelState: (label: string, index: number) => {
+      labelState: (label: string, index: number, value: unknown, ...additionalValues: unknown[]) => {
         try {
           const guid = guidRef.current!;
           if (typeof index !== "number") {
             throw new Error("AutoTracer: labelState requires an explicit index. Manual mode is unsupported.");
           }
-          addLabelForGuid(guid, label, index);
+          // Clear old labels on first call (index 0) for this render
+          if (index === 0) {
+            clearLabelsForGuid(guid);
+          }
+          // First value is always used for matching
+          // Additional values (for multi-value hooks) are currently ignored
+          addLabelForGuid(guid, { label, index, value });
         } catch (error) {
           logWarn(`AutoTracer: Error storing label ${label}:`, error);
         }

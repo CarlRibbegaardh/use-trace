@@ -736,27 +736,27 @@ const isUnnecessaryRerender =
 ```typescript
 // ❌ BAD - creates new object reference every render
 function useTodo() {
-  const [todo] = useState({ id: 1, text: 'Buy milk' });
+  const [todo] = useState({ id: 1, text: "Buy milk" });
   return { todo }; // New object wrapper on every render!
 }
 
 function App() {
   const result = useTodo();
   useEffect(() => {
-    console.log('Changed!');
+    console.log("Changed!");
   }, [result]); // Triggers every render because result is a new object!
   return <TodoList data={result} />;
 }
 
 // ✅ GOOD - return the todo directly, not wrapped
 function useTodo() {
-  const [todo] = useState({ id: 1, text: 'Buy milk' });
+  const [todo] = useState({ id: 1, text: "Buy milk" });
   return todo; // Same reference every render
 }
 
 // ✅ ALSO GOOD - memoize the wrapper object
 function useTodo() {
-  const [todo] = useState({ id: 1, text: 'Buy milk' });
+  const [todo] = useState({ id: 1, text: "Buy milk" });
   return useMemo(() => ({ todo }), [todo]); // Stable reference
 }
 ```
@@ -928,3 +928,10 @@ completedTodos | unknown changed: [] -> []
 This solution completely eliminates the index space mismatch problem by using values as the primary matching key. The ordinal disambiguation ensures that even when multiple hooks share the same value, they can be correctly identified if all occurrences are labeled. The fallback to "unknown" for partial coverage provides clear feedback about ambiguous cases while maintaining correctness.
 
 The implementation follows TDD principles, starting with comprehensive tests that define the expected behavior for all scenarios before making any code changes.
+
+## Acceptance test reports
+
+[ ] #1 The auto-tracer-state-marker shows in the logs
+
+Actual: Initial state: Symbol(auto-tracer-state-marker) color: #df7f02; font-style: italic
+Expected: No state log output of auto-tracer-state-marker visible.

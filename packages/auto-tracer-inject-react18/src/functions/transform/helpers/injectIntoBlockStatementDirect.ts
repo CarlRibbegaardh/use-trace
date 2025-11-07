@@ -166,7 +166,12 @@ export function injectIntoBlockStatementDirect(
   }
 
   // Second pass: identify labeled hooks and use the precomputed index
-  const hooksToLabel: Array<{ index: number; label: string; hookPosition: number }> = [];
+  const hooksToLabel: Array<{
+    index: number;
+    label: string;
+    hookPosition: number;
+    valueIdentifier: t.Identifier; // Variable identifier for passing as third argument
+  }> = [];
   for (let i = 0; i < blockStatement.body.length; i++) {
     const stmt = blockStatement.body[i];
 
@@ -194,21 +199,24 @@ export function injectIntoBlockStatementDirect(
       if (!isKnownStateHook && !isConfiguredHook) continue;
 
       let label: string | null = null;
+      let valueIdentifier: t.Identifier | null = null;
 
       // Pattern A: const [name] = useState(...)
       if (t.isArrayPattern(decl.id) && decl.id.elements.length > 0) {
         const firstElement = decl.id.elements[0];
         if (t.isIdentifier(firstElement)) {
           label = firstElement.name;
+          valueIdentifier = firstElement; // Capture the state variable (not the setter)
         }
       }
       // Pattern B: const name = useSelector(...)
       else if (t.isIdentifier(decl.id) && isConfiguredHook) {
         label = decl.id.name;
+        valueIdentifier = decl.id; // Capture the return value
       }
 
-      if (label) {
-        hooksToLabel.push({ index: i, label, hookPosition });
+      if (label && valueIdentifier) {
+        hooksToLabel.push({ index: i, label, hookPosition, valueIdentifier });
       }
     }
   }
@@ -237,11 +245,15 @@ export function injectIntoBlockStatementDirect(
 
   // Create and insert labelState calls in reverse order to maintain positions
   for (let i = hooksToLabel.length - 1; i >= 0; i--) {
-    const { index, label, hookPosition } = hooksToLabel[i];
+    const { index, label, hookPosition, valueIdentifier } = hooksToLabel[i];
     const labelStateCall = t.expressionStatement(
       t.callExpression(
         t.memberExpression(tracerId, t.identifier("labelState")),
-        [t.stringLiteral(label), t.numericLiteral(hookPosition)]
+        [
+          t.stringLiteral(label),
+          t.numericLiteral(hookPosition),
+          valueIdentifier // Pass the variable reference as third argument
+        ]
       )
     );
     blockStatement.body.splice(index + 1, 0, labelStateCall);
