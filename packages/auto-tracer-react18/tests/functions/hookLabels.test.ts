@@ -9,9 +9,9 @@ import {
 /**
  * Tests for the hook labels registry.
  *
- * The current implementation stores labels in an array by push order.
- * This test documents the current behavior and will help us verify
- * if we need to change to index-based storage.
+ * The implementation now stores labels in a Record<number, string> indexed
+ * by the hook's position in _debugHookTypes. This allows correct mapping
+ * even when some hooks don't have queues.
  */
 describe("hookLabels", () => {
   const testGuid = "test-component-guid-123";
@@ -20,79 +20,73 @@ describe("hookLabels", () => {
     clearAllHookLabels();
   });
 
-  describe("current behavior (array-based)", () => {
-    it("stores labels in push order", () => {
-      addLabelForGuid(testGuid, "dispatch");
-      addLabelForGuid(testGuid, "filteredTodos");
-      addLabelForGuid(testGuid, "loading");
+  describe("index-based storage (Babel plugin mode)", () => {
+    it("stores labels by explicit index", () => {
+      addLabelForGuid(testGuid, "dispatch", 0);
+      addLabelForGuid(testGuid, "filteredTodos", 9);
+      addLabelForGuid(testGuid, "loading", 18);
 
       const labels = getLabelsForGuid(testGuid);
 
-      expect(labels).toEqual(["dispatch", "filteredTodos", "loading"]);
+      expect(labels).toEqual({
+        0: "dispatch",
+        9: "filteredTodos",
+        18: "loading",
+      });
       expect(labels[0]).toBe("dispatch");
-      expect(labels[1]).toBe("filteredTodos");
-      expect(labels[2]).toBe("loading");
+      expect(labels[9]).toBe("filteredTodos");
+      expect(labels[18]).toBe("loading");
     });
 
-    it("does not store indices - labels are accessed by array position", () => {
-      // This documents the current limitation:
-      // Labels are stored in order they're added, not by their hook index
-      addLabelForGuid(testGuid, "dispatch");    // Hook index 0 in source
-      addLabelForGuid(testGuid, "filteredTodos"); // Hook index 1 in source
-      addLabelForGuid(testGuid, "loading");     // Hook index 2 in source
+    it("allows sparse indices - hooks without queues don't need labels", () => {
+      // Hook indices 0, 9, 18 correspond to stateful hooks
+      // Indices 1-8, 10-17 are non-stateful hooks (useRef, useMemo, etc.)
+      addLabelForGuid(testGuid, "dispatch", 0);
+      addLabelForGuid(testGuid, "filteredTodos", 9);
+      addLabelForGuid(testGuid, "loading", 18);
 
       const labels = getLabelsForGuid(testGuid);
 
-      // We can only access by array index, not by hook index
-      // If hook 0 (dispatch) has no queue and isn't extracted,
-      // then label[0] gets incorrectly matched to the first extracted hook
-      expect(labels[0]).toBe("dispatch"); // Would be matched to first extracted hook
-      expect(labels[1]).toBe("filteredTodos"); // Would be matched to second extracted hook
+      // Only the specified indices should have labels
+      expect(Object.keys(labels).length).toBe(3);
+      expect(labels[0]).toBe("dispatch");
+      expect(labels[5]).toBeUndefined(); // No label for non-stateful hooks
+      expect(labels[9]).toBe("filteredTodos");
     });
   });
+
+  // Auto-index mode removed: labels must be provided with explicit indices.
 
   describe("clearing labels", () => {
     it("clears labels for specific GUID", () => {
       const guid1 = "comp-1";
       const guid2 = "comp-2";
 
-      addLabelForGuid(guid1, "label1");
-      addLabelForGuid(guid2, "label2");
+      addLabelForGuid(guid1, "label1", 0);
+      addLabelForGuid(guid2, "label2", 0);
 
       clearLabelsForGuid(guid1);
 
-      expect(getLabelsForGuid(guid1)).toEqual([]);
-      expect(getLabelsForGuid(guid2)).toEqual(["label2"]);
+      expect(getLabelsForGuid(guid1)).toEqual({});
+      expect(getLabelsForGuid(guid2)).toEqual({ 0: "label2" });
     });
 
     it("clears all labels", () => {
-      addLabelForGuid("comp-1", "label1");
-      addLabelForGuid("comp-2", "label2");
+      addLabelForGuid("comp-1", "label1", 0);
+      addLabelForGuid("comp-2", "label2", 0);
 
       clearAllHookLabels();
 
-      expect(getLabelsForGuid("comp-1")).toEqual([]);
-      expect(getLabelsForGuid("comp-2")).toEqual([]);
+      expect(getLabelsForGuid("comp-1")).toEqual({});
+      expect(getLabelsForGuid("comp-2")).toEqual({});
     });
-  });
 
-  describe("expected behavior for index-based storage (future)", () => {
-    it.skip("should store labels by absolute hook index", () => {
-      // Future behavior: We want to store labels indexed by their
-      // absolute position in the hook chain, not by push order
-
-      // When build-time transform creates:
-      // logger.labelState("dispatch", 0)
-      // logger.labelState("filteredTodos", 1)
-      // logger.labelState("loading", 2)
-
-      // We should be able to retrieve by index:
-      // getLabel(testGuid, 0) → "dispatch"
-      // getLabel(testGuid, 1) → "filteredTodos"
-      // getLabel(testGuid, 2) → "loading"
-
-      // This would allow runtime to match labels even when some hooks
-      // don't have queues and aren't extracted
+    it("resets auto-index counter when clearing labels", () => {
+      addLabelForGuid(testGuid, "first", 0);
+      addLabelForGuid(testGuid, "second", 5);
+      clearLabelsForGuid(testGuid);
+      // After clearing, there should be no labels
+      expect(getLabelsForGuid(testGuid)).toEqual({});
     });
   });
 });

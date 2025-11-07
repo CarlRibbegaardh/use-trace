@@ -54,6 +54,7 @@ export function extractUseStateValues(
           name: hookName,
           value: currentValue,
           prevValue: prevValue,
+          hook: typedHook as { memoizedState: unknown; queue: unknown; next: unknown },
         });
       }
 

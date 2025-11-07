@@ -1,14 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { parse } from 'flatted';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { extractUseStateValues } from '@src/lib/functions/extractUseStateValues.js';
-import {
-  addLabelForGuid,
-  clearAllHookLabels,
-  getLabelsForGuid,
-} from '@src/lib/functions/hookLabels.js';
+import { addLabelForGuid, clearAllHookLabels, getLabelsForGuid } from '@src/lib/functions/hookLabels.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -49,10 +45,12 @@ describe('walkFiberForUpdates - label matching bug', () => {
 
     // Simulate the build-time labels
     // In the real app, labelState() is called for dispatch, filteredTodos, loading in that order
-    const guid = 'test-guid-123';
-    addLabelForGuid(guid, 'dispatch');
-    addLabelForGuid(guid, 'filteredTodos');
-    addLabelForGuid(guid, 'loading');
+  const guid = 'test-guid-123';
+  // Explicit indices correspond to _debugHookTypes target positions
+  // dispatch -> 0, filteredTodos -> 9, loading -> 18
+  addLabelForGuid(guid, 'dispatch', 0);
+  addLabelForGuid(guid, 'filteredTodos', 9);
+  addLabelForGuid(guid, 'loading', 18);
     const labels = getLabelsForGuid(guid);
 
     // Get the second extracted hook (first one after autoTracer)
@@ -61,16 +59,13 @@ describe('walkFiberForUpdates - label matching bug', () => {
 
     console.log('Second extracted hook:', secondHook!.name);
 
-    // DEMONSTRATE THE BUG:
-    // Buggy code uses the array position to match labels
-    const buggyArrayIndex = 1; // Second element in extracted array
-    const buggyLabelIndex = buggyArrayIndex - 1; // Subtract 1 to skip autoTracer
-    const buggyLabel = labels[buggyLabelIndex];
-
-    console.log('BUGGY matching: array index', buggyArrayIndex, '-> labelIndex', buggyLabelIndex, '-> label', buggyLabel);
-
-    // This gets 'dispatch' because it's at labels[0]
-    expect(buggyLabel).toBe('dispatch');
+  // DEMONSTRATE THE BUG (naive mapping):
+  // Using the extracted hooks array index (1) directly into labels fails because labels
+  // are keyed by _debugHookTypes indices, not by anchor/extracted positions.
+  const naiveIndex = 1; // second extracted hook
+  const buggyLabel = labels[naiveIndex];
+  console.log('BUGGY matching: using naive index', naiveIndex, '-> label', buggyLabel);
+  expect(buggyLabel).toBeUndefined();
 
     // But the second hook is NOT dispatch! Dispatch has no queue so it wasn't extracted.
     // The second hook is actually 'stateN' where N > 1 (e.g., state7)
@@ -92,9 +87,8 @@ describe('walkFiberForUpdates - label matching bug', () => {
     // The buggy code will assign the wrong label because it uses array position instead of absolute hook index
     console.log('');
     console.log('BUG SUMMARY:');
-    console.log('- Hook at array position [1] gets label at index [0] = "dispatch"');
-    console.log(`- But actual hook is "${secondHook!.name}" which is hook #${actualHookNumber}, NOT hook #1 (dispatch)`);
-    console.log('- This causes labels to be misaligned when hooks without queues are labeled at build-time');
+  console.log('- Using extracted/anchor index as label index produces undefined/misaligned results');
+  console.log(`- Actual hook is "${secondHook!.name}" which is hook #${actualHookNumber}, not aligned with any label key`);
 
     // The test proves the bug exists in the current architecture
     expect(buggyLabel).toBe('dispatch'); // Wrong label assigned

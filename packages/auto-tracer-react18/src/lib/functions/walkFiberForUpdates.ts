@@ -1,6 +1,11 @@
 import { stringify } from "./stringify.js";
 import { extractPropChanges } from "./extractPropChanges.js";
 import { extractUseStateValues } from "./extractUseStateValues.js";
+import { findStatefulHookTargets } from "./hookMapping/findStatefulHookTargets.js";
+import { findStatefulHookAnchors } from "./hookMapping/findStatefulHookAnchors.js";
+import { createHookChainIndexMap } from "./hookMapping/createHookChainIndexMap.js";
+import { resolveHookLabel } from "./hookMapping/resolveHookLabel.js";
+import type { Hook } from "./hookMapping/types.js";
 import { getComponentName } from "./getComponentName.js";
 import { getRealComponentName } from "./getRealComponentName.js";
 import { isReactInternal } from "./isReactInternal.js";
@@ -275,22 +280,25 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
         });
 
         // Show useState changes if any, attach labels when available
-        const allLabels = trackingGUID ? getLabelsForGuid(trackingGUID) : [];
+        const allLabels = trackingGUID ? getLabelsForGuid(trackingGUID) : {};
 
-        // Map each state change to its label using its original hook index.
-        meaningfulStateChanges.forEach(({ name, value, prevValue }) => {
-          // Find the original index of this state hook to get the correct label.
-          const originalHookIndex = useStateValues.findIndex(
-            (s) => s.name === name
+        // Prepare hook mapping data structures for label resolution
+        const debugHookTypes = (fiberNode as { _debugHookTypes?: string[] })._debugHookTypes;
+        const memoizedState = fiberNode.memoizedState as Hook | null;
+        const targets = findStatefulHookTargets(debugHookTypes);
+        const anchors = findStatefulHookAnchors(memoizedState);
+        const chainIndexMap = createHookChainIndexMap(memoizedState);
+
+        // Map each state change to its label using the anchor-target mapping algorithm
+        meaningfulStateChanges.forEach(({ name, value, prevValue, hook }) => {
+          const label = resolveHookLabel(
+            hook as Hook,
+            anchors,
+            chainIndexMap,
+            targets,
+            allLabels,
+            name
           );
-
-          // The first state hook is the tracer's own, so we subtract 1 to align labels.
-          const labelIndex = originalHookIndex - 1;
-
-          const label =
-            labelIndex >= 0 && allLabels[labelIndex]
-              ? allLabels[labelIndex]
-              : name; // Fallback to the original generic name
 
           const msg = `State change ${label}: ${formatStateChange(
             prevValue,

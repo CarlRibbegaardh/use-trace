@@ -79,6 +79,11 @@ describe("extractUseStateValues", () => {
           name: "state0",
           value: "test-value",
           prevValue: undefined,
+          hook: {
+            memoizedState: "test-value",
+            queue: { dispatch: expect.any(Function) },
+            next: null,
+          },
         },
       ]);
     });
@@ -109,16 +114,31 @@ describe("extractUseStateValues", () => {
           name: "state0",
           value: "first-value",
           prevValue: undefined,
+          hook: {
+            memoizedState: "first-value",
+            queue: { dispatch: expect.any(Function) },
+            next: expect.objectContaining({ memoizedState: 42 }),
+          },
         },
         {
           name: "state1",
           value: 42,
           prevValue: undefined,
+          hook: {
+            memoizedState: 42,
+            queue: { dispatch: expect.any(Function) },
+            next: expect.objectContaining({ memoizedState: true }),
+          },
         },
         {
           name: "state2",
           value: true,
           prevValue: undefined,
+          hook: {
+            memoizedState: true,
+            queue: { dispatch: expect.any(Function) },
+            next: null,
+          },
         },
       ]);
     });
@@ -145,6 +165,11 @@ describe("extractUseStateValues", () => {
           name: "state1",
           value: "state-value",
           prevValue: undefined,
+          hook: {
+            memoizedState: "state-value",
+            queue: { dispatch: expect.any(Function) },
+            next: null,
+          },
         },
       ]);
     });
@@ -172,11 +197,21 @@ describe("extractUseStateValues", () => {
           name: "state0",
           value: undefined,
           prevValue: undefined,
+          hook: {
+            memoizedState: undefined,
+            queue: { dispatch: expect.any(Function) },
+            next: expect.objectContaining({ memoizedState: "valid-state" }),
+          },
         },
         {
           name: "state1",
           value: "valid-state",
           prevValue: undefined,
+          hook: {
+            memoizedState: "valid-state",
+            queue: { dispatch: expect.any(Function) },
+            next: null,
+          },
         },
       ]);
     });
@@ -207,6 +242,11 @@ describe("extractUseStateValues", () => {
           name: "state0",
           value: "new-value",
           prevValue: "old-value",
+          hook: {
+            memoizedState: "new-value",
+            queue: { dispatch: expect.any(Function) },
+            next: null,
+          },
         },
       ]);
     });
@@ -242,11 +282,21 @@ describe("extractUseStateValues", () => {
           name: "state0",
           value: "new-first",
           prevValue: "old-first",
+          hook: {
+            memoizedState: "new-first",
+            queue: { dispatch: expect.any(Function) },
+            next: expect.objectContaining({ memoizedState: "new-second" }),
+          },
         },
         {
           name: "state1",
           value: "new-second",
           prevValue: "old-second",
+          hook: {
+            memoizedState: "new-second",
+            queue: { dispatch: expect.any(Function) },
+            next: null,
+          },
         },
       ]);
     });
@@ -279,11 +329,21 @@ describe("extractUseStateValues", () => {
           name: "state0",
           value: "new-first",
           prevValue: "old-first",
+          hook: {
+            memoizedState: "new-first",
+            queue: { dispatch: expect.any(Function) },
+            next: expect.objectContaining({ memoizedState: "new-second" }),
+          },
         },
         {
           name: "state1",
           value: "new-second",
           prevValue: undefined,
+          hook: {
+            memoizedState: "new-second",
+            queue: { dispatch: expect.any(Function) },
+            next: null,
+          },
         },
       ]);
     });
@@ -307,6 +367,11 @@ describe("extractUseStateValues", () => {
           name: "state0",
           value: "value",
           prevValue: undefined,
+          hook: {
+            memoizedState: "value",
+            queue: { dispatch: expect.any(Function) },
+            next: null,
+          },
         },
       ]);
     });
@@ -332,6 +397,11 @@ describe("extractUseStateValues", () => {
           name: "state0",
           value: "value",
           prevValue: undefined,
+          hook: {
+            memoizedState: "value",
+            queue: { dispatch: expect.any(Function) },
+            next: null,
+          },
         },
       ]);
     });
@@ -363,11 +433,19 @@ describe("extractUseStateValues", () => {
         name: "state0",
         value: "value-0",
         prevValue: undefined,
+        hook: expect.objectContaining({
+          memoizedState: "value-0",
+          queue: { dispatch: expect.any(Function) },
+        }),
       });
       expect(result[19]).toEqual({
         name: "state19",
         value: "value-19",
         prevValue: undefined,
+        hook: expect.objectContaining({
+          memoizedState: "value-19",
+          queue: { dispatch: expect.any(Function) },
+        }),
       });
     });
 
@@ -401,6 +479,10 @@ describe("extractUseStateValues", () => {
         name: "state0",
         value: "value1",
         prevValue: undefined,
+        hook: expect.objectContaining({
+          memoizedState: "value1",
+          queue: { dispatch: expect.any(Function) },
+        }),
       });
     });
   });
@@ -425,6 +507,11 @@ describe("extractUseStateValues", () => {
           name: "state0",
           value: objectValue,
           prevValue: undefined,
+          hook: {
+            memoizedState: objectValue,
+            queue: { dispatch: expect.any(Function) },
+            next: null,
+          },
         },
       ]);
     });
@@ -448,6 +535,11 @@ describe("extractUseStateValues", () => {
           name: "state0",
           value: arrayValue,
           prevValue: undefined,
+          hook: {
+            memoizedState: arrayValue,
+            queue: { dispatch: expect.any(Function) },
+            next: null,
+          },
         },
       ]);
     });
@@ -470,6 +562,11 @@ describe("extractUseStateValues", () => {
           name: "state0",
           value: null,
           prevValue: undefined,
+          hook: {
+            memoizedState: null,
+            queue: { dispatch: expect.any(Function) },
+            next: null,
+          },
         },
       ]);
     });
@@ -495,6 +592,11 @@ describe("extractUseStateValues", () => {
           name: "state0",
           value: functionValue,
           prevValue: undefined,
+          hook: {
+            memoizedState: functionValue,
+            queue: { dispatch: expect.any(Function) },
+            next: null,
+          },
         },
       ]);
     });
@@ -642,11 +744,20 @@ describe("extractUseStateValues", () => {
           name: "state1",
           value: "state-value",
           prevValue: undefined,
+          hook: expect.objectContaining({
+            memoizedState: "state-value",
+            queue: { dispatch: expect.any(Function) },
+          }),
         },
         {
           name: "state3",
           value: 42,
           prevValue: undefined,
+          hook: {
+            memoizedState: 42,
+            queue: { dispatch: expect.any(Function) },
+            next: null,
+          },
         },
       ]);
     });

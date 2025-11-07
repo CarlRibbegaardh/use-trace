@@ -1,8 +1,8 @@
 import { describe, it } from "vitest";
 import { parse, stringify } from "flatted";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -358,7 +358,7 @@ describe("Fiber Dump Analysis", () => {
     // --- Final Combined Table ---
     const statefulHookTypes = (fiber._debugHookTypes || [])
       .map((type: string, index: number) => ({ type, index }))
-      .filter(hook => hook.type === 'useState' || hook.type === 'useSyncExternalStore');
+      .filter((hook: { type: string; index: number }) => hook.type === 'useState' || hook.type === 'useSyncExternalStore');
 
     const anchorsWithQueues: Array<{ index: number; state: any }> = [];
     currentHook = firstHook;

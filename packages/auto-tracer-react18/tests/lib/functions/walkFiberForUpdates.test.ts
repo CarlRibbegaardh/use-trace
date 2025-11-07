@@ -489,7 +489,11 @@ describe("walkFiberForUpdates", () => {
 
       getTrackingGUID.mockReturnValue("test-guid");
       extractUseStateValues.mockReturnValue([
-        { name: "state1", value: "newValue" },
+        {
+          name: "state1",
+          value: "newValue",
+          hook: { memoizedState: "newValue", queue: {}, next: null }
+        },
       ]);
 
       const fiber = {

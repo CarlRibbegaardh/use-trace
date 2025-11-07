@@ -74,10 +74,99 @@ export function injectIntoBlockStatementDirect(
     return;
   }
 
-  // First pass: scan for hooks to label
-  const hooksToLabel: Array<{ index: number; label: string }> = [];
+  // First pass: compute source-order indices for ALL React hook calls (including nested)
+  const callToIndex = new WeakMap<t.CallExpression, number>();
+  const isReactHookCallee = (node: t.Node | null | undefined): node is t.Identifier => {
+    return !!node && t.isIdentifier(node) && /^use[A-Z]/.test(node.name) && node.name !== "useAutoTracer";
+  };
 
-  // Iterate over the body statements
+  function collectHookCalls(node: t.Node | null | undefined, push: (call: t.CallExpression) => void): void {
+    if (!node) return;
+    if (t.isCallExpression(node)) {
+      if (isReactHookCallee(node.callee)) {
+        push(node);
+      }
+      // Recurse into arguments to find nested hook calls
+      for (const arg of node.arguments) {
+        if (t.isExpression(arg)) {
+          collectHookCalls(arg, push);
+        } else if (t.isSpreadElement(arg)) {
+          collectHookCalls(arg.argument as t.Node, push);
+        }
+      }
+      return;
+    }
+
+    // Handle a few common expression/container node kinds that can contain calls
+    if (t.isArrayExpression(node)) {
+      for (const elem of node.elements) {
+        if (t.isExpression(elem)) collectHookCalls(elem, push);
+      }
+      return;
+    }
+    if (t.isObjectExpression(node)) {
+      for (const prop of node.properties) {
+        if (t.isObjectProperty(prop)) {
+          collectHookCalls(prop.value as t.Node, push);
+        } else if (t.isSpreadElement(prop)) {
+          collectHookCalls(prop.argument as t.Node, push);
+        }
+      }
+      return;
+    }
+    if (t.isConditionalExpression(node)) {
+      collectHookCalls(node.test, push);
+      collectHookCalls(node.consequent, push);
+      collectHookCalls(node.alternate, push);
+      return;
+    }
+    if (t.isSequenceExpression(node)) {
+      for (const expr of node.expressions) collectHookCalls(expr, push);
+      return;
+    }
+    if (t.isLogicalExpression(node)) {
+      collectHookCalls(node.left, push);
+      collectHookCalls(node.right, push);
+      return;
+    }
+    if (t.isUnaryExpression(node) || t.isUpdateExpression(node)) {
+      collectHookCalls((node as t.UnaryExpression | t.UpdateExpression).argument as t.Node, push);
+      return;
+    }
+    if (t.isBinaryExpression(node)) {
+      collectHookCalls(node.left as t.Node, push);
+      collectHookCalls(node.right as t.Node, push);
+      return;
+    }
+    if (t.isMemberExpression(node)) {
+      collectHookCalls(node.object as t.Node, push);
+      collectHookCalls(node.property as t.Node, push);
+      return;
+    }
+    // Other node kinds are unlikely to contain top-level hook calls relevant here
+  }
+
+  const orderedCalls: t.CallExpression[] = [];
+  for (let i = 0; i < blockStatement.body.length; i++) {
+    const stmt = blockStatement.body[i];
+    if (t.isVariableDeclaration(stmt)) {
+      for (const decl of stmt.declarations) {
+        collectHookCalls(decl.init as t.Node | undefined, (call) => orderedCalls.push(call));
+      }
+    } else if (t.isExpressionStatement(stmt)) {
+      collectHookCalls(stmt.expression, (call) => orderedCalls.push(call));
+    }
+  }
+  // Assign indices in source order
+  let positionCounter = 0;
+  for (const call of orderedCalls) {
+    if (!callToIndex.has(call)) {
+      callToIndex.set(call, positionCounter++);
+    }
+  }
+
+  // Second pass: identify labeled hooks and use the precomputed index
+  const hooksToLabel: Array<{ index: number; label: string; hookPosition: number }> = [];
   for (let i = 0; i < blockStatement.body.length; i++) {
     const stmt = blockStatement.body[i];
 
@@ -90,14 +179,17 @@ export function injectIntoBlockStatementDirect(
       if (!t.isIdentifier(callee)) continue;
 
       const hookName = callee.name;
-      const isKnownStateHook =
-        hookName === "useState" || hookName === "useReducer";
-      const isConfiguredHook =
-        hookNameSet.has(hookName) ||
-        (hookNameRegex && hookNameRegex.test(hookName));
 
-      // Skip useAutoTracer - it's the tracer hook itself
       if (hookName === "useAutoTracer") continue;
+
+      const isReactHook = /^use[A-Z]/.test(hookName);
+      if (!isReactHook) continue;
+
+      const hookPosition = callToIndex.get(init);
+      if (hookPosition === undefined) continue;
+
+      const isKnownStateHook = hookName === "useState" || hookName === "useReducer";
+      const isConfiguredHook = hookNameSet.has(hookName) || (hookNameRegex && hookNameRegex.test(hookName));
 
       if (!isKnownStateHook && !isConfiguredHook) continue;
 
@@ -116,7 +208,7 @@ export function injectIntoBlockStatementDirect(
       }
 
       if (label) {
-        hooksToLabel.push({ index: i, label });
+        hooksToLabel.push({ index: i, label, hookPosition });
       }
     }
   }
@@ -145,11 +237,11 @@ export function injectIntoBlockStatementDirect(
 
   // Create and insert labelState calls in reverse order to maintain positions
   for (let i = hooksToLabel.length - 1; i >= 0; i--) {
-    const { index, label } = hooksToLabel[i];
+    const { index, label, hookPosition } = hooksToLabel[i];
     const labelStateCall = t.expressionStatement(
       t.callExpression(
         t.memberExpression(tracerId, t.identifier("labelState")),
-        [t.stringLiteral(label), t.numericLiteral(i)]
+        [t.stringLiteral(label), t.numericLiteral(hookPosition)]
       )
     );
     blockStatement.body.splice(index + 1, 0, labelStateCall);

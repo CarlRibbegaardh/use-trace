@@ -71,9 +71,13 @@ export function useAutoTracer(): ComponentLogger {
        * logger.labelState("count");
        * ```
        */
-      labelState: (label: string) => {
+      labelState: (label: string, index: number) => {
         try {
-          addLabelForGuid(guidRef.current!, label);
+          const guid = guidRef.current!;
+          if (typeof index !== "number") {
+            throw new Error("AutoTracer: labelState requires an explicit index. Manual mode is unsupported.");
+          }
+          addLabelForGuid(guid, label, index);
         } catch (error) {
           logWarn(`AutoTracer: Error storing label ${label}:`, error);
         }
