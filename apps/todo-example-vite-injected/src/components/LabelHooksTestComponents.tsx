@@ -51,6 +51,9 @@ export function LabelHooksTestComponent() {
       <button onClick={() => custom.setValue("updated-custom")}>
         Update Custom
       </button>
+      <button onClick={() => nested.setValue("updated-nested")}>
+        Update Nested
+      </button>
     </div>
   );
 }
