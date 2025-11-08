@@ -3,6 +3,10 @@
  */
 
 import { stringify } from "./stringify.js";
+import { normalizeValue } from "./normalizeValue.js";
+import { classifyObjectProperties, type PropertyMetadata } from "./classifyObjectProperties.js";
+import { reconstructObjectFromFiber, type FiberHook } from "./reconstructObjectFromFiber.js";
+import { matchByStructure } from "./matchByStructure.js";
 
 /**
  * A label entry associates a hook's label with its build-time index and current value.
@@ -15,6 +19,8 @@ export interface LabelEntry {
   value: unknown;
   /** Friendly name (e.g., "filteredTodos") */
   label: string;
+  /** Property metadata for object-valued hooks (optional, for structural matching) */
+  propertyMetadata?: PropertyMetadata;
 }
 
 // Registry mapping GUID -> array of label entries
@@ -25,6 +31,11 @@ const guidToLabelsMap = new Map<string, LabelEntry[]>();
  * Adds a label with value for a component's hook.
  * This is used by the Babel plugin which knows the exact source position.
  *
+ * For object-valued hooks:
+ * - Normalizes function properties to "(fn)" placeholder
+ * - Classifies properties and stores metadata for structural matching
+ * - Enables matching custom hooks that return objects with changing values
+ *
  * @param guid - The unique identifier for the component instance
  * @param entry - Label entry containing label, index, and value
  */
@@ -32,10 +43,20 @@ export function addLabelForGuid(
   guid: string,
   entry: LabelEntry
 ): void {
+  // Normalize value and compute metadata for objects
+  const normalizedValue = normalizeValue(entry.value);
+  const metadata = classifyObjectProperties(normalizedValue);
+
+  const processedEntry: LabelEntry = {
+    ...entry,
+    value: normalizedValue,
+    propertyMetadata: metadata ?? undefined,
+  };
+
   if (!guidToLabelsMap.has(guid)) {
     guidToLabelsMap.set(guid, []);
   }
-  guidToLabelsMap.get(guid)!.push(entry);
+  guidToLabelsMap.get(guid)!.push(processedEntry);
 }
 
 /**
@@ -75,6 +96,13 @@ export function clearAllHookLabels(): void {
 
 /**
  * Resolve hook label using value-based matching with ordinal disambiguation.
+ *
+ * Matching strategy:
+ * 1. Primitive value matching (existing logic for strings, numbers, booleans, etc.)
+ * 2. Structural matching fallback for objects (Solution 8):
+ *    - Normalize current anchor value
+ *    - Try to match by object structure (same property keys)
+ *    - If structure matches, update values and return label
  *
  * @param guid - Component GUID
  * @param anchorIndex - Index of the anchor in the memoizedState chain
@@ -140,10 +168,92 @@ export function resolveHookLabel(
     .sort((a, b) => a.index - b.index) // Preserve source order for developer clarity
     .map((l) => l.label);
 
-  // If no labels match, return just "unknown" (not "unknown | unknown | ...")
+  // If no labels match, try structural matching before giving up
   if (labelNames.length === 0) {
+    const structuralMatch = tryStructuralMatching(
+      labels,
+      anchorIndex,
+      anchorValue,
+      allFiberAnchors
+    );
+    if (structuralMatch) {
+      return structuralMatch;
+    }
     return "unknown";
   }
 
   return [...labelNames, "unknown"].join(" | ");
 }
+
+/**
+ * Attempts to match a hook by object structure (Solution 8).
+ *
+ * For custom hooks returning objects with changing values:
+ * 1. Normalize the current anchor value
+ * 2. For each labeled entry with metadata:
+ *    - Reconstruct object from fiber hooks using stored metadata
+ *    - Match by structure (same property keys)
+ *    - If match found, update label entry value and return label
+ *
+ * @param labels - All labeled entries for this component
+ * @param anchorIndex - Current hook index in fiber
+ * @param anchorValue - Current hook value
+ * @param allFiberAnchors - All hooks in the fiber
+ * @returns Label if structural match found, null otherwise
+ */
+function tryStructuralMatching(
+  labels: LabelEntry[],
+  anchorIndex: number,
+  anchorValue: unknown,
+  allFiberAnchors: Array<{ index: number; value: unknown }>
+): string | null {
+  // Normalize current anchor value
+  const normalizedCurrent = normalizeValue(anchorValue);
+  const currentMetadata = classifyObjectProperties(normalizedCurrent);
+
+  // Only try structural matching if current value is an object
+  if (!currentMetadata) {
+    return null;
+  }
+
+  // Try to match against each labeled entry that has metadata
+  for (const labelEntry of labels) {
+    if (!labelEntry.propertyMetadata) {
+      continue; // Skip non-object labels
+    }
+
+    // Reconstruct the object from fiber hooks using stored metadata
+    const fiberHooks: FiberHook[] = allFiberAnchors.map((a) => ({
+      index: a.index,
+      value: a.value,
+    }));
+
+    const reconstructionResult = reconstructObjectFromFiber(
+      anchorIndex,
+      labelEntry.propertyMetadata,
+      fiberHooks
+    );
+
+    if (!reconstructionResult.success) {
+      continue; // Reconstruction failed, try next label
+    }
+
+    // Normalize the reconstructed object
+    const normalizedReconstructed = normalizeValue(reconstructionResult.value);
+
+    // Match by structure
+    const matchResult = matchByStructure(
+      labelEntry.value as Record<string, unknown>,
+      normalizedReconstructed as Record<string, unknown>
+    );
+
+    if (matchResult.success) {
+      // Structure matches! Update the label entry value for future matches
+      labelEntry.value = normalizedReconstructed;
+      return labelEntry.label;
+    }
+  }
+
+  return null; // No structural match found
+}
+
