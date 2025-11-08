@@ -11,11 +11,7 @@ autoTracer({
   includeSkipped: false,
   maxFiberDepth: 100,
   enableAutoTracerInternalsLogging: true,
-  detectIdenticalValueChanges: {
-    enable: true,
-    showInConsole: true,
-    maxValueLength: 10000,
-  },
+  detectIdenticalValueChanges: true,
   skippedObjectProps: [
     {
       objectName: "ThemeProvider3",

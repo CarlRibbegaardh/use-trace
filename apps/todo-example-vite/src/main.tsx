@@ -6,7 +6,6 @@ import App from "./App.tsx";
 autoTracer({
   enabled: true,
   showFlags: true,
-  showFunctionContentOnChange: false,
   skipNonTrackedBranches: true,
   maxFiberDepth: 100,
   enableAutoTracerInternalsLogging: false,
