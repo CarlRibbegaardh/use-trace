@@ -14,13 +14,13 @@ export function LabelHooksTestComponent() {
 
   // useState
   const [title, setTitle] = useState("test-title");
-  logger.labelState("title", 0);
+  logger.labelState("title", 0, title);
 
   // useReducer
   const [count, dispatch] = useReducer((state: number, action: string) => {
     return action === "increment" ? state + 1 : state;
   }, 0);
-  logger.labelState("count", 1);
+  logger.labelState("count", 1, count, dispatch);
 
   // useSelector - Mock for now to avoid Redux issues
   const todos = ["mock-todo-1", "mock-todo-2"]; // useSelector((state: RootState) => state.todos?.todos || ['mock-todo-1', 'mock-todo-2']);
@@ -30,11 +30,11 @@ export function LabelHooksTestComponent() {
 
   // useCustomHook
   const custom = useCustomHook("test-custom");
-  logger.labelState("custom", 2);
+  logger.labelState("custom", 2, custom);
 
   // useCustomHook2WithCustomHookInside
   const nested = useCustomHook2WithCustomHookInside();
-  logger.labelState("nested", 3);
+  logger.labelState("nested", 3, nested);
 
   return (
     <div data-testid="label-hooks-test">
@@ -61,7 +61,7 @@ export function LabelHooksPatternTestComponent() {
 
   // useState
   const [description, setDescription] = useState("pattern-test");
-  logger.labelState("description", 0);
+  logger.labelState("description", 0, description, setDescription);
 
   // useReducer
   const [counter, dispatchCounter] = useReducer(
@@ -70,7 +70,7 @@ export function LabelHooksPatternTestComponent() {
     },
     10
   );
-  logger.labelState("counter", 1);
+  logger.labelState("counter", 1, counter, dispatchCounter);
 
   // useSelector - Mock for now to avoid Redux issues
   const selectorResult = "all-filter"; // useSelector((state: RootState) => state.todos?.filter || 'all-filter');
@@ -80,11 +80,11 @@ export function LabelHooksPatternTestComponent() {
 
   // useCustomHook
   const customHookResult = useCustomHook("pattern-custom");
-  logger.labelState("customHookResult", 2);
+  logger.labelState("customHookResult", 2, customHookResult);
 
   // useCustomHook2WithCustomHookInside
   const nestedHookResult = useCustomHook2WithCustomHookInside();
-  logger.labelState("nestedHookResult", 3);
+  logger.labelState("nestedHookResult", 3, nestedHookResult);
 
   return (
     <div data-testid="label-hooks-pattern-test">

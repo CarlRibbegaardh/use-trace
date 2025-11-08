@@ -209,7 +209,9 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
           return (
             prevValue !== undefined &&
             prevValue !== value &&
-            !isReactInternal(name)
+            !isReactInternal(name) &&
+            value !== AUTOTRACER_STATE_MARKER &&
+            prevValue !== AUTOTRACER_STATE_MARKER
           );
         }
       );
@@ -250,13 +252,30 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
           });
         }
 
-        // Show initial useState values
+        // Show initial useState values with labels
         const allStateValues = extractUseStateValues(fiberNode);
-        allStateValues.forEach(({ name, value }) => {
-          if (!isReactInternal(name)) {
+        const memoizedStateInitial = fiberNode.memoizedState as Hook | null;
+        const anchorsInitial = findStatefulHookAnchors(memoizedStateInitial);
+
+        // Collect all anchor values for ordinal matching
+        const allAnchorsInitial = anchorsInitial.map((anchor, idx) => ({
+          index: idx,
+          value: anchor.memoizedState,
+        }));
+
+        allStateValues.forEach(({ name, value, hook }) => {
+          if (!isReactInternal(name) && value !== AUTOTRACER_STATE_MARKER) {
+            const anchorIndex = anchorsInitial.indexOf(hook as Hook);
+            const label = resolveHookLabel(
+              trackingGUID ?? "",
+              anchorIndex,
+              (hook as Hook).memoizedState,
+              allAnchorsInitial
+            );
+
             logStateChange(
               `${indent}│   `,
-              `Initial state: ${formatStateValue(value, {
+              `Initial state ${label}: ${formatStateValue(value, {
                 showFunctionContent:
                   traceOptions.showFunctionContentOnChange ?? false,
               })}`,
@@ -283,7 +302,7 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
         // Collect all anchor values for ordinal matching
         const allAnchors = anchors.map((anchor, idx) => ({
           index: idx,
-          value: anchor.memoizedState
+          value: anchor.memoizedState,
         }));
 
         // Map each state change to its label using value-based matching

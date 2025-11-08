@@ -931,7 +931,7 @@ The implementation follows TDD principles, starting with comprehensive tests tha
 
 ## Acceptance test reports
 
-[ ] #1 The auto-tracer-state-marker shows in the logs
+[x] #1 The auto-tracer-state-marker shows in the logs
 
 Actual: Initial state: Symbol(auto-tracer-state-marker) color: #df7f02; font-style: italic
 Expected: No state log output of auto-tracer-state-marker visible.
