@@ -333,7 +333,61 @@ export function formatStateChange(before: unknown, after: unknown): string {
 
 **File**: `packages/auto-tracer-react18/src/lib/functions/deepMerge.ts`
 
-Remove the `showFunctionContentOnChange` merge logic (search for references and remove).
+Add explicit handling for the new `detectIdenticalValueChanges` option and the new color configurations:
+
+```typescript
+export function deepMergeOptions(
+  target: AutoTracerOptions,
+  source: Partial<AutoTracerOptions>
+): AutoTracerOptions {
+  const result: AutoTracerOptions = { ...target };
+
+  // Handle top-level properties
+  // ... existing properties ...
+  if (source.detectIdenticalValueChanges !== undefined) {
+    result.detectIdenticalValueChanges = source.detectIdenticalValueChanges;
+  }
+
+  // Handle nested colors object
+  if (source.colors) {
+    // ... existing color merges ...
+
+    // Add merge for identicalStateValueWarning
+    if (source.colors.identicalStateValueWarning) {
+      result.colors.identicalStateValueWarning = {
+        ...target.colors?.identicalStateValueWarning,
+        ...source.colors.identicalStateValueWarning,
+        lightMode: {
+          ...target.colors?.identicalStateValueWarning?.lightMode,
+          ...source.colors.identicalStateValueWarning.lightMode,
+        },
+        darkMode: {
+          ...target.colors?.identicalStateValueWarning?.darkMode,
+          ...source.colors.identicalStateValueWarning.darkMode,
+        },
+      };
+    }
+
+    // Add merge for identicalPropValueWarning
+    if (source.colors.identicalPropValueWarning) {
+      result.colors.identicalPropValueWarning = {
+        ...target.colors?.identicalPropValueWarning,
+        ...source.colors.identicalPropValueWarning,
+        lightMode: {
+          ...target.colors?.identicalPropValueWarning?.lightMode,
+          ...source.colors.identicalPropValueWarning.lightMode,
+        },
+        darkMode: {
+          ...target.colors?.identicalPropValueWarning?.darkMode,
+          ...source.colors.identicalPropValueWarning.darkMode,
+        },
+      };
+    }
+  }
+
+  return result;
+}
+```
 
 **File**: `packages/auto-tracer-react18/src/lib/functions/walkFiberForUpdates.ts`
 
@@ -341,10 +395,12 @@ Update all calls to `formatStateValue` and `formatPropValue` to remove the optio
 
 ```typescript
 // Before:
-formatStateValue(value, { showFunctionContent: traceOptions.showFunctionContentOnChange ?? false })
+formatStateValue(value, {
+  showFunctionContent: traceOptions.showFunctionContentOnChange ?? false,
+});
 
 // After:
-formatStateValue(value)
+formatStateValue(value);
 ```
 
 **File**: `packages/auto-tracer-react18/tests/**/*.test.ts`
@@ -1072,8 +1128,10 @@ Deep equality comparison using `stringify()` has a cost, especially for large ob
    const prevStr = stringify(prevValue);
    const currStr = stringify(value);
 
-   if (prevStr.length > MAX_SIZE_FOR_DEEP_COMPARE || 
-       currStr.length > MAX_SIZE_FOR_DEEP_COMPARE) {
+   if (
+     prevStr.length > MAX_SIZE_FOR_DEEP_COMPARE ||
+     currStr.length > MAX_SIZE_FOR_DEEP_COMPARE
+   ) {
      // Skip deep comparison for very large objects
      isIdenticalValueChange = false;
    } else {
@@ -1170,36 +1228,38 @@ The `detectIdenticalValueChanges` feature helps developers identify a common Rea
 
 **Implementation Checklist**:
 
-- [ ] Add `safe-stable-stringify` dependency to package.json
-- [ ] Remove `showFunctionContentOnChange` from AutoTracerOptions interface
-- [ ] Remove `showFunctionContentOnChange` from defaultSettings
-- [ ] Remove `FormatOptions` interface from changeFormatting.ts
-- [ ] Simplify `formatStateValue()` and `formatPropValue()` to always use stringify (no options param)
-- [ ] Remove `showFunctionContentOnChange` merge logic from deepMerge.ts
-- [ ] Update all `walkFiberForUpdates.ts` calls to formatters (remove options parameter)
-- [ ] Remove `showFunctionContentOnChange` from all tests
-- [ ] Update `stringify.ts` to use `safe-stable-stringify` for stable key ordering
-- [ ] Add function identity tracking with WeakMap and auto-incrementing IDs
-- [ ] Implement replacer function to convert functions to `(fn:id)` format
-- [ ] Verify all existing tests pass with new stringify implementation
-- [ ] Add unit tests for function identity tracking (same reference = same ID, different instances = different IDs)
-- [ ] Add unit test for stable key ordering
-- [ ] Add `detectIdenticalValueChanges` to AutoTracerOptions interface
-- [ ] Add to defaultAutoTracerOptions (default: true)
-- [ ] Add `identicalStateValueWarning` color configuration to AutoTracerOptions interface
-- [ ] Add `identicalPropValueWarning` color configuration to AutoTracerOptions interface
-- [ ] Add default colors for `identicalStateValueWarning` in defaultSettings (orange with bold and ⚠️)
-- [ ] Add default colors for `identicalPropValueWarning` in defaultSettings (magenta with bold and ⚠️)
-- [ ] Create `logIdenticalStateValueWarning()` function in styledLogger.ts
-- [ ] Create `logIdenticalPropValueWarning()` function in styledLogger.ts
-- [ ] Export `logIdenticalStateValueWarning()` from log.ts
-- [ ] Export `logIdenticalPropValueWarning()` from log.ts
-- [ ] Import both warning functions in walkFiberForUpdates.ts
-- [ ] Implement detection in state change logging (walkFiberForUpdates.ts) using `logIdenticalStateValueWarning()`
-- [ ] Implement detection in prop change logging (walkFiberForUpdates.ts) using `logIdenticalPropValueWarning()`
-- [ ] Add unit tests for detection logic (objects, arrays, functions)
-- [ ] Add E2E tests with real scenarios (inline functions, object wrappers, arrays)
+- [x] Add `safe-stable-stringify` dependency to package.json
+- [x] Remove `showFunctionContentOnChange` from AutoTracerOptions interface
+- [x] Remove `showFunctionContentOnChange` from defaultSettings
+- [x] Remove `FormatOptions` interface from changeFormatting.ts
+- [x] Simplify `formatStateValue()` and `formatPropValue()` to always use stringify (no options param)
+- [x] Add explicit handling for `detectIdenticalValueChanges` in deepMerge.ts
+- [x] Add explicit deep merge for `identicalStateValueWarning` colors in deepMerge.ts
+- [x] Add explicit deep merge for `identicalPropValueWarning` colors in deepMerge.ts
+- [x] Update all `walkFiberForUpdates.ts` calls to formatters (remove options parameter)
+- [x] Remove `showFunctionContentOnChange` from all test mocks
+- [x] Update `stringify.ts` to use `safe-stable-stringify` for stable key ordering
+- [x] Add function identity tracking with WeakMap and auto-incrementing IDs
+- [x] Implement replacer function to convert functions to `(fn:id)` format
+- [x] Verify all existing tests pass with new stringify implementation
+- [x] Add unit tests for function identity tracking (same reference = same ID, different instances = different IDs)
+- [x] Add unit test for stable key ordering
+- [x] Add `detectIdenticalValueChanges` to AutoTracerOptions interface
+- [x] Add to defaultAutoTracerOptions (default: true)
+- [x] Add `identicalStateValueWarning` color configuration to AutoTracerOptions interface
+- [x] Add `identicalPropValueWarning` color configuration to AutoTracerOptions interface
+- [x] Add default colors for `identicalStateValueWarning` in defaultSettings (orange with bold and ⚠️)
+- [x] Add default colors for `identicalPropValueWarning` in defaultSettings (magenta with bold and ⚠️)
+- [x] Create `logIdenticalStateValueWarning()` function in styledLogger.ts
+- [x] Create `logIdenticalPropValueWarning()` function in styledLogger.ts
+- [x] Export `logIdenticalStateValueWarning()` from log.ts
+- [x] Export `logIdenticalPropValueWarning()` from log.ts
+- [x] Import both warning functions in walkFiberForUpdates.ts
+- [x] Implement detection in state change logging (walkFiberForUpdates.ts) using `logIdenticalStateValueWarning()`
+- [x] Implement detection in prop change logging (walkFiberForUpdates.ts) using `logIdenticalPropValueWarning()`
+- [x] Add unit tests for detection logic (objects, arrays, functions)
+- [x] Add E2E tests with real scenarios (inline functions, object wrappers, arrays)
 - [ ] Optimize stringify performance (skip primitives, size threshold with cached strings)
-- [ ] Update doc-v1.md with the new configuration option
-- [ ] Update doc-v1.md with examples and fixes (including inline function anti-pattern)
-- [ ] Add user education section on how to resolve warnings (useCallback, useMemo, constant extraction)
+- [x] Update package README with the new configuration option
+- [x] Update package README with examples and fixes (including inline function anti-pattern)
+- [x] Add user education section on how to resolve warnings (useCallback, useMemo, constant extraction)

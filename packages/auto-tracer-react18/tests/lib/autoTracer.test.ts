@@ -53,7 +53,7 @@ vi.mock("@src/lib/functions/deepMerge.js", () => {
         includeSkipped: false,
         showFlags: false,
         maxFiberDepth: 100,
-        showFunctionContentOnChange: false,
+        detectIdenticalValueChanges: true,
         skipNonTrackedBranches: true,
         skippedObjectProps: [],
       };
@@ -72,7 +72,7 @@ vi.mock("@src/lib/types/defaultSettings.js", () => {
       includeSkipped: false,
       showFlags: false,
       maxFiberDepth: 100,
-      showFunctionContentOnChange: false,
+      detectIdenticalValueChanges: true,
       skipNonTrackedBranches: true,
       skippedObjectProps: [],
     },
@@ -90,14 +90,11 @@ vi.mock("@src/lib/functions/devToolsUtils.js", () => {
 });
 
 // Mock detect updated components
-vi.mock(
-  "@src/lib/functions/detectUpdatedComponents.js",
-  () => {
-    return {
-      detectUpdatedComponents: vi.fn(),
-    };
-  }
-);
+vi.mock("@src/lib/functions/detectUpdatedComponents.js", () => {
+  return {
+    detectUpdatedComponents: vi.fn(),
+  };
+});
 
 // Mock log functions
 vi.mock("@src/lib/functions/log.js", () => {
@@ -205,9 +202,7 @@ describe("autoTracer", () => {
       expect(isAutoTracerInitialized()).toBe(true);
 
       // Second call should warn and return stopAutoTracer
-      const { logWarn } = await import(
-        "@src/lib/functions/log.js"
-      );
+      const { logWarn } = await import("@src/lib/functions/log.js");
       const cleanup = autoTracer({ enableAutoTracerInternalsLogging: true });
 
       expect(logWarn).toHaveBeenCalledWith(

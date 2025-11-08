@@ -36,6 +36,9 @@ export function deepMergeOptions(
   if (source.skippedObjectProps !== undefined) {
     result.skippedObjectProps = source.skippedObjectProps;
   }
+  if (source.detectIdenticalValueChanges !== undefined) {
+    result.detectIdenticalValueChanges = source.detectIdenticalValueChanges;
+  }
 
   // Handle nested colors object
   if (source.colors) {
@@ -158,6 +161,36 @@ export function deepMergeOptions(
         darkMode: {
           ...target.colors?.skipped?.darkMode,
           ...source.colors.skipped.darkMode,
+        },
+      };
+    }
+
+    if (source.colors.identicalStateValueWarning) {
+      result.colors.identicalStateValueWarning = {
+        ...target.colors?.identicalStateValueWarning,
+        ...source.colors.identicalStateValueWarning,
+        lightMode: {
+          ...target.colors?.identicalStateValueWarning?.lightMode,
+          ...source.colors.identicalStateValueWarning.lightMode,
+        },
+        darkMode: {
+          ...target.colors?.identicalStateValueWarning?.darkMode,
+          ...source.colors.identicalStateValueWarning.darkMode,
+        },
+      };
+    }
+
+    if (source.colors.identicalPropValueWarning) {
+      result.colors.identicalPropValueWarning = {
+        ...target.colors?.identicalPropValueWarning,
+        ...source.colors.identicalPropValueWarning,
+        lightMode: {
+          ...target.colors?.identicalPropValueWarning?.lightMode,
+          ...source.colors.identicalPropValueWarning.lightMode,
+        },
+        darkMode: {
+          ...target.colors?.identicalPropValueWarning?.darkMode,
+          ...source.colors.identicalPropValueWarning.darkMode,
         },
       };
     }
