@@ -15,6 +15,8 @@ import {
 } from "./changeFormatting.js";
 import {
   log,
+  logIdenticalStateValueWarning,
+  logIdenticalPropValueWarning,
   logLogStatement,
   logPropChange,
   logReconciled,
@@ -204,8 +206,8 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
 
       // Extract and show useState changes only if they exist
       const useStateValues = extractUseStateValues(fiberNode);
-      const meaningfulStateChanges = useStateValues.filter(
-        ({ name, value, prevValue }) => {
+      const meaningfulStateChanges = useStateValues
+        .filter(({ name, value, prevValue }) => {
           return (
             prevValue !== undefined &&
             prevValue !== value &&
@@ -213,8 +215,17 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
             value !== AUTOTRACER_STATE_MARKER &&
             prevValue !== AUTOTRACER_STATE_MARKER
           );
-        }
-      );
+        })
+        .map(({ name, value, prevValue, hook }) => {
+          // Detect identical value change if feature enabled
+          // Only flag when references are different but values are the same
+          const isIdenticalValueChange =
+            !!traceOptions.detectIdenticalValueChanges &&
+            prevValue !== value &&
+            stringify(prevValue) === stringify(value);
+
+          return { name, value, prevValue, hook, isIdenticalValueChange };
+        });
 
       // Extract prop changes only if they exist
       const propChanges = extractPropChanges(
@@ -242,10 +253,7 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
             ) {
               logPropChange(
                 `${indent}│   `,
-                `Initial prop ${name}: ${formatPropValue(value, {
-                  showFunctionContent:
-                    traceOptions.showFunctionContentOnChange ?? false,
-                })}`,
+                `Initial prop ${name}: ${formatPropValue(value)}`,
                 true
               );
             }
@@ -275,10 +283,7 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
 
             logStateChange(
               `${indent}│   `,
-              `Initial state ${label}: ${formatStateValue(value, {
-                showFunctionContent:
-                  traceOptions.showFunctionContentOnChange ?? false,
-              })}`,
+              `Initial state ${label}: ${formatStateValue(value)}`,
               true
             );
           }
@@ -286,13 +291,24 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
       } else {
         // Show prop changes if any
         propChanges.forEach(({ name, value, prevValue }) => {
-          logPropChange(
-            `${indent}│   `,
-            `Prop change ${name}: ${formatPropChange(prevValue, value, {
-              showFunctionContent:
-                traceOptions.showFunctionContentOnChange ?? false,
-            })}`
-          );
+          // Detect identical value change for props if feature enabled
+          // Only flag when references are different but values are the same
+          const isIdenticalValueChange =
+            !!traceOptions.detectIdenticalValueChanges &&
+            prevValue !== value &&
+            stringify(prevValue) === stringify(value);
+
+          const formattedChange = formatPropChange(prevValue, value);
+
+          // Use warning log for identical value changes if enabled
+          if (isIdenticalValueChange && traceOptions.detectIdenticalValueChanges) {
+            logIdenticalPropValueWarning(
+              `${indent}│   `,
+              `Prop change ${name} (identical value): ${formattedChange}`
+            );
+          } else {
+            logPropChange(`${indent}│   `, `Prop change ${name}: ${formattedChange}`);
+          }
         });
 
         // Show useState changes if any, attach labels when available
@@ -306,25 +322,28 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
         }));
 
         // Map each state change to its label using value-based matching
-        meaningfulStateChanges.forEach(({ name, value, prevValue, hook }) => {
-          const anchorIndex = anchors.indexOf(hook as Hook);
-          const label = resolveHookLabel(
-            trackingGUID ?? "",
-            anchorIndex,
-            (hook as Hook).memoizedState,
-            allAnchors
-          );
+        meaningfulStateChanges.forEach(
+          ({ name, value, prevValue, hook, isIdenticalValueChange }) => {
+            const anchorIndex = anchors.indexOf(hook as Hook);
+            const label = resolveHookLabel(
+              trackingGUID ?? "",
+              anchorIndex,
+              (hook as Hook).memoizedState,
+              allAnchors
+            );
 
-          const msg = `State change ${label}: ${formatStateChange(
-            prevValue,
-            value,
-            {
-              showFunctionContent:
-                traceOptions.showFunctionContentOnChange ?? false,
+            const formattedChange = formatStateChange(prevValue, value);
+
+            // Use warning log for identical value changes if enabled
+            if (isIdenticalValueChange && traceOptions.detectIdenticalValueChanges) {
+              const msg = `State change ${label} (identical value): ${formattedChange}`;
+              logIdenticalStateValueWarning(`${indent}│   `, msg);
+            } else {
+              const msg = `State change ${label}: ${formattedChange}`;
+              logStateChange(`${indent}│   `, msg);
             }
-          )}`;
-          logStateChange(`${indent}│   `, msg);
-        });
+          }
+        );
       }
 
       // Show component logs if this component was tracked

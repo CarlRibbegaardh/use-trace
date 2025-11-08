@@ -6,12 +6,16 @@ import App from "./App.tsx";
 autoTracer({
   enabled: true,
   showFlags: true,
-  showFunctionContentOnChange: false,
   skipNonTrackedBranches: true,
   includeReconciled: false,
   includeSkipped: false,
   maxFiberDepth: 100,
-  enableAutoTracerInternalsLogging: false,
+  enableAutoTracerInternalsLogging: true,
+  detectIdenticalValueChanges: {
+    enable: true,
+    showInConsole: true,
+    maxValueLength: 10000,
+  },
   skippedObjectProps: [
     {
       objectName: "ThemeProvider3",

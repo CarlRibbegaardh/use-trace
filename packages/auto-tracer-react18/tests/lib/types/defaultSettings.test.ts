@@ -9,7 +9,6 @@ describe("defaultSettings", () => {
     expect(defaultAutoTracerOptions.showFlags).toBe(false);
     expect(defaultAutoTracerOptions.enableAutoTracerInternalsLogging).toBe(false);
     expect(defaultAutoTracerOptions.maxFiberDepth).toBe(100);
-    expect(defaultAutoTracerOptions.showFunctionContentOnChange).toBe(false);
     expect(defaultAutoTracerOptions.skipNonTrackedBranches).toBe(true);
     expect(defaultAutoTracerOptions.skippedObjectProps).toEqual([]);
   });

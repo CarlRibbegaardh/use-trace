@@ -14,6 +14,7 @@
   "homepage": "https://github.com/CarlRibbegaardh/use-trace/",
   "type": "module",
   "dependencies": {
+    "safe-stable-stringify": "^2.4.3",
     "tslib": "^2.6.3"
   },
   "devDependencies": {

@@ -16,7 +16,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe("walkFiberForUpdates with correct label mapping", () => {
   let logSpy: any;
+  let warnSpy: any;
   let consoleLogs: string[] = [];
+  let warningLogs: string[] = [];
 
   beforeEach(() => {
     // Reset modules and spies before each test
@@ -31,12 +33,17 @@ describe("walkFiberForUpdates with correct label mapping", () => {
         consoleLogs.push(message);
       });
 
-    // Set trace options for the test
-    traceOptions.showFunctionContentOnChange = false;
+    // Also capture identical state value warnings
+    warnSpy = vi
+      .spyOn(logFunctions, "logIdenticalStateValueWarning")
+      .mockImplementation((_prefix, message) => {
+        warningLogs.push(message);
+      });
   });
 
   afterEach(() => {
-    logSpy.mockRestore();
+  logSpy.mockRestore();
+  warnSpy.mockRestore();
   });
 
   it("should correctly label state changes based on the comprehensive hook blueprint", () => {
@@ -78,17 +85,20 @@ describe("walkFiberForUpdates with correct label mapping", () => {
     walkFiberForUpdates(fiberNode, 0);
 
     // Assert: Check if the logs contain the correctly labeled state changes
-    const logOutput = consoleLogs.join("\\n");
+  const logOutput = consoleLogs.join("\n");
+  const warningOutput = warningLogs.join("\n");
 
     // These are the state changes from the fixture data, which represents a re-render
     // Based on the actual fixture data:
     // - loading changes from false (alternate) to true (current)
     // - filteredTodos is recalculated but has same value
-    const expectedLog1 = "State change filteredTodos: [[]] → [[]]";
-    const expectedLog2 = "State change loading: false → true";
+    // Note: safe-stable-stringify serializes [[]] as []
+    const expectedWarning = "State change filteredTodos (identical value): [] → []";
+    const expectedLog = "State change loading: false → true";
 
-    // This test will fail until the logic in walkFiberForUpdates is correct
-    expect(logOutput).toContain(expectedLog1);
-    expect(logOutput).toContain(expectedLog2);
+    // filteredTodos should be flagged as identical value change and logged via warning logger
+    expect(warningOutput).toContain(expectedWarning);
+    // loading should be a normal state change
+    expect(logOutput).toContain(expectedLog);
   });
 });

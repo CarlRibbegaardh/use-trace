@@ -10,7 +10,6 @@ describe("deepMergeOptions", () => {
     enabled: true,
     enableAutoTracerInternalsLogging: false,
     maxFiberDepth: 10,
-    showFunctionContentOnChange: false,
     skipNonTrackedBranches: true,
     skippedObjectProps: [],
     colors: {

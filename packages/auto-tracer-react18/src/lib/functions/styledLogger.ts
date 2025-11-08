@@ -22,6 +22,9 @@ export type ColorPalette = {
   logStatements?: ColorOptions;
   reconciled?: ColorOptions;
   skipped?: ColorOptions;
+  // Split identical value warning styling for state and prop
+  identicalStateValueWarning?: ColorOptions;
+  identicalPropValueWarning?: ColorOptions;
 };
 
 export interface StyledLoggerOptions {
@@ -150,6 +153,38 @@ export function logSkipped(
   const style = buildStyle(themeOptions);
 
   logWithOptionalStyle(prefix, `${message}${icon}`, style);
+}
+
+/**
+ * Styled logging for identical value warnings with theme-aware colors
+ * Prefix is monochrome, icon+message are styled: "  │   ⚠️ Identical value: {x:1} → {x:1}"
+ */
+// Identical state value warning (distinct color bucket)
+export function logIdenticalStateValueWarning(
+  prefix: string,
+  message: string,
+  options: StyledLoggerOptions
+): void {
+  const colorOptions = options.getColors().identicalStateValueWarning;
+  const themeOptions = getThemeOptions(colorOptions, options.themeManager);
+  const icon = colorOptions?.icon ? `${colorOptions.icon} ` : "";
+  const style = buildStyle(themeOptions);
+
+  logWithOptionalStyle(prefix, `${icon}${message}`, style);
+}
+
+// Identical prop value warning (distinct color bucket)
+export function logIdenticalPropValueWarning(
+  prefix: string,
+  message: string,
+  options: StyledLoggerOptions
+): void {
+  const colorOptions = options.getColors().identicalPropValueWarning;
+  const themeOptions = getThemeOptions(colorOptions, options.themeManager);
+  const icon = colorOptions?.icon ? `${colorOptions.icon} ` : "";
+  const style = buildStyle(themeOptions);
+
+  logWithOptionalStyle(prefix, `${icon}${message}`, style);
 }
 
 /**
