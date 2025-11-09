@@ -47,6 +47,10 @@ This is a TypeScript monorepo workspace using pnpm workspaces. The project conta
 
 ## Testing Guidelines
 
+- packages are tested using Vitest
+- apps are tested using Playwright E2E tests
+- All tests are located in `tests/` directories within each package or app
+- Tests must cover all new features and bug fixes
 - **IMPORTANT**: When running Playwright E2E tests, do NOT use the `--headed` flag
 - Always run tests in headless mode for better performance and CI compatibility
 - Use `pnpm --filter <app-name> test:e2e` without additional flags
@@ -62,16 +66,22 @@ This is a TypeScript monorepo workspace using pnpm workspaces. The project conta
 - A readme file should exist in each package and app directory with defailed descriptions of what the system part does and how to use it. It should be updated when changes are made.
 - Readme files should have both easily readable description, and technical details, including code examples where applicable and mermaid flowcharts if needed.
 
-## Code Patterns
+# Quality Standards
 
-- Use Domain-Driven Design (DDD) architecture in example apps
-- Material-UI components are used for UI consistency
-- Redux Toolkit is used for state management in examples
-- All TypeScript code should follow strict typing practices
-- One top level function, interface or type per file for clarity
+- All code must be in TypeScript with strictest possible settings.
+- Avoid casts and type assertions at all cost. If you see casts in the code, report it immediately.
+- All code must have TSDoc comments for all functions, types and interfaces.
+- For public apis, the interface fields must also have TSDoc comments.
+- TDD should be used for all new features and bug fixes.
+- All new code must have unit tests with 100% coverage (we expect pure and total functions to be the rule). Any exceptions must be clearly justified.
+- Functional Clean Code principles should be applied.
+- Prefer functional programming over OOP.
+- Functional DDD principles should be applied.
+- Immutability must be used where possible.
+- Functions should be pure and total where possible. Exceptions must be clearly documented with TSDoc and readme updates.
+- One top level function, interface or type per file for clarity.
 - Named exports only, no default exports, except for the babel plugin which must be a default export.
-- TSDoc comments for all functions and types!
-- Casts and type assertions must be avoided! Use proper typing and type guards if needed. If you see casts in the code, report it!
+- File names must match the exported function, interface or type name exactly.
 
 ## Verification
 
