@@ -138,7 +138,7 @@ export function shouldSkipFiber(
   depth: number,
   isTracked: boolean
 ): boolean {
-  if (!traceOptions.skipNonTrackedBranches) {
+  if (traceOptions.includeNonTrackedBranches) {
     return false;
   }
 

@@ -14,7 +14,7 @@ vi.mock("@src/lib/types/globalState.js", () => {
   return {
     traceOptions: {
       maxFiberDepth: 1000,
-      skipNonTrackedBranches: false,
+      includeNonTrackedBranches: true,
     },
   };
 });
@@ -219,9 +219,9 @@ describe("fiberTraversal", () => {
   });
 
   describe("shouldSkipFiber", () => {
-    it("should return false when skipNonTrackedBranches is disabled", async () => {
+    it("should return false when includeNonTrackedBranches is enabled", async () => {
       const { traceOptions } = await import("@src/lib/types/globalState.js");
-      traceOptions.skipNonTrackedBranches = false;
+      traceOptions.includeNonTrackedBranches = true;
 
       const result = shouldSkipFiber({}, 0, false);
       expect(result).toBe(false);
@@ -229,7 +229,7 @@ describe("fiberTraversal", () => {
 
     it("should return false for tracked fibers", async () => {
       const { traceOptions } = await import("@src/lib/types/globalState.js");
-      traceOptions.skipNonTrackedBranches = true;
+      traceOptions.includeNonTrackedBranches = false;
 
       const result = shouldSkipFiber({}, 0, true);
       expect(result).toBe(false);
@@ -239,7 +239,7 @@ describe("fiberTraversal", () => {
       const { traceOptions } = await import("@src/lib/types/globalState.js");
       const { getTrackingGUID } = await import("@src/lib/functions/renderRegistry.js");
 
-      traceOptions.skipNonTrackedBranches = true;
+      traceOptions.includeNonTrackedBranches = false;
       vi.mocked(getTrackingGUID).mockReturnValue(null);
 
       const fiber = {

@@ -41,7 +41,7 @@ const stop = autoTracer({
   showFlags: false,
   enableAutoTracerInternalsLogging: true,
   maxFiberDepth: 100,
-  skipNonTrackedBranches: true,
+  includeNonTrackedBranches: false,
   /**
    * Detects re-renders where the new value is structurally identical to the previous
    * value but with a different reference (e.g. re-created arrays, objects, inline
