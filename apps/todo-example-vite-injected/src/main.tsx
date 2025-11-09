@@ -10,6 +10,7 @@ autoTracer({
   includeReconciled: false,
   includeSkipped: false,
   maxFiberDepth: 100,
+  filterEmptyNodes: "all",
   enableAutoTracerInternalsLogging: true,
   detectIdenticalValueChanges: true,
   skippedObjectProps: [

@@ -34,6 +34,62 @@ interface AutoTracerOptions {
   skippedObjectProps?: SkippedObjectProp[]; // Skip specific props for specific object types (default: [])
   detectIdenticalValueChanges?: DetectIdenticalValueChanges; // Detect and warn about identical value changes
 
+  /**
+   * Filter mode for collapsing empty nodes in the component tree.
+   *
+   * Empty nodes are components that render without meaningful content:
+   * - No state changes
+   * - No prop changes
+   * - No component logs
+   * - Not tracked (no trackingGUID)
+   * - No identical value warnings
+   * - Visibility-filtered nodes (Reconciled when includeReconciled=false, Skipped when includeSkipped=false)
+   *
+   * Filter modes:
+   *
+   * **"none"** (default):
+   * - No filtering applied
+   * - All nodes appear in the tree regardless of content
+   * - Zero performance overhead (identity function)
+   * - Use when you need complete visibility into the component hierarchy
+   *
+   * **"first"**:
+   * - Collapses only the initial sequence of empty nodes at the start of the tree
+   * - Replaces consecutive empty nodes with a single marker: "... (N empty levels)"
+   * - Preserves all empty nodes that appear after the first non-empty node
+   * - Useful for cleaning up top-level wrapper components while maintaining full visibility deeper in the tree
+   *
+   * **"all"**:
+   * - Collapses all empty node sequences throughout the entire tree
+   * - Each sequence of consecutive empty nodes becomes a marker: "... (N empty levels)"
+   * - Provides the most compact view by removing all noise
+   * - Useful for focusing on components with actual state/prop changes or logs
+   *
+   * Performance characteristics:
+   * - "none": O(1) - identity function, no processing
+   * - "first": O(n) - single pass, stops at first non-empty node
+   * - "all": O(n) - single pass over entire array
+   *
+   * Markers preserve:
+   * - Depth of the first empty node in the collapsed sequence
+   * - Count of collapsed nodes (singular "level" or plural "levels")
+   *
+   * @example
+   * ```typescript
+   * // No filtering - see everything
+   * { filterEmptyNodes: 'none' }
+   *
+   * // Clean up wrapper components at the top
+   * { filterEmptyNodes: 'first' }
+   *
+   * // Maximum clarity - only show meaningful renders
+   * { filterEmptyNodes: 'all' }
+   * ```
+   *
+   * @default 'none'
+   */
+  filterEmptyNodes?: "none" | "first" | "all";
+
   // Styling options changed to colors object below
   // definitiveRenderColor?: string;
   // propChangeColor?: string;

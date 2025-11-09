@@ -15,6 +15,7 @@ export const defaultAutoTracerOptions: AutoTracerOptions = {
   skippedObjectProps: [], // Skip specific props for specific object types
   // Simple boolean per spec: enabled by default
   detectIdenticalValueChanges: true,
+  filterEmptyNodes: "none", // No empty node filtering by default (backward compatible)
 
   // Default styling (matching comments in AutoTracerOptions.ts)
   colors: {
