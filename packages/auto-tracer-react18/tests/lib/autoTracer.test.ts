@@ -54,7 +54,7 @@ vi.mock("@src/lib/functions/deepMerge.js", () => {
         showFlags: false,
         maxFiberDepth: 100,
         detectIdenticalValueChanges: true,
-        skipNonTrackedBranches: true,
+        includeNonTrackedBranches: false,
         skippedObjectProps: [],
       };
       return { ...defaults, ...source };
@@ -73,7 +73,7 @@ vi.mock("@src/lib/types/defaultSettings.js", () => {
       showFlags: false,
       maxFiberDepth: 100,
       detectIdenticalValueChanges: true,
-      skipNonTrackedBranches: true,
+      includeNonTrackedBranches: false,
       skippedObjectProps: [],
     },
   };

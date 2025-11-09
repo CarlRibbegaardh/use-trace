@@ -32,7 +32,7 @@ function buildFiber({
 describe("walkFiberForUpdates identical value detection (spec)", () => {
   it("should flag identical array prop content changes with warning logger", () => {
   traceOptions.detectIdenticalValueChanges = true;
-  traceOptions.skipNonTrackedBranches = false;
+  traceOptions.includeNonTrackedBranches = true;
   vi.spyOn(renderRegistry, "getTrackingGUID").mockReturnValue("identical-prop-guid");
     const prevProps = { items: [1, 2, 3] };
     const nextProps = { items: [1, 2, 3] }; // new reference identical content
@@ -50,7 +50,7 @@ describe("walkFiberForUpdates identical value detection (spec)", () => {
 
   it("should flag identical object state content changes with warning logger", () => {
     traceOptions.detectIdenticalValueChanges = true;
-    traceOptions.skipNonTrackedBranches = false;
+    traceOptions.includeNonTrackedBranches = true;
     vi.spyOn(renderRegistry, "getTrackingGUID").mockReturnValue("identical-state-guid");
     // Build proper useState-like hooks (queue present)
     const prevState = { memoizedState: { a: 1, b: 2 }, queue: {}, next: null };
@@ -75,7 +75,7 @@ describe("walkFiberForUpdates identical value detection (spec)", () => {
 
   it("should not flag different prop content changes", () => {
   traceOptions.detectIdenticalValueChanges = true;
-  traceOptions.skipNonTrackedBranches = false;
+  traceOptions.includeNonTrackedBranches = true;
   vi.spyOn(renderRegistry, "getTrackingGUID").mockReturnValue("identical-none-guid");
     const prevProps = { count: 1 };
     const nextProps = { count: 2 };

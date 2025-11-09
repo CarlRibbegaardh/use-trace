@@ -115,7 +115,7 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
     const trackingGUID = getTrackingGUID(fiberNode);
     const isTracked = trackingGUID !== null;
 
-    if (traceOptions.skipNonTrackedBranches) {
+    if (!traceOptions.includeNonTrackedBranches) {
       const isInParentChain = isInParentChainOfTracked(fiberNode, depth);
 
       if (!isTracked && !isInParentChain) {

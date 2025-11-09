@@ -260,7 +260,7 @@ interface AutoTracerOptions {
   enableAutoTracerInternalsLogging?: boolean;
   maxFiberDepth?: number;
   // REMOVE: showFunctionContentOnChange?: boolean;
-  skipNonTrackedBranches?: boolean;
+  includeNonTrackedBranches?: boolean;
   skippedObjectProps?: SkippedObjectProp[];
   detectIdenticalValueChanges?: boolean;
 
@@ -283,7 +283,7 @@ export const defaultAutoTracerOptions: AutoTracerOptions = {
   enableAutoTracerInternalsLogging: false,
   maxFiberDepth: 100,
   // REMOVE: showFunctionContentOnChange: false,
-  skipNonTrackedBranches: true,
+  includeNonTrackedBranches: false,
   skippedObjectProps: [],
   detectIdenticalValueChanges: true,
 
@@ -562,7 +562,7 @@ interface AutoTracerOptions {
   showFlags?: boolean;
   enableAutoTracerInternalsLogging?: boolean;
   maxFiberDepth?: number;
-  skipNonTrackedBranches?: boolean;
+  includeNonTrackedBranches?: boolean;
   skippedObjectProps?: SkippedObjectProp[];
   detectIdenticalValueChanges?: boolean; // ADD THIS - Detect reference changes with identical content (default: true)
 
@@ -586,7 +586,7 @@ export const defaultAutoTracerOptions: AutoTracerOptions = {
   showFlags: false,
   enableAutoTracerInternalsLogging: false,
   maxFiberDepth: 100,
-  skipNonTrackedBranches: true,
+  includeNonTrackedBranches: false,
   skippedObjectProps: [],
   detectIdenticalValueChanges: true, // ADD THIS - Enable by default for development
 

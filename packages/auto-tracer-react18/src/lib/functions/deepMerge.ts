@@ -30,8 +30,8 @@ export function deepMergeOptions(
   if (source.maxFiberDepth !== undefined) {
     result.maxFiberDepth = source.maxFiberDepth;
   }
-  if (source.skipNonTrackedBranches !== undefined) {
-    result.skipNonTrackedBranches = source.skipNonTrackedBranches;
+  if (source.includeNonTrackedBranches !== undefined) {
+    result.includeNonTrackedBranches = source.includeNonTrackedBranches;
   }
   if (source.skippedObjectProps !== undefined) {
     result.skippedObjectProps = source.skippedObjectProps;
