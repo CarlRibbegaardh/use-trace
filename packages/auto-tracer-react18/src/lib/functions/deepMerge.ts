@@ -30,14 +30,14 @@ export function deepMergeOptions(
   if (source.maxFiberDepth !== undefined) {
     result.maxFiberDepth = source.maxFiberDepth;
   }
-  if (source.showFunctionContentOnChange !== undefined) {
-    result.showFunctionContentOnChange = source.showFunctionContentOnChange;
-  }
   if (source.skipNonTrackedBranches !== undefined) {
     result.skipNonTrackedBranches = source.skipNonTrackedBranches;
   }
   if (source.skippedObjectProps !== undefined) {
     result.skippedObjectProps = source.skippedObjectProps;
+  }
+  if (source.detectIdenticalValueChanges !== undefined) {
+    result.detectIdenticalValueChanges = source.detectIdenticalValueChanges;
   }
 
   // Handle nested colors object
@@ -161,6 +161,36 @@ export function deepMergeOptions(
         darkMode: {
           ...target.colors?.skipped?.darkMode,
           ...source.colors.skipped.darkMode,
+        },
+      };
+    }
+
+    if (source.colors.identicalStateValueWarning) {
+      result.colors.identicalStateValueWarning = {
+        ...target.colors?.identicalStateValueWarning,
+        ...source.colors.identicalStateValueWarning,
+        lightMode: {
+          ...target.colors?.identicalStateValueWarning?.lightMode,
+          ...source.colors.identicalStateValueWarning.lightMode,
+        },
+        darkMode: {
+          ...target.colors?.identicalStateValueWarning?.darkMode,
+          ...source.colors.identicalStateValueWarning.darkMode,
+        },
+      };
+    }
+
+    if (source.colors.identicalPropValueWarning) {
+      result.colors.identicalPropValueWarning = {
+        ...target.colors?.identicalPropValueWarning,
+        ...source.colors.identicalPropValueWarning,
+        lightMode: {
+          ...target.colors?.identicalPropValueWarning?.lightMode,
+          ...source.colors.identicalPropValueWarning.lightMode,
+        },
+        darkMode: {
+          ...target.colors?.identicalPropValueWarning?.darkMode,
+          ...source.colors.identicalPropValueWarning.darkMode,
         },
       };
     }

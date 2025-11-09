@@ -15,10 +15,10 @@ export const AddTodoForm: React.FC<AddTodoFormProps> = ({ todoService }) => {
   logger.log("AddTodoForm component rendered");
 
   const [title, setTitle] = useState("");
-  logger.labelState("title");
+  logger.labelState("title", 0, title);
 
   const [description, setDescription] = useState("");
-  logger.labelState("description");
+  logger.labelState("description", 1, description);
 
   const dispatch = useAppDispatch();
 

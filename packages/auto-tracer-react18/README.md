@@ -31,7 +31,7 @@ createRoot(document.getElementById("root")!).render(<App />);
 // stopTracing();
 ```
 
-Options
+## Options
 
 ```ts
 const stop = autoTracer({
@@ -41,10 +41,25 @@ const stop = autoTracer({
   showFlags: false,
   enableAutoTracerInternalsLogging: true,
   maxFiberDepth: 100,
-  showFunctionContentOnChange: false,
   skipNonTrackedBranches: true,
+  /**
+   * Detects re-renders where the new value is structurally identical to the previous
+   * value but with a different reference (e.g. re-created arrays, objects, inline
+   * functions). When true a warning line is logged:
+   *   "⚠️ State change filteredTodos (identical value): [] → []"
+   * Uses stable JSON stringification for deep equality (including circular markers).
+   */
+  detectIdenticalValueChanges: true,
 });
 ```
+
+Removed legacy option:
+
+```diff
+- showFunctionContentOnChange: false
+```
+
+The formatting no longer short-circuits functions; values are always safely stringified.
 
 Live updates
 
@@ -62,6 +77,17 @@ if (isAutoTracerInitialized()) {
 - State change <label>: <old> → <new>
 
 Labels come from the helper hook useAutoTracer, which can be auto-injected into your components by our Babel/Vite plugins. Without injection, you still get lifecycle logs but with fewer labels.
+
+### Identical value warnings
+
+When `detectIdenticalValueChanges` is `true` (default) a value change with a different reference but identical deep content logs a warning line with a shared icon (⚠️) and the `(identical value)` suffix:
+
+```
+│   ⚠️ State change filteredTodos (identical value): [] → []
+│   ⚠️ Prop change items (identical value): [1,2,3] → [1,2,3]
+```
+
+Distinct color/style buckets are applied internally for state vs prop identical warnings, inheriting the base theme hues.
 
 ## API
 
@@ -112,6 +138,7 @@ The auto-tracer-inject-core with Babel/Vite plugins augments your source so useA
 - No logs? Verify autoTracer() runs before React renders and that you’re in a client context.
 - Unlabeled logs? Ensure the injection plugin is configured and active in your build.
 - Too verbose? Tweak options like includeReconciled/includeSkipped and maxFiberDepth.
+- Seeing repeated identical value warnings? Consider memoization (React.memo, useMemo, useCallback) or stable selectors.
 
 ## License
 

@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 
-// Mock the flatted module to test error scenarios
-vi.mock("flatted", () => {
+// Mock the safe-stable-stringify module to test error scenarios
+vi.mock("safe-stable-stringify", () => {
   return {
-    stringify: vi.fn(),
+    default: vi.fn(),
   };
 });
 
@@ -12,8 +12,13 @@ describe("stringify", () => {
     vi.clearAllMocks();
 
     // Set up default mock behavior
-    const { stringify: flattedStringify } = vi.mocked(await import("flatted"));
-    flattedStringify.mockImplementation((value) => {
+    const safeStringifyModule = vi.mocked(await import("safe-stable-stringify"));
+    const safeStringifyMock = safeStringifyModule.default;
+    safeStringifyMock.mockImplementation((value, replacer) => {
+      // If a replacer is provided, use it
+      if (replacer) {
+        return JSON.stringify(value, replacer as (key: string, value: unknown) => unknown);
+      }
       return JSON.stringify(value);
     });
   });
@@ -30,19 +35,20 @@ describe("stringify", () => {
       expect(result).toContain("42");
     });
 
-    it("should handle circular references using flatted", async () => {
-      const { stringify: flattedStringify } = vi.mocked(await import("flatted"));
+    it("should handle circular references", async () => {
+      const safeStringifyModule = vi.mocked(await import("safe-stable-stringify"));
+      const safeStringifyMock = safeStringifyModule.default;
       const { stringify } = await import("@src/lib/functions/stringify.js");
 
-      flattedStringify.mockReturnValue('{"0":"[Circular]","1":"value"}');
+      safeStringifyMock.mockReturnValue('{"circular":"[Circular]","key":"value"}');
 
       const obj: Record<string, unknown> = { key: "value" };
       obj.circular = obj;
 
       const result = stringify(obj);
 
-      expect(result).toBe('{"0":"[Circular]","1":"value"}');
-      expect(flattedStringify).toHaveBeenCalledWith(obj);
+      expect(result).toBe('{"circular":"[Circular]","key":"value"}');
+      expect(safeStringifyMock).toHaveBeenCalledWith(obj, expect.any(Function));
     });
 
     it("should handle nested objects", async () => {
@@ -286,11 +292,12 @@ describe("stringify", () => {
   });
 
   describe("error handling", () => {
-    it("should handle flatted stringify throwing an error", async () => {
-      const { stringify: flattedStringify } = vi.mocked(await import("flatted"));
+    it("should handle safe-stable-stringify throwing an error", async () => {
+      const safeStringifyModule = vi.mocked(await import("safe-stable-stringify"));
+      const safeStringifyMock = safeStringifyModule.default;
       const { stringify } = await import("@src/lib/functions/stringify.js");
 
-      flattedStringify.mockImplementation(() => {
+      safeStringifyMock.mockImplementation(() => {
         throw new Error("Serialization failed");
       });
 
@@ -300,11 +307,12 @@ describe("stringify", () => {
       expect(result).toBe("[Error serializing: Serialization failed]");
     });
 
-    it("should handle flatted stringify throwing a non-Error object", async () => {
-      const { stringify: flattedStringify } = vi.mocked(await import("flatted"));
+    it("should handle safe-stable-stringify throwing a non-Error object", async () => {
+      const safeStringifyModule = vi.mocked(await import("safe-stable-stringify"));
+      const safeStringifyMock = safeStringifyModule.default;
       const { stringify } = await import("@src/lib/functions/stringify.js");
 
-      flattedStringify.mockImplementation(() => {
+      safeStringifyMock.mockImplementation(() => {
         throw "String error";
       });
 
@@ -315,10 +323,11 @@ describe("stringify", () => {
     });
 
     it("should handle String() throwing an error in fallback", async () => {
-      const { stringify: flattedStringify } = vi.mocked(await import("flatted"));
+      const safeStringifyModule = vi.mocked(await import("safe-stable-stringify"));
+      const safeStringifyMock = safeStringifyModule.default;
       const { stringify } = await import("@src/lib/functions/stringify.js");
 
-      flattedStringify.mockImplementation(() => {
+      safeStringifyMock.mockImplementation(() => {
         throw new Error("Serialization failed");
       });
 
@@ -329,7 +338,8 @@ describe("stringify", () => {
     });
 
     it("should handle complex error scenarios", async () => {
-      const { stringify: flattedStringify } = vi.mocked(await import("flatted"));
+      const safeStringifyModule = vi.mocked(await import("safe-stable-stringify"));
+      const safeStringifyMock = safeStringifyModule.default;
       const { stringify } = await import("@src/lib/functions/stringify.js");
 
       // Test with object that has getters that throw
@@ -340,7 +350,7 @@ describe("stringify", () => {
         },
       });
 
-      flattedStringify.mockImplementation(() => {
+      safeStringifyMock.mockImplementation(() => {
         throw new Error("Cannot serialize");
       });
 
@@ -350,10 +360,11 @@ describe("stringify", () => {
     });
 
     it("should handle TypeError specifically", async () => {
-      const { stringify: flattedStringify } = vi.mocked(await import("flatted"));
+      const safeStringifyModule = vi.mocked(await import("safe-stable-stringify"));
+      const safeStringifyMock = safeStringifyModule.default;
       const { stringify } = await import("@src/lib/functions/stringify.js");
 
-      flattedStringify.mockImplementation(() => {
+      safeStringifyMock.mockImplementation(() => {
         throw new TypeError("Converting circular structure to JSON");
       });
 
@@ -364,7 +375,8 @@ describe("stringify", () => {
     });
 
     it("should handle nested error in error message creation", async () => {
-      const { stringify: flattedStringify } = vi.mocked(await import("flatted"));
+      const safeStringifyModule = vi.mocked(await import("safe-stable-stringify"));
+      const safeStringifyMock = safeStringifyModule.default;
       const { stringify } = await import("@src/lib/functions/stringify.js");
 
       // Create an error object that throws when converted to string
@@ -375,7 +387,7 @@ describe("stringify", () => {
         },
       });
 
-      flattedStringify.mockImplementation(() => {
+      safeStringifyMock.mockImplementation(() => {
         throw problematicError;
       });
 

@@ -16,7 +16,8 @@
     "publish-auto-tracer-react18": "pnpm --filter @auto-tracer/react18 publish --tag alpha --no-git-checks --access=public",
     "publish-auto-tracer-inject-react18": "pnpm --filter @auto-tracer/inject-react18 publish --tag alpha --no-git-checks --access=public",
     "publish-auto-tracer-plugin-babel-react18": "pnpm --filter @auto-tracer/plugin-babel-react18 publish --tag alpha --no-git-checks --access=public",
-    "publish-auto-tracer-plugin-vite-react18": "pnpm --filter @auto-tracer/plugin-vite-react18 publish --tag alpha --no-git-checks --access=public"
+    "publish-auto-tracer-plugin-vite-react18": "pnpm --filter @auto-tracer/plugin-vite-react18 publish --tag alpha --no-git-checks --access=public",
+    "publish-suite": "pnpm run publish-auto-tracer-react18 && pnpm run publish-auto-tracer-inject-react18 && pnpm run publish-auto-tracer-plugin-vite-react18"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.3",

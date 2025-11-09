@@ -64,13 +64,13 @@ describe("labelHooks (list-based)", () => {
     expect(result.injected).toBe(true);
     const out = result.code;
 
-    // Should label built-ins
-    expect(out).toMatch(/__autoTracer\.labelState\(['"]title['"],\s*0\)/);
-    expect(out).toMatch(/__autoTracer\.labelState\(['"]count['"],\s*1\)/);
+    // Should label built-ins with 3 arguments (label, index, value)
+    expect(out).toMatch(/__autoTracer\.labelState\(['"]title['"],\s*0,\s*title\)/);
+    expect(out).toMatch(/__autoTracer\.labelState\(['"]count['"],\s*1,\s*count\)/);
 
-    // Should label configured selectors
-    expect(out).toMatch(/__autoTracer\.labelState\(['"]todos['"],\s*2\)/);
-    expect(out).toMatch(/__autoTracer\.labelState\(['"]appTodos['"],\s*3\)/);
+    // Should label configured selectors with 3 arguments
+    expect(out).toMatch(/__autoTracer\.labelState\(['"]todos['"],\s*2,\s*todos\)/);
+    expect(out).toMatch(/__autoTracer\.labelState\(['"]appTodos['"],\s*3,\s*appTodos\)/);
 
     // Should NOT label custom hooks when only list is provided
     expect(out).not.toMatch(/__autoTracer\.labelState\(['"]custom['"]/);
@@ -117,15 +117,15 @@ describe("labelHooksPattern (regex-based)", () => {
     expect(result.injected).toBe(true);
     const out = result.code;
 
-    // Built-ins (useState/useReducer) are always handled
-    expect(out).toMatch(/__autoTracer\.labelState\(['"]title['"],\s*0\)/);
-    expect(out).toMatch(/__autoTracer\.labelState\(['"]count['"],\s*1\)/);
+    // Built-ins (useState/useReducer) are always handled with 3 arguments
+    expect(out).toMatch(/__autoTracer\.labelState\(['"]title['"],\s*0,\s*title\)/);
+    expect(out).toMatch(/__autoTracer\.labelState\(['"]count['"],\s*1,\s*count\)/);
 
-    // Pattern should match selectors and custom hooks
-    expect(out).toMatch(/__autoTracer\.labelState\(['"]todos['"],\s*2\)/);
-    expect(out).toMatch(/__autoTracer\.labelState\(['"]appTodos['"],\s*3\)/);
-    expect(out).toMatch(/__autoTracer\.labelState\(['"]custom['"],\s*4\)/);
-    expect(out).toMatch(/__autoTracer\.labelState\(['"]nested['"],\s*5\)/);
+    // Pattern should match selectors and custom hooks with 3 arguments
+    expect(out).toMatch(/__autoTracer\.labelState\(['"]todos['"],\s*2,\s*todos\)/);
+    expect(out).toMatch(/__autoTracer\.labelState\(['"]appTodos['"],\s*3,\s*appTodos\)/);
+    expect(out).toMatch(/__autoTracer\.labelState\(['"]custom['"],\s*4,\s*custom\)/);
+    expect(out).toMatch(/__autoTracer\.labelState\(['"]nested['"],\s*5,\s*nested\)/);
 
     // Total labelState occurrences should be exactly 6
     expect(countOccurrences(out, "labelState")).toBe(6);
@@ -163,11 +163,11 @@ describe("labelHooksPattern (regex-based)", () => {
     };
     const result = transform(code, context);
     expect(result.injected).toBe(true);
-    // Built-in useState labeled via array pattern
-    expect(result.code).toMatch(/labelState\(['"]s['"],\s*0\)/);
-    // Pattern-matched identifiers labeled in order
-    expect(result.code).toMatch(/labelState\(['"]a['"],\s*1\)/);
-    expect(result.code).toMatch(/labelState\(['"]b['"],\s*2\)/);
+    // Built-in useState labeled via array pattern with 3 arguments
+    expect(result.code).toMatch(/labelState\(['"]s['"],\s*0,\s*s\)/);
+    // Pattern-matched identifiers labeled in order with 3 arguments
+    expect(result.code).toMatch(/labelState\(['"]a['"],\s*1,\s*a\)/);
+    expect(result.code).toMatch(/labelState\(['"]b['"],\s*2,\s*b\)/);
   });
 
   it("labels hooks matched by both list and pattern (combined)", () => {
@@ -192,9 +192,9 @@ describe("labelHooksPattern (regex-based)", () => {
     };
     const result = transform(code, context);
     expect(result.injected).toBe(true);
-    expect(result.code).toMatch(/labelState\(['"]s['"],\s*0\)/);
-    expect(result.code).toMatch(/labelState\(['"]picked['"],\s*1\)/);
-    expect(result.code).toMatch(/labelState\(['"]dynamic['"],\s*2\)/);
+    expect(result.code).toMatch(/labelState\(['"]s['"],\s*0,\s*s\)/);
+    expect(result.code).toMatch(/labelState\(['"]picked['"],\s*1,\s*picked\)/);
+    expect(result.code).toMatch(/labelState\(['"]dynamic['"],\s*2,\s*dynamic\)/);
   });
 });
 
@@ -217,9 +217,9 @@ describe("useAutoTracer exclusion", () => {
     expect(result.injected).toBe(true);
     const out = result.code;
 
-    // Should label useState hooks
-    expect(out).toMatch(/logger\.labelState\(['"]title['"],\s*0\)/);
-    expect(out).toMatch(/logger\.labelState\(['"]description['"],\s*1\)/);
+    // Should label useState hooks with 3 arguments
+    expect(out).toMatch(/logger\.labelState\(['"]title['"],\s*0,\s*title\)/);
+    expect(out).toMatch(/logger\.labelState\(['"]description['"],\s*1,\s*description\)/);
 
     // Should NOT label useAutoTracer
     expect(out).not.toMatch(/logger\.labelState\(['"]logger['"]/);
@@ -353,7 +353,7 @@ describe("HOC-wrapped components", () => {
     expect(result.components).toHaveLength(1);
     expect(result.components[0].name).toBe("MyComponent");
     expect(result.code).toMatch(
-      /__autoTracer\.labelState\(['"]count['"],\s*0\)/
+      /__autoTracer\.labelState\(['"]count['"],\s*0,\s*count\)/
     );
   });
 
@@ -380,7 +380,7 @@ describe("HOC-wrapped components", () => {
     expect(result.components).toHaveLength(1);
     expect(result.components[0].name).toBe("MyComponent");
     expect(result.code).toMatch(
-      /__autoTracer\.labelState\(['"]value['"],\s*0\)/
+      /__autoTracer\.labelState\(['"]value['"],\s*0,\s*value\)/
     );
   });
 
@@ -407,7 +407,7 @@ describe("HOC-wrapped components", () => {
     expect(result.components).toHaveLength(1);
     expect(result.components[0].name).toBe("MyComponent");
     expect(result.code).toMatch(
-      /__autoTracer\.labelState\(['"]data['"],\s*0\)/
+      /__autoTracer\.labelState\(['"]data['"],\s*0,\s*data\)/
     );
   });
 
@@ -515,7 +515,7 @@ describe("HOC-wrapped components", () => {
     expect(result.injected).toBe(true);
     expect(result.components).toHaveLength(1);
     expect(result.code).toMatch(
-      /__autoTracer\.labelState\(['"]count['"],\s*0\)/
+      /__autoTracer\.labelState\(['"]count['"],\s*0,\s*count\)/
     );
   });
 
@@ -740,7 +740,7 @@ describe("edge cases in injectIntoBlockStatement", () => {
     const result = transform(code, context);
     // Current transformer proceeds because a tracer identifier exists
     expect(result.injected).toBe(true);
-    expect(result.code).toMatch(/tracer\.labelState\(['"]count['"],\s*0\)/);
+    expect(result.code).toMatch(/tracer\.labelState\(['"]count['"],\s*0,\s*count\)/);
   });
 
   it("skips labeling when labelState calls already exist", () => {
@@ -871,7 +871,7 @@ describe("edge cases in injectIntoBlockStatement", () => {
     const result = transform(code, context);
     expect(result.injected).toBe(true);
     // Should label using the 'tracer' identifier, not __autoTracer
-    expect(result.code).toMatch(/tracer\.labelState\(['"]count['"],\s*0\)/);
+    expect(result.code).toMatch(/tracer\.labelState\(['"]count['"],\s*0,\s*count\)/);
     expect(result.code).not.toMatch(/__autoTracer\.labelState/);
   });
 

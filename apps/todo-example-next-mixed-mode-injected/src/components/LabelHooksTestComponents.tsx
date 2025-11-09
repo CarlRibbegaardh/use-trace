@@ -12,13 +12,13 @@ export function LabelHooksTestComponent() {
 
   // useState
   const [title, setTitle] = useState("test-title");
-  logger.labelState("title");
+  logger.labelState("title", 0, title);
 
   // useReducer
   const [count, dispatch] = useReducer((state: number, action: string) => {
     return action === "increment" ? state + 1 : state;
   }, 0);
-  logger.labelState("count");
+  logger.labelState("count", 1, count);
 
   // useSelector - Mock for now to avoid Redux issues
   const todos = ["mock-todo-1", "mock-todo-2"];
@@ -28,11 +28,11 @@ export function LabelHooksTestComponent() {
 
   // useCustomHook
   const custom = useCustomHook("test-custom");
-  logger.labelState("custom");
+  logger.labelState("custom", 2, custom);
 
   // useCustomHook2WithCustomHookInside
   const nested = useCustomHook2WithCustomHookInside();
-  logger.labelState("nested");
+  logger.labelState("nested", 3, nested);
 
   return (
     <div data-testid="label-hooks-test">
@@ -59,7 +59,7 @@ export function LabelHooksPatternTestComponent() {
 
   // useState
   const [description, setDescription] = useState("pattern-test");
-  logger.labelState("description");
+  logger.labelState("description", 0, description);
 
   // useReducer
   const [counter, dispatchCounter] = useReducer(
@@ -68,7 +68,7 @@ export function LabelHooksPatternTestComponent() {
     },
     10
   );
-  logger.labelState("counter");
+  logger.labelState("counter", 1, counter);
 
   // useSelector - Mock for now to avoid Redux issues
   const selectorResult = "all-filter";
@@ -78,11 +78,11 @@ export function LabelHooksPatternTestComponent() {
 
   // useCustomHook
   const customHookResult = useCustomHook("pattern-custom");
-  logger.labelState("customHookResult");
+  logger.labelState("customHookResult", 2, customHookResult);
 
   // useCustomHook2WithCustomHookInside
   const nestedHookResult = useCustomHook2WithCustomHookInside();
-  logger.labelState("nestedHookResult");
+  logger.labelState("nestedHookResult", 3, nestedHookResult);
 
   return (
     <div data-testid="label-hooks-pattern-test">

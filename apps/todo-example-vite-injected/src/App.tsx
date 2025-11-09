@@ -15,6 +15,8 @@ import { AddTodoForm } from "./components/AddTodoForm";
 import { TodoList } from "./components/TodoList";
 import { TestComponent } from "./components/TestComponent";
 import { LabelHooksTestComponent, LabelHooksPatternTestComponent } from "./components/LabelHooksTestComponents";
+import { DetectIdenticalValueChangesDemo } from "./components/DetectIdenticalValueChangesDemo";
+import { SimpleIdenticalValueDemo } from "./components/SimpleIdenticalValueDemo";
 import { TodoService } from "./domain/TodoService";
 import { InMemoryTodoRepository } from "./infrastructure/InMemoryTodoRepository";
 import { useAppDispatch } from "./hooks/redux";
@@ -83,6 +85,20 @@ const TodoApp: React.FC = () => {
             Label Hooks Pattern Test:
           </Typography>
           <LabelHooksPatternTestComponent />
+        </Box>
+
+        <Box sx={{ mt: 4, p: 2, border: "1px dashed #f90", borderRadius: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Detect Identical Value Changes Demo:
+          </Typography>
+          <SimpleIdenticalValueDemo />
+        </Box>
+
+        <Box sx={{ mt: 4, p: 2, border: "1px dashed #ccc", borderRadius: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            All 6 Scenarios Demo:
+          </Typography>
+          <DetectIdenticalValueChangesDemo />
         </Box>
       </Container>
     </>

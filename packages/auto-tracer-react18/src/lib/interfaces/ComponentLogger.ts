@@ -10,30 +10,17 @@ export interface ComponentLogger {
   log: (message: string, ...args: unknown[]) => void;
 
   /**
-   * **Internal API - Not intended for direct developer use**
+   * INTERNAL: Associates a human-readable label with a state hook using its stable index
+   * in React's _debugHookTypes ordering. Intended for code injection only.
    *
-   * Associates a human-readable label with a state hook for debugging purposes.
-   * This method is primarily used by the auto-tracer Vite plugin during build-time
-   * AST transformation to automatically label useState/useSelector hooks.
-   *
-   * While always available at runtime, developers should generally not call this
-   * method directly as the Vite plugin handles labeling automatically.
+   * NOTE: The index AND value are REQUIRED. Manual use without the injector is unsupported.
    *
    * @param label Human-readable name for the state hook (e.g., "filteredTodos", "loading")
-   * @param index Optional stable index of the state hook within the component (0-based)
-   *
-   * @example
-   * ```tsx
-   * // Automatically handled by Vite plugin:
-   * const todos = useSelector(selectTodos);
-   * // Plugin injects: logger.labelState("todos");
-   *
-   * // Manual usage (not recommended):
-   * const [count, setCount] = useState(0);
-   * logger.labelState("count");
-   * ```
+   * @param index Stable index of the state hook within the component (0-based)
+   * @param value Current state value for value-based matching (REQUIRED)
+   * @param additionalValues Additional values for multi-value hooks (optional)
    */
-  labelState: (label: string, index?: number) => void;
+  labelState: (label: string, index: number, value: unknown, ...additionalValues: unknown[]) => void;
 }
 
 /**

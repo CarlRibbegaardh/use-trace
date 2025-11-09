@@ -9,6 +9,8 @@ import {
 import {
   type StyledLoggerOptions,
   logDefinitive as logDefinitiveStyled,
+  logIdenticalStateValueWarning as logIdenticalStateValueWarningStyled,
+  logIdenticalPropValueWarning as logIdenticalPropValueWarningStyled,
   logLogStatement as logLogStatementStyled,
   logPropChange as logPropChangeStyled,
   logReconciled as logReconciledStyled,
@@ -90,6 +92,18 @@ export function logReconciled(prefix: string, message: string): void {
  */
 export function logSkipped(prefix: string, message: string): void {
   logSkippedStyled(prefix, message, styledLoggerOptions);
+}
+
+/**
+ * Styled logging for identical value warnings with theme-aware colors
+ * Prefix is monochrome, icon+message are styled: "  │   ⚠️ Identical value: {x:1} → {x:1}"
+ */
+export function logIdenticalStateValueWarning(prefix: string, message: string): void {
+  logIdenticalStateValueWarningStyled(prefix, message, styledLoggerOptions);
+}
+
+export function logIdenticalPropValueWarning(prefix: string, message: string): void {
+  logIdenticalPropValueWarningStyled(prefix, message, styledLoggerOptions);
 }
 
 /**

@@ -163,7 +163,6 @@ describe("validateOptions", () => {
         includeSkipped: false,
         showFlags: true,
         maxFiberDepth: 200,
-        showFunctionContentOnChange: true,
         skipNonTrackedBranches: false,
         skippedObjectProps: [
           { objectName: "Component", propNames: ["prop1"] },
@@ -186,7 +185,6 @@ describe("validateOptions", () => {
         includeSkipped: false,
         showFlags: true,
         maxFiberDepth: 200,
-        showFunctionContentOnChange: true,
         skipNonTrackedBranches: false,
         skippedObjectProps: [
           { objectName: "Component", propNames: ["prop1"] },

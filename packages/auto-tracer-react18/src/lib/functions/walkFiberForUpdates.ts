@@ -1,6 +1,9 @@
 import { stringify } from "./stringify.js";
 import { extractPropChanges } from "./extractPropChanges.js";
 import { extractUseStateValues } from "./extractUseStateValues.js";
+import { findStatefulHookAnchors } from "./hookMapping/findStatefulHookAnchors.js";
+import { resolveHookLabel } from "./hookLabels.js";
+import type { Hook } from "./hookMapping/types.js";
 import { getComponentName } from "./getComponentName.js";
 import { getRealComponentName } from "./getRealComponentName.js";
 import { isReactInternal } from "./isReactInternal.js";
@@ -12,6 +15,8 @@ import {
 } from "./changeFormatting.js";
 import {
   log,
+  logIdenticalStateValueWarning,
+  logIdenticalPropValueWarning,
   logLogStatement,
   logPropChange,
   logReconciled,
@@ -23,7 +28,6 @@ import {
 import { traceOptions } from "../types/globalState.js";
 import { Placement, getFlagNames, hasRenderWork } from "./reactFiberFlags.js";
 import { getTrackingGUID } from "./renderRegistry.js";
-import { getLabelsForGuid } from "./hookLabels.js";
 import { AUTOTRACER_STATE_MARKER } from "../types/marker.js";
 import { getSkippedProps } from "./getSkippedProps.js";
 import { componentLogRegistry } from "./componentLogRegistry.js";
@@ -202,15 +206,26 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
 
       // Extract and show useState changes only if they exist
       const useStateValues = extractUseStateValues(fiberNode);
-      const meaningfulStateChanges = useStateValues.filter(
-        ({ name, value, prevValue }) => {
+      const meaningfulStateChanges = useStateValues
+        .filter(({ name, value, prevValue }) => {
           return (
             prevValue !== undefined &&
             prevValue !== value &&
-            !isReactInternal(name)
+            !isReactInternal(name) &&
+            value !== AUTOTRACER_STATE_MARKER &&
+            prevValue !== AUTOTRACER_STATE_MARKER
           );
-        }
-      );
+        })
+        .map(({ name, value, prevValue, hook }) => {
+          // Detect identical value change if feature enabled
+          // Only flag when references are different but values are the same
+          const isIdenticalValueChange =
+            !!traceOptions.detectIdenticalValueChanges &&
+            prevValue !== value &&
+            stringify(prevValue) === stringify(value);
+
+          return { name, value, prevValue, hook, isIdenticalValueChange };
+        });
 
       // Extract prop changes only if they exist
       const propChanges = extractPropChanges(
@@ -238,26 +253,37 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
             ) {
               logPropChange(
                 `${indent}│   `,
-                `Initial prop ${name}: ${formatPropValue(value, {
-                  showFunctionContent:
-                    traceOptions.showFunctionContentOnChange ?? false,
-                })}`,
+                `Initial prop ${name}: ${formatPropValue(value)}`,
                 true
               );
             }
           });
         }
 
-        // Show initial useState values
+        // Show initial useState values with labels
         const allStateValues = extractUseStateValues(fiberNode);
-        allStateValues.forEach(({ name, value }) => {
-          if (!isReactInternal(name)) {
+        const memoizedStateInitial = fiberNode.memoizedState as Hook | null;
+        const anchorsInitial = findStatefulHookAnchors(memoizedStateInitial);
+
+        // Collect all anchor values for ordinal matching
+        const allAnchorsInitial = anchorsInitial.map((anchor, idx) => ({
+          index: idx,
+          value: anchor.memoizedState,
+        }));
+
+        allStateValues.forEach(({ name, value, hook }) => {
+          if (!isReactInternal(name) && value !== AUTOTRACER_STATE_MARKER) {
+            const anchorIndex = anchorsInitial.indexOf(hook as Hook);
+            const label = resolveHookLabel(
+              trackingGUID ?? "",
+              anchorIndex,
+              (hook as Hook).memoizedState,
+              allAnchorsInitial
+            );
+
             logStateChange(
               `${indent}│   `,
-              `Initial state: ${formatStateValue(value, {
-                showFunctionContent:
-                  traceOptions.showFunctionContentOnChange ?? false,
-              })}`,
+              `Initial state ${label}: ${formatStateValue(value)}`,
               true
             );
           }
@@ -265,43 +291,59 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
       } else {
         // Show prop changes if any
         propChanges.forEach(({ name, value, prevValue }) => {
-          logPropChange(
-            `${indent}│   `,
-            `Prop change ${name}: ${formatPropChange(prevValue, value, {
-              showFunctionContent:
-                traceOptions.showFunctionContentOnChange ?? false,
-            })}`
-          );
+          // Detect identical value change for props if feature enabled
+          // Only flag when references are different but values are the same
+          const isIdenticalValueChange =
+            !!traceOptions.detectIdenticalValueChanges &&
+            prevValue !== value &&
+            stringify(prevValue) === stringify(value);
+
+          const formattedChange = formatPropChange(prevValue, value);
+
+          // Use warning log for identical value changes if enabled
+          if (isIdenticalValueChange && traceOptions.detectIdenticalValueChanges) {
+            logIdenticalPropValueWarning(
+              `${indent}│   `,
+              `Prop change ${name} (identical value): ${formattedChange}`
+            );
+          } else {
+            logPropChange(`${indent}│   `, `Prop change ${name}: ${formattedChange}`);
+          }
         });
 
         // Show useState changes if any, attach labels when available
-        const allLabels = trackingGUID ? getLabelsForGuid(trackingGUID) : [];
+        const memoizedState = fiberNode.memoizedState as Hook | null;
+        const anchors = findStatefulHookAnchors(memoizedState);
 
-        // Map each state change to its label using its original hook index.
-        meaningfulStateChanges.forEach(({ name, value, prevValue }) => {
-          // Find the original index of this state hook to get the correct label.
-          const originalHookIndex = useStateValues.findIndex(
-            (s) => s.name === name
-          );
+        // Collect all anchor values for ordinal matching
+        const allAnchors = anchors.map((anchor, idx) => ({
+          index: idx,
+          value: anchor.memoizedState,
+        }));
 
-          // The first state hook is the tracer's own, so we subtract 1 to align labels.
-          const labelIndex = originalHookIndex - 1;
+        // Map each state change to its label using value-based matching
+        meaningfulStateChanges.forEach(
+          ({ name, value, prevValue, hook, isIdenticalValueChange }) => {
+            const anchorIndex = anchors.indexOf(hook as Hook);
+            const label = resolveHookLabel(
+              trackingGUID ?? "",
+              anchorIndex,
+              (hook as Hook).memoizedState,
+              allAnchors
+            );
 
-          const label =
-            labelIndex >= 0 && allLabels[labelIndex]
-              ? allLabels[labelIndex]
-              : name; // Fallback to the original generic name
+            const formattedChange = formatStateChange(prevValue, value);
 
-          const msg = `State change ${label}: ${formatStateChange(
-            prevValue,
-            value,
-            {
-              showFunctionContent:
-                traceOptions.showFunctionContentOnChange ?? false,
+            // Use warning log for identical value changes if enabled
+            if (isIdenticalValueChange && traceOptions.detectIdenticalValueChanges) {
+              const msg = `State change ${label} (identical value): ${formattedChange}`;
+              logIdenticalStateValueWarning(`${indent}│   `, msg);
+            } else {
+              const msg = `State change ${label}: ${formattedChange}`;
+              logStateChange(`${indent}│   `, msg);
             }
-          )}`;
-          logStateChange(`${indent}│   `, msg);
-        });
+          }
+        );
       }
 
       // Show component logs if this component was tracked

@@ -69,7 +69,6 @@ vi.mock("@src/lib/types/globalState.js", () => {
       skipNonTrackedBranches: false,
       includeReconciled: true,
       includeSkipped: true,
-      showFunctionContentOnChange: false,
       showFlags: false,
     },
   };
@@ -122,7 +121,6 @@ describe("walkFiberForUpdates", () => {
     traceOptions.skipNonTrackedBranches = false;
     traceOptions.includeReconciled = true;
     traceOptions.includeSkipped = true;
-    traceOptions.showFunctionContentOnChange = false;
     traceOptions.showFlags = false;
   });
 
@@ -489,7 +487,11 @@ describe("walkFiberForUpdates", () => {
 
       getTrackingGUID.mockReturnValue("test-guid");
       extractUseStateValues.mockReturnValue([
-        { name: "state1", value: "newValue" },
+        {
+          name: "state1",
+          value: "newValue",
+          hook: { memoizedState: "newValue", queue: {}, next: null }
+        },
       ]);
 
       const fiber = {
@@ -548,48 +550,6 @@ describe("walkFiberForUpdates", () => {
       walkFiberForUpdates(fiber, 0);
 
       expect(componentLogRegistry.consumeLogs).toHaveBeenCalledWith(testGuid);
-    });
-
-    it("should format function values based on showFunctionContentOnChange option", async () => {
-      const { traceOptions } = vi.mocked(
-        await import("@src/lib/types/globalState.js")
-      );
-      const { walkFiberForUpdates } = await import(
-        "@src/lib/functions/walkFiberForUpdates.js"
-      );
-      const { extractPropChanges } = vi.mocked(
-        await import("@src/lib/functions/extractPropChanges.js")
-      );
-      const { getTrackingGUID } = vi.mocked(
-        await import("@src/lib/functions/renderRegistry.js")
-      );
-
-      traceOptions.showFunctionContentOnChange = true;
-      getTrackingGUID.mockReturnValue("test-guid");
-
-      const testFunction = () => {
-        return "test";
-      };
-      extractPropChanges.mockReturnValue([
-        { name: "callback", value: testFunction, prevValue: testFunction },
-      ]);
-
-      const fiber = {
-        elementType: () => {
-          return null;
-        },
-        child: null,
-        sibling: null,
-        flags: 1,
-        alternate: {
-          memoizedProps: { callback: testFunction },
-        },
-        memoizedProps: { callback: testFunction },
-      };
-
-      walkFiberForUpdates(fiber, 0);
-
-      expect(extractPropChanges).toHaveBeenCalled();
     });
 
     it("should handle complex fiber tree traversal", async () => {
