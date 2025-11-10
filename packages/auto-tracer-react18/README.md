@@ -64,7 +64,10 @@ The formatting no longer short-circuits functions; values are always safely stri
 Live updates
 
 ```ts
-import { updateAutoTracerOptions, isAutoTracerInitialized } from "@auto-tracer/react18";
+import {
+  updateAutoTracerOptions,
+  isAutoTracerInitialized,
+} from "@auto-tracer/react18";
 
 if (isAutoTracerInitialized()) {
   updateAutoTracerOptions({ showFlags: true });
@@ -135,10 +138,11 @@ The auto-tracer-inject-core with Babel/Vite plugins augments your source so useA
 
 ## Troubleshooting
 
-- No logs? Verify autoTracer() runs before React renders and that you’re in a client context.
+- No logs? Verify autoTracer() runs before React renders and that you're in a client context.
 - Unlabeled logs? Ensure the injection plugin is configured and active in your build.
 - Too verbose? Tweak options like includeReconciled/includeSkipped and maxFiberDepth.
 - Seeing repeated identical value warnings? Consider memoization (React.memo, useMemo, useCallback) or stable selectors.
+- Seeing "State change unknown" in third-party components? This is expected behavior. Third-party libraries (e.g., MUI's ButtonBase) use internal state hooks that aren't labeled because they're not transformed by the build plugin. The tracer correctly detects the state changes but can't provide meaningful labels since it only transforms your source code, not node_modules.
 
 ## License
 

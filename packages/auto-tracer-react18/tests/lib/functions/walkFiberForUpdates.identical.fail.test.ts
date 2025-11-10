@@ -70,8 +70,8 @@ describe("walkFiberForUpdates identical value detection (spec)", () => {
     }
     const joined = logs.join("\n");
   // Allow unknown or state0 label depending on resolution path
-  // Multi-line format for 20-200 char values
-  expect(joined).toMatch(/State change (state0|unknown) \(identical value\): \{"a":1,"b":2\}\n→\n\{"a":1,"b":2\}/);
+  // Multi-line format for 20-200 char values (starts with newline)
+  expect(joined).toMatch(/State change (state0|unknown) \(identical value\):\s*\n\{"a":1,"b":2\}\n→\n\{"a":1,"b":2\}/);
   });
 
   it("should not flag different prop content changes", () => {

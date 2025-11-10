@@ -19,7 +19,10 @@ vi.mock("@src/lib/functions/stringify.js", () => {
           try {
             return JSON.stringify(value);
           } catch (error) {
-            if (error instanceof TypeError && error.message.includes("circular")) {
+            if (
+              error instanceof TypeError &&
+              error.message.includes("circular")
+            ) {
               return "[Circular]";
             }
             throw error;
@@ -28,7 +31,9 @@ vi.mock("@src/lib/functions/stringify.js", () => {
           return String(value);
         }
       } catch (error) {
-        return `[Error serializing: ${error instanceof Error ? error.message : String(error)}]`;
+        return `[Error serializing: ${
+          error instanceof Error ? error.message : String(error)
+        }]`;
       }
     }),
   };
@@ -75,8 +80,26 @@ describe("changeFormatting", () => {
   describe("formatStateChange", () => {
     it("should format changes between values", () => {
       expect(formatStateChange(0, 1)).toBe("0 → 1");
-      // Multi-line format for 20-200 char values
-      expect(formatStateChange({ count: 0 }, { count: 1 })).toBe('{"count":0}\n→\n{"count":1}');
+      // Multi-line format for 20-200 char values (starts with newline)
+      expect(formatStateChange({ count: 0 }, { count: 1 })).toBe(
+        '\n{"count":0}\n→\n{"count":1}'
+      );
+    });
+
+    it("should use multi-line format with truncation for very long values", () => {
+      const longBefore = "a".repeat(250);
+      const longAfter = "b".repeat(260);
+
+      const result = formatStateChange(longBefore, longAfter);
+
+      // Should be multi-line (contains \n→\n)
+      expect(result).toContain("\n→\n");
+      // Should truncate at 200 chars and show character count
+      expect(result).toContain("... (250 characters)");
+      expect(result).toContain("... (260 characters)");
+      // Should show first 200 chars of each
+      expect(result).toContain("a".repeat(200));
+      expect(result).toContain("b".repeat(200));
     });
   });
 

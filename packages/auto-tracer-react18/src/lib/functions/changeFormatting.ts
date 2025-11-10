@@ -25,7 +25,7 @@ export function formatPropValue(value: unknown): string {
  * Truncation rules:
  * - < 20 chars: value → value (single line)
  * - 20-200 chars: Multi-line format
- * - 200+ chars: value... (X characters) → value... (Y characters)
+ * - 200+ chars: Multi-line with truncated values and character counts
  *
  * @param before - Previous value
  * @param after - New value
@@ -47,9 +47,9 @@ export function formatPropChange(before: unknown, after: unknown): string {
     return `${beforeStr} → ${afterStr}`;
   } else if (totalLength <= 200) {
     // Medium: multi-line
-    return `${beforeStr}\n→\n${afterStr}`;
+    return `\n${beforeStr}\n→\n${afterStr}`;
   } else {
-    // Long: truncate both values
+    // Long: truncate both values and use multi-line format
     const beforeTrunc =
       beforeStr.length > 200
         ? `${beforeStr.slice(0, 200)}... (${beforeStr.length} characters)`
@@ -58,7 +58,7 @@ export function formatPropChange(before: unknown, after: unknown): string {
       afterStr.length > 200
         ? `${afterStr.slice(0, 200)}... (${afterStr.length} characters)`
         : afterStr;
-    return `${beforeTrunc} → ${afterTrunc}`;
+    return `\n${beforeTrunc}\n→\n${afterTrunc}`;
   }
 }
 
@@ -86,7 +86,7 @@ export function formatStateValue(value: unknown): string {
  * Truncation rules:
  * - < 20 chars: value → value (single line)
  * - 20-200 chars: Multi-line format
- * - 200+ chars: value... (X characters) → value... (Y characters)
+ * - 200+ chars: Multi-line with truncated values and character counts
  *
  * @param before - Previous value
  * @param after - New value
@@ -108,9 +108,9 @@ export function formatStateChange(before: unknown, after: unknown): string {
     return `${beforeStr} → ${afterStr}`;
   } else if (totalLength <= 200) {
     // Medium: multi-line
-    return `${beforeStr}\n→\n${afterStr}`;
+    return `\n${beforeStr}\n→\n${afterStr}`;
   } else {
-    // Long: truncate both values
+    // Long: truncate both values and use multi-line format
     const beforeTrunc =
       beforeStr.length > 200
         ? `${beforeStr.slice(0, 200)}... (${beforeStr.length} characters)`
@@ -119,6 +119,6 @@ export function formatStateChange(before: unknown, after: unknown): string {
       afterStr.length > 200
         ? `${afterStr.slice(0, 200)}... (${afterStr.length} characters)`
         : afterStr;
-    return `${beforeTrunc} → ${afterTrunc}`;
+    return `\n${beforeTrunc}\n→\n${afterTrunc}`;
   }
 }

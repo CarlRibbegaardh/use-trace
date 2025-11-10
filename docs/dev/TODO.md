@@ -1,20 +1,17 @@
 TODO
-Global on off setting for useTrace.
 Can useTrace be improved using AST?
 Harmonize the settings.
 Can autoTracker understand redux selector triggered updates?
-Changes on separate lines if message is over a specific length.
 Build time tree shaking
 Knip for the library only
 Theme file support
 Config scenarios (named combinations for all but theme)
 CICD?
 GLOB with minimatch
+Make Mount optional in config
 The babelconfig in next client only looks like it's a bug in the babel plugin.
 
 DOING
-Can autoTracker sense hooks?
-Can autoTracker learn state names from AST?
 
 DONE
 Better name for useAutoTracer -> useAutoTracer.
@@ -25,3 +22,7 @@ useAutoTracer returning a logger.
 Library Test Coverage
 Refactor
 Can useAutoTracer be autoinjected using AST?
+Can autoTracker sense hooks?
+Can autoTracker learn state names from AST?
+Global on off setting for useTrace.
+Changes on separate lines if message is over a specific length.
