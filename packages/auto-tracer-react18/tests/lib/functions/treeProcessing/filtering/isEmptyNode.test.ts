@@ -1,6 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { isEmptyNode } from "../../../../../src/lib/functions/treeProcessing/filtering/isEmptyNode.js";
 import type { TreeNode } from "../../../../../src/lib/functions/treeProcessing/types/TreeNode.js";
+import type {
+  StateChangeWithWarning,
+  PropChangeWithWarning,
+} from "../../../../../src/lib/functions/treeProcessing/types/TreeNode.js";
 
 describe("isEmptyNode", () => {
   // Helper to create test nodes
@@ -19,66 +23,86 @@ describe("isEmptyNode", () => {
     ...overrides,
   });
 
-  describe("Phase 1: Visibility Filtering (takes precedence)", () => {
-    it("should consider Reconciled node as empty when includeReconciled=false", () => {
+  // Helper to create state change with warning flag
+  const createStateChange = (
+    name: string,
+    value: unknown,
+    prevValue: unknown,
+    isIdenticalValueChange: boolean = false
+  ): StateChangeWithWarning => ({
+    name,
+    value,
+    prevValue,
+    hook: { memoizedState: value, queue: null, next: null },
+    isIdenticalValueChange,
+  });
+
+  // Helper to create prop change with warning flag
+  const createPropChange = (
+    name: string,
+    value: unknown,
+    prevValue: unknown,
+    isIdenticalValueChange: boolean = false
+  ): PropChangeWithWarning => ({
+    name,
+    value,
+    prevValue,
+    isIdenticalValueChange,
+  });
+
+  describe("Phase 1: Content Filtering (takes precedence)", () => {
+    it("should consider Reconciled node as empty when includeReconciled=false and no content", () => {
       const node = createNode({ renderType: "Reconciled" });
       const options = { includeReconciled: false, includeSkipped: true };
 
       expect(isEmptyNode(node, options)).toBe(true);
     });
 
-    it("should NOT consider Reconciled node as empty when includeReconciled=true", () => {
+    it("should NOT consider Reconciled node as empty when includeReconciled=true and no content", () => {
       const node = createNode({ renderType: "Reconciled" });
       const options = { includeReconciled: true, includeSkipped: true };
 
       expect(isEmptyNode(node, options)).toBe(false);
     });
 
-    it("should consider Skipped node as empty when includeSkipped=false", () => {
+    it("should consider Skipped node as empty when includeSkipped=false and no content", () => {
       const node = createNode({ renderType: "Skipped" });
       const options = { includeReconciled: true, includeSkipped: false };
 
       expect(isEmptyNode(node, options)).toBe(true);
     });
 
-    it("should NOT consider Skipped node as empty when includeSkipped=true", () => {
+    it("should NOT consider Skipped node as empty when includeSkipped=true and no content", () => {
       const node = createNode({ renderType: "Skipped" });
       const options = { includeReconciled: true, includeSkipped: true };
 
       expect(isEmptyNode(node, options)).toBe(false);
     });
 
-    it("should consider Reconciled node as empty even with state changes when includeReconciled=false", () => {
+    it("should NOT consider Reconciled node as empty when it has state changes, even with includeReconciled=false", () => {
       const node = createNode({
         renderType: "Reconciled",
-        stateChanges: [
-          {
-            name: "state0",
-            value: 1,
-            prevValue: 0,
-            hook: { memoizedState: 1, queue: null, next: null },
-          },
-        ],
+        stateChanges: [createStateChange("state0", 1, 0)],
       });
       const options = { includeReconciled: false, includeSkipped: true };
 
-      // Visibility filtering takes precedence - it's filtered out before content is checked
-      expect(isEmptyNode(node, options)).toBe(true);
+      // Content takes precedence - nodes with changes are NEVER filtered
+      expect(isEmptyNode(node, options)).toBe(false);
     });
 
-    it("should consider Skipped node as empty even with prop changes when includeSkipped=false", () => {
+    it("should NOT consider Skipped node as empty when it has prop changes, even with includeSkipped=false", () => {
       const node = createNode({
         renderType: "Skipped",
-        propChanges: [{ name: "value", value: 10, prevValue: 5 }],
+        propChanges: [createPropChange("value", 10, 5)],
       });
       const options = { includeReconciled: true, includeSkipped: false };
 
-      // Visibility filtering takes precedence - it's filtered out before content is checked
-      expect(isEmptyNode(node, options)).toBe(true);
+      // Content takes precedence - nodes with changes are NEVER filtered
+      expect(isEmptyNode(node, options)).toBe(false);
     });
   });
 
-  describe("Phase 2: Content Filtering (only for visible nodes)", () => {
+  describe("Phase 2: Visibility Filtering (only for empty nodes)", () => {
     describe("Mount and Rendering nodes (always visible)", () => {
       it("should consider Mount node empty when no changes", () => {
         const node = createNode({ renderType: "Mount" });

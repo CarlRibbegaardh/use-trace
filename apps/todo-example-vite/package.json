@@ -12,7 +12,9 @@
     "clean": "rimraf dist",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test:e2e": "playwright test --reporter=list"
+    "test:e2e": "playwright test --reporter=list",
+    "test:e2e:explicit": "playwright test --config playwright.explicit.config.ts --reporter=list",
+    "test:e2e:pattern": "playwright test --config playwright.pattern.config.ts --reporter=list"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",

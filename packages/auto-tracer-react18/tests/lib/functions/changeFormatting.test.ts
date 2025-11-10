@@ -75,7 +75,8 @@ describe("changeFormatting", () => {
   describe("formatStateChange", () => {
     it("should format changes between values", () => {
       expect(formatStateChange(0, 1)).toBe("0 → 1");
-      expect(formatStateChange({ count: 0 }, { count: 1 })).toBe('{"count":0} → {"count":1}');
+      // Multi-line format for 20-200 char values
+      expect(formatStateChange({ count: 0 }, { count: 1 })).toBe('{"count":0}\n→\n{"count":1}');
     });
   });
 

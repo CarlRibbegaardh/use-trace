@@ -18,17 +18,17 @@ export interface EmptyNodeOptions {
 }
 
 /**
- * Determines if a TreeNode is considered "empty" based on two-phase filtering logic.
+ * Determines if a TreeNode is considered "empty" based on content-first filtering logic.
  *
- * **Phase 1: Visibility Filtering (takes precedence)**
- * - Reconciled nodes are empty when includeReconciled=false
- * - Skipped nodes are empty when includeSkipped=false
- * - This phase short-circuits before content checking
- *
- * **Phase 2: Content Filtering (only for visible nodes)**
- * - Mount/Rendering nodes are empty when they have no changes, logs, tracking, or warnings
- * - Reconciled/Skipped nodes are NEVER empty when visible (phase 1 passed)
+ * **Phase 1: Content Filtering (takes precedence)**
+ * - Nodes with state changes, prop changes, logs, tracking, or warnings are NEVER empty
+ * - This ensures important information is always visible regardless of render type
  * - Marker nodes are NEVER empty
+ *
+ * **Phase 2: Visibility Filtering (only for nodes without content)**
+ * - Reconciled nodes without content are empty when includeReconciled=false
+ * - Skipped nodes without content are empty when includeSkipped=false
+ * - Mount/Rendering nodes without content are always empty
  *
  * Content indicators (any makes node non-empty):
  * - stateChanges.length > 0
@@ -43,9 +43,13 @@ export interface EmptyNodeOptions {
  *
  * @example
  * ```typescript
- * // Reconciled node filtered by visibility
- * const reconciled: TreeNode = { renderType: "Reconciled", ... };
- * isEmptyNode(reconciled, { includeReconciled: false, includeSkipped: true }); // true
+ * // Skipped node WITH prop changes is visible even when includeSkipped=false
+ * const skippedWithChanges: TreeNode = { renderType: "Skipped", propChanges: [...], ... };
+ * isEmptyNode(skippedWithChanges, { includeReconciled: true, includeSkipped: false }); // false
+ *
+ * // Skipped node WITHOUT changes is filtered when includeSkipped=false
+ * const skippedEmpty: TreeNode = { renderType: "Skipped", propChanges: [], ... };
+ * isEmptyNode(skippedEmpty, { includeReconciled: true, includeSkipped: false }); // true
  *
  * // Mount node with no changes is empty
  * const mount: TreeNode = { renderType: "Mount", stateChanges: [], ... };
@@ -60,28 +64,14 @@ export function isEmptyNode(
   node: TreeNode,
   options: EmptyNodeOptions
 ): boolean {
-  // Phase 1: Visibility Filtering (short-circuits before content check)
-  if (node.renderType === "Reconciled" && !options.includeReconciled) {
-    return true; // Filtered out by visibility
-  }
-
-  if (node.renderType === "Skipped" && !options.includeSkipped) {
-    return true; // Filtered out by visibility
-  }
-
-  // Phase 2: Content Filtering (only reached if node is visible)
+  // Phase 1: Content Filtering (takes precedence - nodes with content are NEVER empty)
 
   // Marker nodes are never empty
   if (node.renderType === "Marker") {
     return false;
   }
 
-  // Reconciled and Skipped nodes are never empty when visible
-  if (node.renderType === "Reconciled" || node.renderType === "Skipped") {
-    return false;
-  }
-
-  // Mount and Rendering nodes: check for content
+  // Check for content - if node has ANY content, it's not empty regardless of render type
   const hasContent =
     node.stateChanges.length > 0 ||
     node.propChanges.length > 0 ||
@@ -89,5 +79,27 @@ export function isEmptyNode(
     node.isTracked ||
     node.hasIdenticalValueWarning;
 
-  return !hasContent; // Empty if no content
+  if (hasContent) {
+    return false; // Nodes with content are NEVER empty
+  }
+
+  // Phase 2: Visibility Filtering (only for nodes without content)
+
+  // Reconciled nodes without content are filtered by includeReconciled
+  if (node.renderType === "Reconciled" && !options.includeReconciled) {
+    return true; // Filtered out by visibility
+  }
+
+  // Skipped nodes without content are filtered by includeSkipped
+  if (node.renderType === "Skipped" && !options.includeSkipped) {
+    return true; // Filtered out by visibility
+  }
+
+  // Reconciled/Skipped nodes without content but with visibility enabled are not empty
+  if (node.renderType === "Reconciled" || node.renderType === "Skipped") {
+    return false;
+  }
+
+  // Mount and Rendering nodes without content are empty
+  return true;
 }

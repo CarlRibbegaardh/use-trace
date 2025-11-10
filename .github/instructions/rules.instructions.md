@@ -44,6 +44,7 @@ This is a TypeScript monorepo workspace using pnpm workspaces. The project conta
 - `packages/tracing/`: Core tracing library for React component render tracking
 - `apps/`: Example applications demonstrating the tracing library usage
 - Each app has its own E2E tests using Playwright
+- Tests are located in `tests/` directories within each package or app
 
 ## Testing Guidelines
 
@@ -55,7 +56,7 @@ This is a TypeScript monorepo workspace using pnpm workspaces. The project conta
 - Always run tests in headless mode for better performance and CI compatibility
 - Use `pnpm --filter <app-name> test:e2e` without additional flags
 - Run a single test at a time, since we are capturing logs for analysis
-- Filter for single test using "test" not "grep"
+- When checking for a string in a test, use a direct string comparison instead of asserting on match counts; it produces clearer test failures and is easier to read.
 
 ## Development Practices
 
@@ -82,8 +83,22 @@ This is a TypeScript monorepo workspace using pnpm workspaces. The project conta
 - One top level function, interface or type per file for clarity.
 - Named exports only, no default exports, except for the babel plugin which must be a default export.
 - File names must match the exported function, interface or type name exactly.
+- CC ≤ 5 per function
+- Decompose complex functions to isolate change impact
 
-## Verification
+## Task verification
 
-- Build the whole project using `pnpm build` from the root
-- Run a single E2E test from the command line to verify logs are captured correctly
+A task is not done unless:
+
+- The current lib or app builds successfully from the root using `pnpm build` with filter.
+- The tests for the current lib or app pass when run from the root using `pnpm test` with filter.
+
+## Feature Verification
+
+A feature is not done unless:
+
+- The whole project builds successfully from the root using `pnpm build`
+- All tests pass when run from the root using `pnpm test`
+
+Do not declare success until all verification steps are complete.
+Do not randomly change things just to make tests pass.

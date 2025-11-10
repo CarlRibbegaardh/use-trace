@@ -1,4 +1,5 @@
 import { stringify } from "./stringify.js";
+import { areValuesIdentical } from "./areValuesIdentical.js";
 import { extractPropChanges } from "./extractPropChanges.js";
 import { extractUseStateValues } from "./extractUseStateValues.js";
 import { findStatefulHookAnchors } from "./hookMapping/findStatefulHookAnchors.js";
@@ -222,7 +223,7 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
           const isIdenticalValueChange =
             !!traceOptions.detectIdenticalValueChanges &&
             prevValue !== value &&
-            stringify(prevValue) === stringify(value);
+            areValuesIdentical(prevValue, value);
 
           return { name, value, prevValue, hook, isIdenticalValueChange };
         });
@@ -296,7 +297,7 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
           const isIdenticalValueChange =
             !!traceOptions.detectIdenticalValueChanges &&
             prevValue !== value &&
-            stringify(prevValue) === stringify(value);
+            areValuesIdentical(prevValue, value);
 
           const formattedChange = formatPropChange(prevValue, value);
 

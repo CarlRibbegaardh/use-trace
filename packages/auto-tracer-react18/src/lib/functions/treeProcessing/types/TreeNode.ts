@@ -3,6 +3,28 @@ import type { PropChange } from "../../../interfaces/PropChange.js";
 import type { ComponentLogEntry } from "../../../interfaces/ComponentLogger.js";
 
 /**
+ * Extended state value with identical value change detection.
+ */
+export interface StateChangeWithWarning extends StateValue {
+  /**
+   * Whether this state change has identical values (different references, same content).
+   * Defaults to false if not specified.
+   */
+  readonly isIdenticalValueChange?: boolean;
+}
+
+/**
+ * Extended prop change with identical value change detection.
+ */
+export interface PropChangeWithWarning extends PropChange {
+  /**
+   * Whether this prop change has identical values (different references, same content).
+   * Defaults to false if not specified.
+   */
+  readonly isIdenticalValueChange?: boolean;
+}
+
+/**
  * Represents the type of render operation for a tree node.
  *
  * - "Mount": Initial render of a component
@@ -68,13 +90,13 @@ export interface TreeNode {
    * Immutable array of state changes detected in this render.
    * Empty for reconciled, skipped, and marker nodes.
    */
-  readonly stateChanges: readonly StateValue[];
+  readonly stateChanges: readonly StateChangeWithWarning[];
 
   /**
    * Immutable array of prop changes detected in this render.
    * Empty for reconciled, skipped, and marker nodes.
    */
-  readonly propChanges: readonly PropChange[];
+  readonly propChanges: readonly PropChangeWithWarning[];
 
   /**
    * Immutable array of component log statements from this render.

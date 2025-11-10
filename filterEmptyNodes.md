@@ -2,7 +2,13 @@
 
 ## Specification Changelog
 
-### Version 1.3 (Current)
+### Version 1.4 (Current)
+
+- **CRITICAL FIX: Corrected depth vs indentation semantics**: Visual indentation reflects filtered structure when nodes are collapsed. Original depth preserved only for optional debug labels.
+- **Clarified rendering model**: Nodes are assigned sequential visual depths based on their position in the filtered array. Original fiber depth stored separately for debugging.
+- **Updated examples**: All examples now show correct visual indentation behavior where collapsed nodes result in compact indentation.
+
+### Version 1.3
 
 - **Fixed code examples**: Added missing `options` parameter to all filter function calls
 - **Clarified marker formatting**: Markers show count format OR level format (not both simultaneously)
@@ -49,9 +55,10 @@ In applications with deep provider hierarchies (especially Next.js apps with Red
 - **Marker Node**: A special node type that represents collapsed empty nodes in the output
 - **Visibility Filtering**: Settings that control which node types are shown (`includeReconciled`, `includeSkipped`). Takes precedence over content richness—if a node is visibility-filtered, it's treated as empty regardless of changes or warnings
 - **Content Filtering**: Checking if a node has meaningful changes (state, props, logs)
-- **Depth**: The zero-based nesting level of a node in the original fiber tree
-- **Visual Indent**: The indentation level in the rendered output (may differ from depth after filtering)
-- **Depth Label**: The `(Level: N)` annotation shown when `enableAutoTracerInternalsLogging` is enabled
+- **Depth**: The zero-based nesting level of a node in the original fiber tree (preserved in TreeNode for debugging)
+- **Visual Depth**: The zero-based nesting level in the rendered output (calculated based on position in filtered array)
+- **Visual Indent**: The indentation level in the rendered output, calculated as `visualDepth * 2` spaces
+- **Depth Label**: The `(Level: N)` annotation showing original fiber depth when `enableAutoTracerInternalsLogging` is enabled
 - **Tracked Component**: A component that uses the `useAutoTracer()` hook and has a trackingGUID
 
 ## Architecture Overview
@@ -970,44 +977,68 @@ The tree processing pipeline has predictable algorithmic complexity:
 
 ### Depth Preservation Invariant
 
-**CRITICAL**: Depth values in TreeNode always refer to the original fiber depth in the React component tree. Filtering operations never renumber or modify depth values.
+**CRITICAL**: The `depth` field in TreeNode always refers to the original fiber depth in the React component tree. Filtering operations never modify this value. It is preserved solely for optional debugging labels.
 
 **Convention**: Depth is **zero-based**. The root fiber has depth 0, its children have depth 1, etc.
 
 This means:
 
 - A node at depth 15 in the fiber tree will have `depth: 15` in TreeNode
-- After filtering, it still has `depth: 15` even if displayed earlier in the output
-- Depth labels (when `enableAutoTracerInternalsLogging` is true) always show original fiber depth as `(Level: N)` where N is the zero-based depth
+- After filtering, it still has `depth: 15` stored in the node
+- When `enableAutoTracerInternalsLogging` is true, depth labels show this original value as `(Level: 15)`
 - This aids debugging by maintaining traceability to the actual React fiber tree structure
 
-### Indentation vs Depth
+**Important**: The original depth value is ONLY used for optional debug labels. Visual indentation uses a separate calculated visual depth.
 
-After filtering, visual indentation may not correspond 1:1 with depth labels:
+### Visual Depth vs Original Depth (CRITICAL)
 
-- **Visual indentation**: Derived from original depth values (even after filtering), calculated as `depth * 2` spaces
-- **Depth label**: Shows the original fiber depth before filtering as `(Level: N)`
+**The purpose of this feature is to reduce visual clutter by collapsing empty nodes.**
 
-**Important**: Visual indentation continues to use the original depth values. This means:
+After filtering, nodes are rendered with **visual depths** based on their position in the filtered array:
 
-- Filtering removes nodes but doesn't renumber depths
-- Visual gaps in indentation indicate where nodes were removed
-- Depth labels confirm the original nesting level
+- **Original depth** (`node.depth`): Preserved from fiber tree, never changed, used only for `(Level: N)` labels
+- **Visual depth**: Calculated during rendering as the node's index position accounting for tree structure
 
-Example:
+**Visual indentation formula**: `visualDepth * 2` spaces
+
+**When filtering collapses nodes**, the visual structure becomes compact:
 
 ```
-└─┐ (Level: 0)  ← Original depth 0, indent 0
-  └─┐ (Level: 1)  ← Original depth 1, indent 2 spaces
-    └─┐ ... (Level: 14)  ← Marker at depth 14 (collapsed 13 nodes)
-      ├─ [TodoList] Rendering ⚡  ← Original depth 15, indent 30 spaces
+└─┐ ... (21 empty levels)     ← Marker: visualDepth=0, originalDepth=1, indent=0
+  ├─ [TodoList] Rendering ⚡   ← TodoList: visualDepth=1, originalDepth=22, indent=2
 ```
 
-This approach:
+**When no filtering occurs** (mode="none" or no empty nodes), visual depth equals original depth:
 
-- Preserves traceability to the actual fiber tree structure
-- Shows where nodes were removed (indentation jumps)
-- Maintains consistency between depth labels and visual positioning
+```
+└─┐                           ← visualDepth=0, originalDepth=0
+  └─┐                         ← visualDepth=1, originalDepth=1
+    ├─ [TodoList] Rendering ⚡ ← visualDepth=2, originalDepth=2
+```
+
+With debug labels enabled on filtered output:
+
+```
+└─┐ ... (Level: 1)            ← Shows original depth 1
+  ├─ [TodoList] Rendering ⚡ (Level: 22)  ← Shows original depth 22, indented at visual depth 1
+```
+
+**Key principle**: Visual indentation reflects the **filtered** structure (compact when nodes collapsed), while optional debug labels show **original** structure (for traceability).
+
+### What Changed in Version 1.4
+
+**Version 1.3 (INCORRECT):**
+- Stated "visual indentation uses original depth values"
+- Would render: `depth * 2` spaces based on `node.depth`
+- Result: Marker at 2 spaces, TodoList at 44 spaces (defeats the purpose!)
+
+**Version 1.4 (CORRECT):**
+- Visual indentation uses **calculated visual depth**
+- Marker at position 0 → 0 spaces indent
+- TodoList at position 1 after marker → 2 spaces indent
+- Original depths preserved only for optional `(Level: N)` labels
+
+This aligns with the Problem Statement showing compact output after filtering.
 
 ### Processing Order and maxFiberDepth
 
@@ -1830,12 +1861,16 @@ const processTree = (fiber: unknown, mode: FilterMode) => {
 ### With depth indicators and filtering (enableAutoTracerInternalsLogging: true, filterEmptyNodes: "first")
 
 ```
-└─┐ ... (Level: 5)
-  ├─ [TodoList] Rendering ⚡
+└─┐ ... (Level: 1)           ← Marker shows original depth where collapse started
+  ├─ [TodoList] Rendering ⚡ (Level: 22)  ← Shows original depth 22, indented at visual depth 1
   │   State change todos: [] → [...]
 ```
 
-**Note:** When `enableAutoTracerInternalsLogging` is enabled, markers show the **depth level** where the collapsed sequence begins, not the count of collapsed nodes. This maintains consistency with other depth indicators in the output.
+**Note:** When `enableAutoTracerInternalsLogging` is enabled:
+- Markers show the **original fiber depth** where the collapsed sequence begins as `(Level: N)`
+- Component nodes show their **original fiber depth** in the label
+- **Visual indentation** reflects the filtered structure (compact display)
+- This provides both traceability (original depths) and readability (compact layout)
 
 ## Open Questions
 

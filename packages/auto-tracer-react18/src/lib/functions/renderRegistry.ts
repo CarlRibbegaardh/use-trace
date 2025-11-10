@@ -7,7 +7,11 @@
 import { useMemo, useRef } from "react";
 import type { ComponentLogger } from "../interfaces/ComponentLogger.js";
 import { componentLogRegistry } from "./componentLogRegistry.js";
-import { addLabelForGuid, clearLabelsForGuid, clearAllHookLabels } from "./hookLabels.js";
+import {
+  addLabelForGuid,
+  clearLabelsForGuid,
+  clearAllHookLabels,
+} from "./hookLabels.js";
 import { log, logWarn } from "./log.js";
 
 // Registry of GUIDs that definitely rendered this cycle
@@ -74,11 +78,18 @@ export function useAutoTracer(): ComponentLogger {
        * logger.labelState("count", 1, count);
        * ```
        */
-      labelState: (label: string, index: number, value: unknown, ...additionalValues: unknown[]) => {
+      labelState: (
+        label: string,
+        index: number,
+        value: unknown,
+        ...additionalValues: unknown[]
+      ) => {
         try {
           const guid = guidRef.current!;
           if (typeof index !== "number") {
-            throw new Error("AutoTracer: labelState requires an explicit index. Manual mode is unsupported.");
+            throw new Error(
+              "AutoTracer: labelState requires an explicit index. Manual mode is unsupported."
+            );
           }
           // Clear old labels on first call (index 0) for this render
           if (index === 0) {
@@ -149,4 +160,13 @@ export function clearRenderRegistry(): void {
  */
 export function getTrackedGUIDs(): Set<string> {
   return new Set(trackedGUIDs);
+}
+
+/**
+ * Register a GUID for testing purposes.
+ * This allows tests to simulate tracked components without using the useAutoTracer hook.
+ * @internal
+ */
+export function registerTrackedGUID(guid: string): void {
+  trackedGUIDs.add(guid);
 }

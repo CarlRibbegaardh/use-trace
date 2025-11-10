@@ -5,13 +5,13 @@ import App from "./App.tsx";
 // Initialize autoTracer before anything else
 autoTracer({
   enabled: true,
-  showFlags: true,
+  showFlags: false,
   skipNonTrackedBranches: true,
   includeReconciled: false,
   includeSkipped: false,
   maxFiberDepth: 100,
   filterEmptyNodes: "all",
-  enableAutoTracerInternalsLogging: true,
+  enableAutoTracerInternalsLogging: false,
   detectIdenticalValueChanges: true,
   skippedObjectProps: [
     {
