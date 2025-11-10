@@ -44,13 +44,13 @@ test.describe("Explicit labelHooks Configuration Tests", () => {
     // Verify we have more hook logging in pattern mode than explicit mode would have
     // Pattern should automatically detect useSelector, useAppSelector, useCustomHook, etc.
     const dispatchLogs = pageLogs.filter((log: string) =>
-      log.includes("State change dispatch:")
+      log.includes("State change dispatch")
     );
     // EXPANDED TEST: Dispatch should NOT be logged as state change (it's a function!)
     expect(dispatchLogs.length).toBe(0);
 
     const filteredTodosLogs = pageLogs.filter((log: string) =>
-      log.includes("State change filteredTodos:")
+      log.includes("State change filteredTodos")
     );
     expect(filteredTodosLogs.length).toBeGreaterThan(0);
 

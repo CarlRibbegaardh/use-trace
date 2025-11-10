@@ -1028,11 +1028,13 @@ With debug labels enabled on filtered output:
 ### What Changed in Version 1.4
 
 **Version 1.3 (INCORRECT):**
+
 - Stated "visual indentation uses original depth values"
 - Would render: `depth * 2` spaces based on `node.depth`
 - Result: Marker at 2 spaces, TodoList at 44 spaces (defeats the purpose!)
 
 **Version 1.4 (CORRECT):**
+
 - Visual indentation uses **calculated visual depth**
 - Marker at position 0 → 0 spaces indent
 - TodoList at position 1 after marker → 2 spaces indent
@@ -1867,6 +1869,7 @@ const processTree = (fiber: unknown, mode: FilterMode) => {
 ```
 
 **Note:** When `enableAutoTracerInternalsLogging` is enabled:
+
 - Markers show the **original fiber depth** where the collapsed sequence begins as `(Level: N)`
 - Component nodes show their **original fiber depth** in the label
 - **Visual indentation** reflects the filtered structure (compact display)
@@ -2025,24 +2028,26 @@ Current proposal: `└─┐ ... (N empty levels)` - simple, clear, ASCII-friend
 When a component first mounts (initial render), the auto-tracer distinguishes between **initial values** and **subsequent changes**:
 
 **On Mount** (`renderType: "Mount"`):
+
 ```typescript
 // Logged to console as:
-"Initial state count: 0"       // NOT "State change"
-"Initial prop title: 'Hello'"  // NOT "Prop change"
+"Initial state count: 0"; // NOT "State change"
+"Initial prop title: 'Hello'"; // NOT "Prop change"
 ```
 
 **On Update** (`renderType: "Rendering"`):
+
 ```typescript
 // Logged to console as:
-"State change count: 0 → 1"
-"Prop change title: 'Hello' → 'World'"
+"State change count: 0 → 1";
+"Prop change title: 'Hello' → 'World'";
 ```
 
 This distinction is important for readability - users see "Initial" for first render, "Change" for updates.
 
 ### How This Affects TreeNode Data Structure
 
-**Critical insight:** While the *logging output* distinguishes "Initial" vs "Change", the **TreeNode data structure** does not:
+**Critical insight:** While the _logging output_ distinguishes "Initial" vs "Change", the **TreeNode data structure** does not:
 
 ```typescript
 // Mount with initial state - TreeNode contains:
@@ -2068,13 +2073,16 @@ The `stateChanges` and `propChanges` arrays are populated for Mounts that have i
 This means our empty node logic correctly handles both cases:
 
 ```typescript
-export function isEmptyNode(node: TreeNode, options: EmptyNodeOptions): boolean {
+export function isEmptyNode(
+  node: TreeNode,
+  options: EmptyNodeOptions
+): boolean {
   // ... visibility filtering ...
 
   // Mount and Rendering nodes: check for content
   const hasContent =
-    node.stateChanges.length > 0 ||   // ← Includes "initial state" entries!
-    node.propChanges.length > 0 ||    // ← Includes "initial prop" entries!
+    node.stateChanges.length > 0 || // ← Includes "initial state" entries!
+    node.propChanges.length > 0 || // ← Includes "initial prop" entries!
     node.componentLogs.length > 0 ||
     node.isTracked ||
     node.hasIdenticalValueWarning;
@@ -2089,12 +2097,13 @@ export function isEmptyNode(node: TreeNode, options: EmptyNodeOptions): boolean 
 
 ```jsx
 function Counter() {
-  const [count, setCount] = useState(0);  // Has initial value
+  const [count, setCount] = useState(0); // Has initial value
   return <div>{count}</div>;
 }
 ```
 
 **TreeNode:**
+
 ```typescript
 {
   renderType: "Mount",
@@ -2104,6 +2113,7 @@ function Counter() {
 ```
 
 **Console Output:**
+
 ```
 ├─ [Counter] Mount ⚡
 │   Initial state count: 0
@@ -2112,6 +2122,7 @@ function Counter() {
 **Empty Node Status:** ❌ **NOT empty** (has content: `stateChanges.length > 0`)
 
 **Filtering Behavior:**
+
 - Current implementation: **Shown** (has content)
 - Spec-literal approach: **Shown** (Mounts never empty)
 - **Result: Both approaches agree** ✅
@@ -2128,6 +2139,7 @@ function Wrapper({ children }) {
 ```
 
 **TreeNode:**
+
 ```typescript
 {
   renderType: "Mount",
@@ -2141,16 +2153,20 @@ function Wrapper({ children }) {
 ```
 
 **Console Output (if shown):**
+
 ```
 ├─ [Wrapper] Mount
 ```
+
 (Just the component name, no "Initial" entries)
 
 **Empty Node Status:**
+
 - Current implementation: ✅ **Empty** (no content)
 - Spec-literal approach: ❌ **NOT empty** (Mounts never empty)
 
 **Filtering Behavior:**
+
 - Current implementation: **Filtered out** (collapsed into marker)
 - Spec-literal approach: **Always shown**
 - **Result: Approaches differ** ⚠️
@@ -2170,18 +2186,20 @@ function Wrapper({ children }) {
 ```
 
 **TreeNodes:**
+
 ```typescript
 [
-  { renderType: "Mount", stateChanges: [] },            // _App - empty
-  { renderType: "Mount", stateChanges: [] },            // ErrorBoundary - empty
-  { renderType: "Mount", stateChanges: [{ store }] },   // ReduxProvider - NOT empty
-  { renderType: "Mount", stateChanges: [{ theme }] },   // ThemeProvider - NOT empty
-  { renderType: "Rendering", stateChanges: [] },        // Layout - empty
-  { renderType: "Rendering", stateChanges: [{ data }] } // HomePage - NOT empty
-]
+  { renderType: "Mount", stateChanges: [] }, // _App - empty
+  { renderType: "Mount", stateChanges: [] }, // ErrorBoundary - empty
+  { renderType: "Mount", stateChanges: [{ store }] }, // ReduxProvider - NOT empty
+  { renderType: "Mount", stateChanges: [{ theme }] }, // ThemeProvider - NOT empty
+  { renderType: "Rendering", stateChanges: [] }, // Layout - empty
+  { renderType: "Rendering", stateChanges: [{ data }] }, // HomePage - NOT empty
+];
 ```
 
 **Current Implementation Output** (`filterEmptyNodes: "all"`):
+
 ```
 └─┐ ... (2 empty levels)      ← _App and ErrorBoundary collapsed
   ├─ [ReduxProvider] Mount ⚡
@@ -2195,9 +2213,11 @@ function Wrapper({ children }) {
       ├─ [HomePage] Rendering ⚡
       │   Initial state data: { ... }
 ```
+
 **6 components → 3 markers + 3 content = 6 lines**
 
 **Spec-Literal Output** (`filterEmptyNodes: "all"`):
+
 ```
 └─┐
   ├─ [_App] Mount             ← Shown (Mounts never empty)
@@ -2217,6 +2237,7 @@ function Wrapper({ children }) {
           ├─ [HomePage] Rendering ⚡
           │   Initial state data: { ... }
 ```
+
 **6 components → 2 shown + 1 marker + 3 content = 12 lines** (2x more verbose)
 
 ---
@@ -2224,16 +2245,20 @@ function Wrapper({ children }) {
 ### Why Current Implementation is Preferred
 
 **1. Empty wrapper Mounts provide no debugging value:**
+
 ```
 ├─ [Wrapper] Mount    ← What does this tell me? Nothing.
 ```
+
 vs.
+
 ```
 ├─ [Counter] Mount ⚡
 │   Initial state count: 0   ← This is useful!
 ```
 
 **2. Common React patterns create many empty wrapper Mounts:**
+
 - Error boundaries (before error occurs)
 - Lazy component wrappers
 - Framework wrappers (`_App`, `_Document`)
@@ -2241,23 +2266,27 @@ vs.
 - Higher-order component wrappers
 
 **3. When a Mount DOES have content, both approaches show it:**
+
 - No information is lost
 - Focus on meaningful state/prop initialization
 - "Mount" badge (⚡) still indicates it's a new component
 
 **4. Real-world impact:**
+
 - Typical Next.js app: **30-50% fewer lines** of output
 - Focus on **what changed**, not **what mounted with nothing**
 - Easier to scan for actual state/prop initialization
 
 ### Decision Rationale
 
-The specification's original language ("Not a mount") was intended to indicate "Mounts are important" because they *typically* have initial state/props. However, the implementation is more nuanced:
+The specification's original language ("Not a mount") was intended to indicate "Mounts are important" because they _typically_ have initial state/props. However, the implementation is more nuanced:
 
 **Implementation Logic:**
+
 > "Mounts are NOT empty **if they have content** (initial state/props/logs). Mounts WITHOUT content are noise and should be filtered like any other empty node."
 
 This provides the best of both worlds:
+
 - ✅ Show meaningful Mounts (with initial state/props)
 - ✅ Hide noise Mounts (empty wrappers)
 - ✅ Consistent with overall feature goal (reduce clutter)
@@ -2265,13 +2294,14 @@ This provides the best of both worlds:
 ### Specification Status
 
 **Version 1.4 (Current Implementation):**
+
 - Mounts with content (state/props/logs): NOT empty
 - Mounts without content: Empty (can be filtered)
 - Rationale: Practical, reduces noise, focuses on meaningful renders
 
 **Version 1.3 (Original Spec):**
+
 - All Mounts: NOT empty (never filtered)
 - Rationale: Mounts are "special" (but creates clutter in practice)
 
 **Recommendation:** Keep version 1.4 behavior (current implementation).
-

@@ -3,8 +3,14 @@ import { buildTreeNode } from "../../../../../src/lib/functions/treeProcessing/b
 import type { Hook } from "../../../../../src/lib/functions/hookMapping/types.js";
 import { traceOptions } from "../../../../../src/lib/types/globalState.js";
 import type { AutoTracerOptions } from "../../../../../src/lib/interfaces/AutoTracerOptions.js";
-import { addLabelForGuid, clearAllHookLabels } from "../../../../../src/lib/functions/hookLabels.js";
-import { registerTrackedGUID, clearRenderRegistry } from "../../../../../src/lib/functions/renderRegistry.js";
+import {
+  addLabelForGuid,
+  clearAllHookLabels,
+} from "../../../../../src/lib/functions/hookLabels.js";
+import {
+  registerTrackedGUID,
+  clearRenderRegistry,
+} from "../../../../../src/lib/functions/renderRegistry.js";
 
 /**
  * Integration tests for useState label resolution in buildTreeNode.
@@ -26,7 +32,7 @@ describe("buildTreeNode - useState label resolution integration", () => {
       includeReconciled: false,
       includeSkipped: false,
       enableAutoTracerInternalsLogging: false,
-      skipNonTrackedBranches: false,
+      includeNonTrackedBranches: true,
       detectIdenticalValueChanges: false,
     } satisfies Partial<AutoTracerOptions>);
   });
@@ -156,7 +162,10 @@ describe("buildTreeNode - useState label resolution integration", () => {
       console.log("State changes:", treeNode.stateChanges);
       if (treeNode.stateChanges[0]) {
         console.log("First state change name:", treeNode.stateChanges[0].name);
-        console.log("First state change value:", treeNode.stateChanges[0].value);
+        console.log(
+          "First state change value:",
+          treeNode.stateChanges[0].value
+        );
         console.log("First state change hook:", treeNode.stateChanges[0].hook);
       }
 

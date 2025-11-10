@@ -9,7 +9,7 @@ autoTracer({
   includeSkipped: true,
   enableAutoTracerInternalsLogging: true,
   maxFiberDepth: 2,
-  skipNonTrackedBranches: false,
+  includeNonTrackedBranches: true,
 });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(<App />);

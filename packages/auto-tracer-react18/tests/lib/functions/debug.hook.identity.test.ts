@@ -2,8 +2,14 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { extractUseStateValues } from "../../../src/lib/functions/extractUseStateValues.js";
 import { findStatefulHookAnchors } from "../../../src/lib/functions/hookMapping/findStatefulHookAnchors.js";
 import type { Hook } from "../../../src/lib/functions/hookMapping/types.js";
-import { walkFiberForUpdates, resetDepthTracking } from "../../../src/lib/functions/walkFiberForUpdates.js";
-import { addLabelForGuid, clearAllHookLabels } from "../../../src/lib/functions/hookLabels.js";
+import {
+  walkFiberForUpdates,
+  resetDepthTracking,
+} from "../../../src/lib/functions/walkFiberForUpdates.js";
+import {
+  addLabelForGuid,
+  clearAllHookLabels,
+} from "../../../src/lib/functions/hookLabels.js";
 import { traceOptions } from "../../../src/lib/types/globalState.js";
 import type { AutoTracerOptions } from "../../../src/lib/interfaces/AutoTracerOptions.js";
 
@@ -20,7 +26,7 @@ describe("Hook Identity Debug", () => {
       includeReconciled: false,
       includeSkipped: false,
       enableAutoTracerInternalsLogging: false,
-      skipNonTrackedBranches: false,
+      includeNonTrackedBranches: true,
       detectIdenticalValueChanges: false,
     } satisfies Partial<AutoTracerOptions>);
 
@@ -44,7 +50,7 @@ describe("Hook Identity Debug", () => {
       queue: {
         pending: null,
         lanes: 0,
-        dispatch: null as unknown as ((action: unknown) => void),
+        dispatch: null as unknown as (action: unknown) => void,
         lastRenderedReducer: null as unknown as (
           state: unknown,
           action: unknown
@@ -67,10 +73,7 @@ describe("Hook Identity Debug", () => {
     return hooks[0]!;
   }
 
-  function createFiberWithUseState(
-    hooks: Hook[],
-    alternate?: unknown
-  ) {
+  function createFiberWithUseState(hooks: Hook[], alternate?: unknown) {
     const memoizedState = chainHooks(hooks);
 
     return {
@@ -87,16 +90,24 @@ describe("Hook Identity Debug", () => {
 
     const prevTitleHook = createUseStateHook("");
     const prevLoadingHook = createUseStateHook(false);
-    const alternateFiber = createFiberWithUseState([prevTitleHook, prevLoadingHook]);
-    const currentFiber = createFiberWithUseState([titleHook, loadingHook], alternateFiber);
+    const alternateFiber = createFiberWithUseState([
+      prevTitleHook,
+      prevLoadingHook,
+    ]);
+    const currentFiber = createFiberWithUseState(
+      [titleHook, loadingHook],
+      alternateFiber
+    );
 
     // Step 1: Extract state values (like line 209 in walkFiberForUpdates)
     const useStateValues = extractUseStateValues(currentFiber);
 
     // Step 2: Filter for meaningful changes (like line 210-229)
-    const meaningfulStateChanges = useStateValues.filter(({ value, prevValue }) => {
-      return prevValue !== undefined && prevValue !== value;
-    });
+    const meaningfulStateChanges = useStateValues.filter(
+      ({ value, prevValue }) => {
+        return prevValue !== undefined && prevValue !== value;
+      }
+    );
 
     // Step 3: Get anchors (like line 316-317)
     const memoizedState = currentFiber.memoizedState as Hook | null;
@@ -117,7 +128,7 @@ describe("Hook Identity Debug", () => {
       console.log("  anchorIndex from indexOf:", anchorIndex);
 
       // Manual check
-      const manualCheck = anchors.findIndex(a => a === change.hook);
+      const manualCheck = anchors.findIndex((a) => a === change.hook);
       console.log("  manualCheck findIndex:", manualCheck);
 
       // Object identity check
@@ -143,8 +154,14 @@ describe("Hook Identity Debug", () => {
     // Create fiber
     const prevTitleHook = createUseStateHook("");
     const prevLoadingHook = createUseStateHook(false);
-    const alternateFiber = createFiberWithUseState([prevTitleHook, prevLoadingHook]);
-    const currentFiber = createFiberWithUseState([titleHook, loadingHook], alternateFiber);
+    const alternateFiber = createFiberWithUseState([
+      prevTitleHook,
+      prevLoadingHook,
+    ]);
+    const currentFiber = createFiberWithUseState(
+      [titleHook, loadingHook],
+      alternateFiber
+    );
 
     // Extract state values
     const stateValues = extractUseStateValues(currentFiber);
@@ -178,14 +195,18 @@ describe("Hook Identity Debug", () => {
       anchors.forEach((anchor, anchorIdx) => {
         const isIdentical = sv.hook === anchor;
         const isSame = Object.is(sv.hook, anchor);
-        console.log(`StateValue[${svIdx}].hook === Anchor[${anchorIdx}]: ${isIdentical} (Object.is: ${isSame})`);
+        console.log(
+          `StateValue[${svIdx}].hook === Anchor[${anchorIdx}]: ${isIdentical} (Object.is: ${isSame})`
+        );
       });
     });
 
     console.log("\n=== INDEXOF CHECKS ===");
     stateValues.forEach((sv, idx) => {
       const indexInAnchors = anchors.indexOf(sv.hook as Hook);
-      console.log(`StateValue[${idx}].hook indexOf in anchors: ${indexInAnchors}`);
+      console.log(
+        `StateValue[${idx}].hook indexOf in anchors: ${indexInAnchors}`
+      );
       console.log(`  Hook type:`, typeof sv.hook);
       console.log(`  Hook constructor:`, sv.hook.constructor.name);
       console.log(`  Is Hook?:`, sv.hook instanceof Object);

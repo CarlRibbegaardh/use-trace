@@ -49,7 +49,10 @@ describe("filterEmptyNodes - Real Fiber Integration", () => {
   // Load real fiber fixture
   const loadFiberFixture = () => {
     const fixtureData = fs.readFileSync(
-      path.join(__dirname, "../../../fixtures/todoListFiberWithDispatch.fixture.flatted"),
+      path.join(
+        __dirname,
+        "../../../fixtures/todoListFiberWithDispatch.fixture.flatted"
+      ),
       "utf8"
     );
     return parse(fixtureData);
@@ -62,7 +65,7 @@ describe("filterEmptyNodes - Real Fiber Integration", () => {
       includeReconciled: false,
       includeSkipped: false,
       enableAutoTracerInternalsLogging: false,
-      skipNonTrackedBranches: false,
+      includeNonTrackedBranches: true,
     } satisfies Partial<AutoTracerOptions>);
   });
 

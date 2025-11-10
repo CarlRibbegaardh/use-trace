@@ -89,7 +89,7 @@ function buildTreeFromFiberInternal(
 
   // Check if we should skip non-tracked branches
   const isTracked = !!getTrackingGUID(fiber);
-  if (traceOptions.skipNonTrackedBranches && !isTracked) {
+  if (!traceOptions.includeNonTrackedBranches && !isTracked) {
     // Only include if this component or any descendant is tracked
     if (!isInParentChainOfTracked(fiber, depth)) {
       // Skip this entire branch (no node, no children, continue with siblings)
@@ -121,7 +121,8 @@ export function buildTreeFromFiber(
   fiber: unknown,
   depth: number
 ): readonly TreeNode[] {
-  const shouldLogTiming = traceOptions.enableAutoTracerInternalsLogging ?? false;
+  const shouldLogTiming =
+    traceOptions.enableAutoTracerInternalsLogging ?? false;
   const startTime = shouldLogTiming ? performance.now() : 0;
 
   const accumulator: TreeNode[] = [];
@@ -130,7 +131,9 @@ export function buildTreeFromFiber(
   if (shouldLogTiming) {
     const duration = performance.now() - startTime;
     console.log(
-      `[AutoTracer] buildTreeFromFiber: ${accumulator.length} nodes in ${duration.toFixed(2)}ms`
+      `[AutoTracer] buildTreeFromFiber: ${
+        accumulator.length
+      } nodes in ${duration.toFixed(2)}ms`
     );
   }
 

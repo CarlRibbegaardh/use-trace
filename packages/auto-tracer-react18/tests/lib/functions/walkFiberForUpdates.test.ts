@@ -66,7 +66,7 @@ vi.mock("@src/lib/types/globalState.js", () => {
   return {
     traceOptions: {
       maxFiberDepth: 1000,
-      skipNonTrackedBranches: false,
+      includeNonTrackedBranches: true,
       includeReconciled: true,
       includeSkipped: true,
       showFlags: false,
@@ -118,7 +118,7 @@ describe("walkFiberForUpdates", () => {
     // Reset trace options between tests to avoid leakage
     const { traceOptions } = await import("@src/lib/types/globalState.js");
     traceOptions.maxFiberDepth = 1000;
-    traceOptions.skipNonTrackedBranches = false;
+    traceOptions.includeNonTrackedBranches = true;
     traceOptions.includeReconciled = true;
     traceOptions.includeSkipped = true;
     traceOptions.showFlags = false;
@@ -252,7 +252,7 @@ describe("walkFiberForUpdates", () => {
         await import("@src/lib/functions/renderRegistry.js")
       );
 
-      traceOptions.skipNonTrackedBranches = true;
+      traceOptions.includeNonTrackedBranches = false;
       getTrackingGUID.mockReturnValue(null);
 
       const childFiber = {

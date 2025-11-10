@@ -11,7 +11,7 @@ export const defaultAutoTracerOptions: AutoTracerOptions = {
   showFlags: false,
   enableAutoTracerInternalsLogging: false,
   maxFiberDepth: 100, // Maximum fiber traversal depth to prevent stack overflow
-  skipNonTrackedBranches: true, // Skip non-tracked branches by default
+  includeNonTrackedBranches: false, // Only show tracked components and their parent chain by default
   skippedObjectProps: [], // Skip specific props for specific object types
   // Simple boolean per spec: enabled by default
   detectIdenticalValueChanges: true,

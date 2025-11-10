@@ -1,10 +1,19 @@
 import { beforeEach, describe, expect, it, afterEach, vi } from "vitest";
-import { walkFiberForUpdates, resetDepthTracking } from "../../../src/lib/functions/walkFiberForUpdates.js";
+import {
+  walkFiberForUpdates,
+  resetDepthTracking,
+} from "../../../src/lib/functions/walkFiberForUpdates.js";
 import type { Hook } from "../../../src/lib/functions/hookMapping/types.js";
 import { traceOptions } from "../../../src/lib/types/globalState.js";
 import type { AutoTracerOptions } from "../../../src/lib/interfaces/AutoTracerOptions.js";
-import { addLabelForGuid, clearAllHookLabels } from "../../../src/lib/functions/hookLabels.js";
-import { registerTrackedGUID, clearRenderRegistry } from "../../../src/lib/functions/renderRegistry.js";
+import {
+  addLabelForGuid,
+  clearAllHookLabels,
+} from "../../../src/lib/functions/hookLabels.js";
+import {
+  registerTrackedGUID,
+  clearRenderRegistry,
+} from "../../../src/lib/functions/renderRegistry.js";
 
 /**
  * Integration tests for useState label resolution in walkFiberForUpdates (OLD CODE).
@@ -26,7 +35,7 @@ describe("walkFiberForUpdates - useState label resolution integration (OLD CODE)
       includeReconciled: false,
       includeSkipped: false,
       enableAutoTracerInternalsLogging: false,
-      skipNonTrackedBranches: false,
+      includeNonTrackedBranches: true,
       detectIdenticalValueChanges: false,
     } satisfies Partial<AutoTracerOptions>);
 
@@ -75,7 +84,7 @@ describe("walkFiberForUpdates - useState label resolution integration (OLD CODE)
       queue: {
         pending: null,
         lanes: 0,
-        dispatch: null as unknown as ((action: unknown) => void),
+        dispatch: null as unknown as (action: unknown) => void,
         lastRenderedReducer: null as unknown as (
           state: unknown,
           action: unknown
@@ -187,7 +196,7 @@ describe("walkFiberForUpdates - useState label resolution integration (OLD CODE)
 
       expect(stateChangeLog).toBeDefined();
       expect(stateChangeLog).toContain("State change title:");
-      expect(stateChangeLog).toContain('→ Hello'); // String values aren't quoted in logs
+      expect(stateChangeLog).toContain("→ Hello"); // String values aren't quoted in logs
     });
 
     it("should resolve useState variable name when value changes", () => {
@@ -273,11 +282,11 @@ describe("walkFiberForUpdates - useState label resolution integration (OLD CODE)
 
       expect(titleLog).toBeDefined();
       expect(titleLog).toContain("State change title:");
-      expect(titleLog).toContain('→ Hello'); // String values aren't quoted in logs
+      expect(titleLog).toContain("→ Hello"); // String values aren't quoted in logs
 
       expect(descriptionLog).toBeDefined();
       expect(descriptionLog).toContain("State change description:");
-      expect(descriptionLog).toContain('→ World'); // String values aren't quoted in logs
+      expect(descriptionLog).toContain("→ World"); // String values aren't quoted in logs
     });
 
     it("should handle mixed hooks (only one changing)", () => {
