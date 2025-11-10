@@ -10,7 +10,8 @@ autoTracer({
   includeReconciled: false,
   includeSkipped: false,
   maxFiberDepth: 100,
-  enableAutoTracerInternalsLogging: true,
+  filterEmptyNodes: "first",
+  enableAutoTracerInternalsLogging: false,
   detectIdenticalValueChanges: true,
   skippedObjectProps: [
     {
@@ -36,6 +37,10 @@ autoTracer({
     {
       objectName: "Insertion6",
       propNames: ["cache"],
+    },
+    {
+      objectName: "Unknown",
+      propNames: ["value"],
     },
   ],
 });

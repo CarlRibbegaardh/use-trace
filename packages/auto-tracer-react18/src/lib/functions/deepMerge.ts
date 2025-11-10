@@ -39,6 +39,9 @@ export function deepMergeOptions(
   if (source.detectIdenticalValueChanges !== undefined) {
     result.detectIdenticalValueChanges = source.detectIdenticalValueChanges;
   }
+  if (source.filterEmptyNodes !== undefined) {
+    result.filterEmptyNodes = source.filterEmptyNodes;
+  }
 
   // Handle nested colors object
   if (source.colors) {

@@ -44,14 +44,19 @@ This is a TypeScript monorepo workspace using pnpm workspaces. The project conta
 - `packages/tracing/`: Core tracing library for React component render tracking
 - `apps/`: Example applications demonstrating the tracing library usage
 - Each app has its own E2E tests using Playwright
+- Tests are located in `tests/` directories within each package or app
 
 ## Testing Guidelines
 
+- packages are tested using Vitest
+- apps are tested using Playwright E2E tests
+- All tests are located in `tests/` directories within each package or app
+- Tests must cover all new features and bug fixes
 - **IMPORTANT**: When running Playwright E2E tests, do NOT use the `--headed` flag
 - Always run tests in headless mode for better performance and CI compatibility
 - Use `pnpm --filter <app-name> test:e2e` without additional flags
 - Run a single test at a time, since we are capturing logs for analysis
-- Filter for single test using "test" not "grep"
+- When checking for a string in a test, use a direct string comparison instead of asserting on match counts; it produces clearer test failures and is easier to read.
 
 ## Development Practices
 
@@ -62,18 +67,38 @@ This is a TypeScript monorepo workspace using pnpm workspaces. The project conta
 - A readme file should exist in each package and app directory with defailed descriptions of what the system part does and how to use it. It should be updated when changes are made.
 - Readme files should have both easily readable description, and technical details, including code examples where applicable and mermaid flowcharts if needed.
 
-## Code Patterns
+# Quality Standards
 
-- Use Domain-Driven Design (DDD) architecture in example apps
-- Material-UI components are used for UI consistency
-- Redux Toolkit is used for state management in examples
-- All TypeScript code should follow strict typing practices
-- One top level function, interface or type per file for clarity
+- All code must be in TypeScript with strictest possible settings.
+- Avoid casts and type assertions at all cost. If you see casts in the code, report it immediately.
+- All code must have TSDoc comments for all functions, types and interfaces.
+- For public apis, the interface fields must also have TSDoc comments.
+- TDD should be used for all new features and bug fixes.
+- All new code must have unit tests with 100% coverage (we expect pure and total functions to be the rule). Any exceptions must be clearly justified.
+- Functional Clean Code principles should be applied.
+- Prefer functional programming over OOP.
+- Functional DDD principles should be applied.
+- Immutability must be used where possible.
+- Functions should be pure and total where possible. Exceptions must be clearly documented with TSDoc and readme updates.
+- One top level function, interface or type per file for clarity.
 - Named exports only, no default exports, except for the babel plugin which must be a default export.
-- TSDoc comments for all functions and types!
-- Casts and type assertions must be avoided! Use proper typing and type guards if needed. If you see casts in the code, report it!
+- File names must match the exported function, interface or type name exactly.
+- CC ≤ 5 per function
+- Decompose complex functions to isolate change impact
 
-## Verification
+## Task verification
 
-- Build the whole project using `pnpm build` from the root
-- Run a single E2E test from the command line to verify logs are captured correctly
+A task is not done unless:
+
+- The current lib or app builds successfully from the root using `pnpm build` with filter.
+- The tests for the current lib or app pass when run from the root using `pnpm test` with filter.
+
+## Feature Verification
+
+A feature is not done unless:
+
+- The whole project builds successfully from the root using `pnpm build`
+- All tests pass when run from the root using `pnpm test`
+
+Do not declare success until all verification steps are complete.
+Do not randomly change things just to make tests pass.

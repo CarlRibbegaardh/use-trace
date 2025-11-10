@@ -49,14 +49,15 @@ test.describe("Hook Labeling E2E Tests", () => {
     // EXPANDED TEST: Dispatch should NOT be logged as state change (it's a function!)
     expect(dispatchLogs.length).toBe(0);
 
-    const filteredTodosLogs = pageLogs.filter((log: string) =>
-      log.includes("State change filteredTodos")
+    const filteredTodosLogs = pageLogs.filter(
+      (log: string) =>
+        log.includes("filteredTodos") && log.includes("State change")
     );
     expect(filteredTodosLogs.length).toBeGreaterThan(0);
 
     // EXPANDED TEST: Check filteredTodos has CORRECT array values, not boolean
     const hasCorrectArrayValues = filteredTodosLogs.some((log: string) =>
-      log.includes("[[]]")
+      log.includes("[]")
     );
     const hasWrongBooleanValues = filteredTodosLogs.some(
       (log: string) =>

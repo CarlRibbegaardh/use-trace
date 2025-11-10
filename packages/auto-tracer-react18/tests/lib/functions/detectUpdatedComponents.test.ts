@@ -2,10 +2,21 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { detectUpdatedComponents } from "@src/lib/functions/detectUpdatedComponents.js";
 
 // Mock dependencies
-vi.mock("@src/lib/functions/walkFiberForUpdates.js", () => {
+vi.mock("@src/lib/functions/treeProcessing/building/buildTreeFromFiber.js", () => {
   return {
-    resetDepthTracking: vi.fn(),
-    walkFiberForUpdates: vi.fn(),
+    buildTreeFromFiber: vi.fn(() => []),
+  };
+});
+
+vi.mock("@src/lib/functions/treeProcessing/filtering/applyEmptyNodeFilter.js", () => {
+  return {
+    applyEmptyNodeFilter: vi.fn(() => vi.fn((nodes) => nodes)),
+  };
+});
+
+vi.mock("@src/lib/functions/treeProcessing/rendering/renderTree.js", () => {
+  return {
+    renderTree: vi.fn(),
   };
 });
 
@@ -29,8 +40,14 @@ describe("detectUpdatedComponents", () => {
   });
 
   it("should return early when root is falsy", async () => {
-    const { walkFiberForUpdates, resetDepthTracking } = vi.mocked(
-      await import("@src/lib/functions/walkFiberForUpdates.js")
+    const { buildTreeFromFiber } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/building/buildTreeFromFiber.js")
+    );
+    const { applyEmptyNodeFilter } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/filtering/applyEmptyNodeFilter.js")
+    );
+    const { renderTree } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/rendering/renderTree.js")
     );
     const { clearRenderRegistry } = vi.mocked(
       await import("@src/lib/functions/renderRegistry.js")
@@ -42,15 +59,22 @@ describe("detectUpdatedComponents", () => {
     detectUpdatedComponents(null);
 
     expect(logGroup).not.toHaveBeenCalled();
-    expect(resetDepthTracking).not.toHaveBeenCalled();
-    expect(walkFiberForUpdates).not.toHaveBeenCalled();
+    expect(buildTreeFromFiber).not.toHaveBeenCalled();
+    expect(applyEmptyNodeFilter).not.toHaveBeenCalled();
+    expect(renderTree).not.toHaveBeenCalled();
     expect(clearRenderRegistry).not.toHaveBeenCalled();
     expect(logGroupEnd).not.toHaveBeenCalled();
   });
 
   it("should return early when root.current is falsy", async () => {
-    const { walkFiberForUpdates, resetDepthTracking } = vi.mocked(
-      await import("@src/lib/functions/walkFiberForUpdates.js")
+    const { buildTreeFromFiber } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/building/buildTreeFromFiber.js")
+    );
+    const { applyEmptyNodeFilter } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/filtering/applyEmptyNodeFilter.js")
+    );
+    const { renderTree } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/rendering/renderTree.js")
     );
     const { clearRenderRegistry } = vi.mocked(
       await import("@src/lib/functions/renderRegistry.js")
@@ -63,15 +87,22 @@ describe("detectUpdatedComponents", () => {
     detectUpdatedComponents(root);
 
     expect(logGroup).not.toHaveBeenCalled();
-    expect(resetDepthTracking).not.toHaveBeenCalled();
-    expect(walkFiberForUpdates).not.toHaveBeenCalled();
+    expect(buildTreeFromFiber).not.toHaveBeenCalled();
+    expect(applyEmptyNodeFilter).not.toHaveBeenCalled();
+    expect(renderTree).not.toHaveBeenCalled();
     expect(clearRenderRegistry).not.toHaveBeenCalled();
     expect(logGroupEnd).not.toHaveBeenCalled();
   });
 
   it("should return early when root.current is undefined", async () => {
-    const { walkFiberForUpdates, resetDepthTracking } = vi.mocked(
-      await import("@src/lib/functions/walkFiberForUpdates.js")
+    const { buildTreeFromFiber } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/building/buildTreeFromFiber.js")
+    );
+    const { applyEmptyNodeFilter } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/filtering/applyEmptyNodeFilter.js")
+    );
+    const { renderTree } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/rendering/renderTree.js")
     );
     const { clearRenderRegistry } = vi.mocked(
       await import("@src/lib/functions/renderRegistry.js")
@@ -84,15 +115,22 @@ describe("detectUpdatedComponents", () => {
     detectUpdatedComponents(root);
 
     expect(logGroup).not.toHaveBeenCalled();
-    expect(resetDepthTracking).not.toHaveBeenCalled();
-    expect(walkFiberForUpdates).not.toHaveBeenCalled();
+    expect(buildTreeFromFiber).not.toHaveBeenCalled();
+    expect(applyEmptyNodeFilter).not.toHaveBeenCalled();
+    expect(renderTree).not.toHaveBeenCalled();
     expect(clearRenderRegistry).not.toHaveBeenCalled();
     expect(logGroupEnd).not.toHaveBeenCalled();
   });
 
   it("should process valid root and call all required functions", async () => {
-    const { walkFiberForUpdates, resetDepthTracking } = vi.mocked(
-      await import("@src/lib/functions/walkFiberForUpdates.js")
+    const { buildTreeFromFiber } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/building/buildTreeFromFiber.js")
+    );
+    const { applyEmptyNodeFilter } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/filtering/applyEmptyNodeFilter.js")
+    );
+    const { renderTree } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/rendering/renderTree.js")
     );
     const { clearRenderRegistry } = vi.mocked(
       await import("@src/lib/functions/renderRegistry.js")
@@ -107,15 +145,22 @@ describe("detectUpdatedComponents", () => {
     detectUpdatedComponents(root);
 
     expect(logGroup).toHaveBeenCalledWith("Component render cycle:");
-    expect(resetDepthTracking).toHaveBeenCalled();
-    expect(walkFiberForUpdates).toHaveBeenCalledWith(mockFiberNode, 0);
+    expect(buildTreeFromFiber).toHaveBeenCalledWith(mockFiberNode, 0);
+    expect(applyEmptyNodeFilter).toHaveBeenCalled();
+    expect(renderTree).toHaveBeenCalled();
     expect(clearRenderRegistry).toHaveBeenCalled();
     expect(logGroupEnd).toHaveBeenCalled();
   });
 
   it("should call functions in correct order", async () => {
-    const { walkFiberForUpdates, resetDepthTracking } = vi.mocked(
-      await import("@src/lib/functions/walkFiberForUpdates.js")
+    const { buildTreeFromFiber } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/building/buildTreeFromFiber.js")
+    );
+    const { applyEmptyNodeFilter } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/filtering/applyEmptyNodeFilter.js")
+    );
+    const { renderTree } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/rendering/renderTree.js")
     );
     const { clearRenderRegistry } = vi.mocked(
       await import("@src/lib/functions/renderRegistry.js")
@@ -129,11 +174,20 @@ describe("detectUpdatedComponents", () => {
     logGroup.mockImplementation(() => {
       callOrder.push("logGroup");
     });
-    resetDepthTracking.mockImplementation(() => {
-      callOrder.push("resetDepthTracking");
+    buildTreeFromFiber.mockImplementation(() => {
+      callOrder.push("buildTreeFromFiber");
+      return [];
     });
-    walkFiberForUpdates.mockImplementation(() => {
-      callOrder.push("walkFiberForUpdates");
+    const mockFilterFn = vi.fn((nodes) => {
+      callOrder.push("filterFn");
+      return nodes;
+    });
+    applyEmptyNodeFilter.mockImplementation(() => {
+      callOrder.push("applyEmptyNodeFilter");
+      return mockFilterFn;
+    });
+    renderTree.mockImplementation(() => {
+      callOrder.push("renderTree");
     });
     clearRenderRegistry.mockImplementation(() => {
       callOrder.push("clearRenderRegistry");
@@ -147,16 +201,24 @@ describe("detectUpdatedComponents", () => {
 
     expect(callOrder).toEqual([
       "logGroup",
-      "resetDepthTracking",
-      "walkFiberForUpdates",
+      "buildTreeFromFiber",
+      "applyEmptyNodeFilter",
+      "filterFn",
+      "renderTree",
       "clearRenderRegistry",
       "logGroupEnd",
     ]);
   });
 
   it("should handle errors gracefully and clean up state", async () => {
-    const { walkFiberForUpdates, resetDepthTracking } = vi.mocked(
-      await import("@src/lib/functions/walkFiberForUpdates.js")
+    const { buildTreeFromFiber } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/building/buildTreeFromFiber.js")
+    );
+    const { applyEmptyNodeFilter } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/filtering/applyEmptyNodeFilter.js")
+    );
+    const { renderTree } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/rendering/renderTree.js")
     );
     const { clearRenderRegistry } = vi.mocked(
       await import("@src/lib/functions/renderRegistry.js")
@@ -166,7 +228,7 @@ describe("detectUpdatedComponents", () => {
     );
 
     const testError = new Error("Test error");
-    walkFiberForUpdates.mockImplementation(() => {
+    buildTreeFromFiber.mockImplementation(() => {
       throw testError;
     });
 
@@ -174,20 +236,18 @@ describe("detectUpdatedComponents", () => {
     detectUpdatedComponents(root);
 
     expect(logGroup).toHaveBeenCalledWith("Component render cycle:");
-    expect(resetDepthTracking).toHaveBeenCalled();
-    expect(walkFiberForUpdates).toHaveBeenCalled();
-    expect(logGroupEnd).toHaveBeenCalledTimes(1); // Once in catch only
+    expect(buildTreeFromFiber).toHaveBeenCalled();
+    expect(logGroupEnd).toHaveBeenCalledTimes(1); // Once in catch
     expect(logError).toHaveBeenCalledWith(
       "AutoTracer: Error during component detection:",
       testError
     );
     expect(clearRenderRegistry).toHaveBeenCalled();
-    expect(resetDepthTracking).toHaveBeenCalledTimes(2); // Once at start, once in cleanup
   });
 
   it("should handle cleanup errors gracefully", async () => {
-    const { walkFiberForUpdates } = vi.mocked(
-      await import("@src/lib/functions/walkFiberForUpdates.js")
+    const { buildTreeFromFiber } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/building/buildTreeFromFiber.js")
     );
     const { clearRenderRegistry } = vi.mocked(
       await import("@src/lib/functions/renderRegistry.js")
@@ -196,11 +256,11 @@ describe("detectUpdatedComponents", () => {
       await import("@src/lib/functions/log.js")
     );
 
-    const walkError = new Error("Walk error");
+    const buildError = new Error("Build error");
     const cleanupError = new Error("Cleanup error");
 
-    walkFiberForUpdates.mockImplementation(() => {
-      throw walkError;
+    buildTreeFromFiber.mockImplementation(() => {
+      throw buildError;
     });
 
     // Make clearRenderRegistry throw during cleanup
@@ -214,7 +274,7 @@ describe("detectUpdatedComponents", () => {
     expect(logError).toHaveBeenNthCalledWith(
       1,
       "AutoTracer: Error during component detection:",
-      walkError
+      buildError
     );
     expect(logError).toHaveBeenNthCalledWith(
       2,
@@ -223,54 +283,15 @@ describe("detectUpdatedComponents", () => {
     );
   });
 
-  it("should handle errors in resetDepthTracking during cleanup", async () => {
-    const { walkFiberForUpdates, resetDepthTracking } = vi.mocked(
-      await import("@src/lib/functions/walkFiberForUpdates.js")
+  it("should pass correct parameters to buildTreeFromFiber", async () => {
+    const { buildTreeFromFiber } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/building/buildTreeFromFiber.js")
     );
-    const { clearRenderRegistry } = vi.mocked(
-      await import("@src/lib/functions/renderRegistry.js")
+    const { applyEmptyNodeFilter } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/filtering/applyEmptyNodeFilter.js")
     );
-    const { logError } = vi.mocked(
-      await import("@src/lib/functions/log.js")
-    );
-
-    const walkError = new Error("Walk error");
-    const resetError = new Error("Reset error");
-
-    walkFiberForUpdates.mockImplementation(() => {
-      throw walkError;
-    });
-
-    // Ensure clearRenderRegistry doesn't throw in this test
-    clearRenderRegistry.mockImplementation(() => {});
-
-    // Make resetDepthTracking throw on second call (during cleanup)
-    let resetCallCount = 0;
-    resetDepthTracking.mockImplementation(() => {
-      resetCallCount++;
-      if (resetCallCount === 2) {
-        throw resetError;
-      }
-    });
-
-    const root = { current: {} };
-    detectUpdatedComponents(root);
-
-    expect(logError).toHaveBeenNthCalledWith(
-      1,
-      "AutoTracer: Error during component detection:",
-      walkError
-    );
-    expect(logError).toHaveBeenNthCalledWith(
-      2,
-      "AutoTracer: Error during cleanup:",
-      resetError
-    );
-  });
-
-  it("should pass correct parameters to walkFiberForUpdates", async () => {
-    const { walkFiberForUpdates, resetDepthTracking } = vi.mocked(
-      await import("@src/lib/functions/walkFiberForUpdates.js")
+    const { renderTree } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/rendering/renderTree.js")
     );
     const { clearRenderRegistry } = vi.mocked(
       await import("@src/lib/functions/renderRegistry.js")
@@ -280,8 +301,9 @@ describe("detectUpdatedComponents", () => {
     );
 
     // Ensure all functions work normally for this test
-    walkFiberForUpdates.mockImplementation(() => {});
-    resetDepthTracking.mockImplementation(() => {});
+    buildTreeFromFiber.mockImplementation(() => []);
+    applyEmptyNodeFilter.mockImplementation(() => vi.fn((nodes) => nodes));
+    renderTree.mockImplementation(() => {});
     clearRenderRegistry.mockImplementation(() => {});
     logGroup.mockImplementation(() => {});
     logGroupEnd.mockImplementation(() => {});
@@ -295,7 +317,7 @@ describe("detectUpdatedComponents", () => {
 
     detectUpdatedComponents(root);
 
-    expect(walkFiberForUpdates).toHaveBeenCalledWith(mockFiberNode, 0);
-    expect(walkFiberForUpdates).toHaveBeenCalledTimes(1);
+    expect(buildTreeFromFiber).toHaveBeenCalledWith(mockFiberNode, 0);
+    expect(buildTreeFromFiber).toHaveBeenCalledTimes(1);
   });
 });
