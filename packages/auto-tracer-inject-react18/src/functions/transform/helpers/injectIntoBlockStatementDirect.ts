@@ -168,9 +168,8 @@ export function injectIntoBlockStatementDirect(
   // Second pass: identify labeled hooks and use the precomputed index
   const hooksToLabel: Array<{
     index: number;
-    label: string;
     hookPosition: number;
-    valueIdentifier: t.Identifier; // Variable identifier for passing as third argument
+    nameValuePairs: Array<{ name: string; identifier: t.Identifier }>; // All variables with their identifiers
   }> = [];
   for (let i = 0; i < blockStatement.body.length; i++) {
     const stmt = blockStatement.body[i];
@@ -198,25 +197,36 @@ export function injectIntoBlockStatementDirect(
 
       if (!isKnownStateHook && !isConfiguredHook) continue;
 
-      let label: string | null = null;
-      let valueIdentifier: t.Identifier | null = null;
+      const nameValuePairs: Array<{ name: string; identifier: t.Identifier }> = [];
 
-      // Pattern A: const [name] = useState(...)
-      if (t.isArrayPattern(decl.id) && decl.id.elements.length > 0) {
-        const firstElement = decl.id.elements[0];
-        if (t.isIdentifier(firstElement)) {
-          label = firstElement.name;
-          valueIdentifier = firstElement; // Capture the state variable (not the setter)
+      // Pattern A: Array destructuring - const [name, ...] = useState(...)
+      if (t.isArrayPattern(decl.id)) {
+        for (const element of decl.id.elements) {
+          if (t.isIdentifier(element)) {
+            nameValuePairs.push({ name: element.name, identifier: element });
+          } else if (t.isRestElement(element) && t.isIdentifier(element.argument)) {
+            nameValuePairs.push({ name: element.argument.name, identifier: element.argument });
+          }
+          // Skip null/undefined elements
         }
       }
-      // Pattern B: const name = useSelector(...)
+      // Pattern B: Object destructuring - const { a, b, ...rest } = useMyHook()
+      else if (t.isObjectPattern(decl.id)) {
+        for (const property of decl.id.properties) {
+          if (t.isObjectProperty(property) && t.isIdentifier(property.value)) {
+            nameValuePairs.push({ name: property.value.name, identifier: property.value });
+          } else if (t.isRestElement(property) && t.isIdentifier(property.argument)) {
+            nameValuePairs.push({ name: property.argument.name, identifier: property.argument });
+          }
+        }
+      }
+      // Pattern C: Simple identifier - const name = useSelector(...)
       else if (t.isIdentifier(decl.id) && isConfiguredHook) {
-        label = decl.id.name;
-        valueIdentifier = decl.id; // Capture the return value
+        nameValuePairs.push({ name: decl.id.name, identifier: decl.id });
       }
 
-      if (label && valueIdentifier) {
-        hooksToLabel.push({ index: i, label, hookPosition, valueIdentifier });
+      if (nameValuePairs.length > 0) {
+        hooksToLabel.push({ index: i, hookPosition, nameValuePairs });
       }
     }
   }
@@ -309,15 +319,22 @@ export function injectIntoBlockStatementDirect(
 
   // Create and insert labelState calls in reverse order to maintain positions
   for (let i = hooksToLabel.length - 1; i >= 0; i--) {
-    const { index, label, hookPosition, valueIdentifier } = hooksToLabel[i];
+    const { index, hookPosition, nameValuePairs } = hooksToLabel[i];
+
+    // Build arguments: [hookPosition, "name1", identifier1, "name2", identifier2, ...]
+    const args: Array<t.NumericLiteral | t.StringLiteral | t.Identifier> = [
+      t.numericLiteral(hookPosition)
+    ];
+
+    for (const pair of nameValuePairs) {
+      args.push(t.stringLiteral(pair.name));
+      args.push(pair.identifier);
+    }
+
     const labelStateCall = t.expressionStatement(
       t.callExpression(
         t.memberExpression(tracerId, t.identifier("labelState")),
-        [
-          t.stringLiteral(label),
-          t.numericLiteral(hookPosition),
-          valueIdentifier // Pass the variable reference as third argument
-        ]
+        args
       )
     );
     blockStatement.body.splice(index + 1, 0, labelStateCall);

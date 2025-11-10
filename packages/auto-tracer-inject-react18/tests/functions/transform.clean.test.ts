@@ -57,7 +57,7 @@ describe("transform core functionality", () => {
     const result = transform(code, context);
     expect(result.injected).toBe(true);
     expect(result.code).toContain("useAutoTracer");
-    expect(result.code).toContain('labelState("count"');
+    expect(result.code).toContain('labelState(0, "count"');
   });
 
   it("achieves 100% coverage with the reorganized structure", () => {

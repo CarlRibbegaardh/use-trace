@@ -66,7 +66,16 @@ function calculateVisualDepths(nodes: readonly TreeNode[]): readonly number[] {
         }
       } else if (isPreviousMarker) {
         // Component after marker is child (marker depth + 1)
-        currentVisualDepth++;
+        // BUT: if we've seen this original level before, use its established visual depth
+        const trackedDepth = levelToVisualDepth.get(currentOriginalDepth);
+        if (trackedDepth !== undefined) {
+          // We've seen this original level before, use its visual depth
+          currentVisualDepth = trackedDepth;
+        } else {
+          // First time at this original level, it's a child of the marker
+          const prevVisualDepth = visualDepths[i - 1] ?? 0;
+          currentVisualDepth = prevVisualDepth + 1;
+        }
         visualDepths.push(currentVisualDepth);
         levelToVisualDepth.set(currentOriginalDepth, currentVisualDepth);
       } else {

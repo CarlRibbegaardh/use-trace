@@ -6,11 +6,11 @@ import App from "./App.tsx";
 autoTracer({
   enabled: true,
   showFlags: true,
-  includeNonTrackedBranches: false,
+  includeNonTrackedBranches: true,
   includeReconciled: false,
   includeSkipped: false,
   maxFiberDepth: 100,
-  filterEmptyNodes: "first",
+  filterEmptyNodes: "all",
   enableAutoTracerInternalsLogging: false,
   detectIdenticalValueChanges: true,
   skippedObjectProps: [

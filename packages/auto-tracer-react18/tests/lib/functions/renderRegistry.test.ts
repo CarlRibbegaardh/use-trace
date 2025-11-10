@@ -173,7 +173,7 @@ describe("renderRegistry", () => {
       const logger = result.current;
       // Simulate Vite plugin injection with explicit _debugHookTypes position and value
       const testValue: unknown[] = [];
-      logger.labelState("filteredTodos", 9, testValue);
+      logger.labelState(9, "filteredTodos", testValue);
 
       const guidsArray = Array.from(getTrackedGUIDs());
       expect(guidsArray.length).toBe(1);
@@ -223,14 +223,14 @@ describe("renderRegistry", () => {
       expect(typeof logger.error).toBe('function');
     });
 
-    it("should expose labelState with mandatory index and value parameters (arity 3)", async () => {
+    it("should expose labelState with mandatory index parameter (arity 1)", async () => {
       const { useAutoTracer } = await import(
         "@src/lib/functions/renderRegistry.js"
       );
       const { result } = renderHook(() => useAutoTracer());
       const logger = result.current;
-      // Function.length is the declared parameter count; should be 3 (label, index, value)
-      expect(logger.labelState.length).toBe(3);
+      // Function.length is the declared parameter count; should be 1 (index), rest params don't count
+      expect(logger.labelState.length).toBe(1);
     });
 
     // SKIPPED: Spy setup issue with vi.spyOn for imported function

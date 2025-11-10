@@ -24,17 +24,16 @@ export interface ComponentLogger {
   error: (message: string, ...args: unknown[]) => void;
 
   /**
-   * INTERNAL: Associates a human-readable label with a state hook using its stable index
+   * INTERNAL: Associates human-readable label(s) with a state hook using its stable index
    * in React's _debugHookTypes ordering. Intended for code injection only.
    *
-   * NOTE: The index AND value are REQUIRED. Manual use without the injector is unsupported.
+   * NOTE: The index is REQUIRED as the first argument, followed by alternating name-value pairs.
+   * Manual use without the injector is unsupported.
    *
-   * @param label Human-readable name for the state hook (e.g., "filteredTodos", "loading")
    * @param index Stable index of the state hook within the component (0-based)
-   * @param value Current state value for value-based matching (REQUIRED)
-   * @param additionalValues Additional values for multi-value hooks (optional)
+   * @param nameValuePairs Alternating name-value pairs: "name1", value1, "name2", value2, ...
    */
-  labelState: (label: string, index: number, value: unknown, ...additionalValues: unknown[]) => void;
+  labelState: (index: number, ...nameValuePairs: unknown[]) => void;
 }
 
 /**

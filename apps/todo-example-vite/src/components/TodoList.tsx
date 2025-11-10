@@ -35,14 +35,14 @@ export const TodoList: React.FC<TodoListProps> = ({ todoService }) => {
   const dispatch = useAppDispatch();
   const filteredTodos = useAppSelector(selectFilteredTodos);
   logger.log("About to call labelState for filteredTodos");
-  logger.labelState("filteredTodos", 0, filteredTodos);
+  logger.labelState(0, "filteredTodos", filteredTodos);
   const loading = useAppSelector(selectTodosLoading);
   logger.log("About to call labelState for loading");
-  logger.labelState("loading", 1, loading);
+  logger.labelState(1, "loading", loading);
   const error = useAppSelector(selectTodosError);
-  logger.labelState("error", 2, error);
+  logger.labelState(2, "error", error);
   const filter = useAppSelector(selectTodosFilter);
-  logger.labelState("filter", 3, filter);
+  logger.labelState(3, "filter", filter);
 
   const handleFilterChange = (
     _: React.MouseEvent<HTMLElement>,
