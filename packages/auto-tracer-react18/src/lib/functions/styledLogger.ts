@@ -20,6 +20,8 @@ export type ColorPalette = {
   stateChange?: ColorOptions;
   stateInitial?: ColorOptions;
   logStatements?: ColorOptions;
+  warnStatements?: ColorOptions;
+  errorStatements?: ColorOptions;
   reconciled?: ColorOptions;
   skipped?: ColorOptions;
   // Split identical value warning styling for state and prop
@@ -106,7 +108,7 @@ export function logStateChange(
 
 /**
  * Styled logging for log statements with theme-aware colors
- * Prefix is monochrome, icon+message are styled: "  │   Log: Custom message"
+ * Prefix is monochrome, icon+message are styled: "  │   📝 Custom message"
  */
 export function logLogStatement(
   prefix: string,
@@ -114,6 +116,40 @@ export function logLogStatement(
   options: StyledLoggerOptions
 ): void {
   const colorOptions = options.getColors().logStatements;
+  const themeOptions = getThemeOptions(colorOptions, options.themeManager);
+  const icon = colorOptions?.icon ? `${colorOptions.icon} ` : "";
+  const style = buildStyle(themeOptions);
+
+  logWithOptionalStyle(prefix, `${icon}${message}`, style);
+}
+
+/**
+ * Styled logging for warn statements with theme-aware colors
+ * Prefix is monochrome, icon+message are styled: "  │   ⚠️ Warning message"
+ */
+export function logWarnStatement(
+  prefix: string,
+  message: string,
+  options: StyledLoggerOptions
+): void {
+  const colorOptions = options.getColors().warnStatements;
+  const themeOptions = getThemeOptions(colorOptions, options.themeManager);
+  const icon = colorOptions?.icon ? `${colorOptions.icon} ` : "";
+  const style = buildStyle(themeOptions);
+
+  logWithOptionalStyle(prefix, `${icon}${message}`, style);
+}
+
+/**
+ * Styled logging for error statements with theme-aware colors
+ * Prefix is monochrome, icon+message are styled: "  │   ❌ Error message"
+ */
+export function logErrorStatement(
+  prefix: string,
+  message: string,
+  options: StyledLoggerOptions
+): void {
+  const colorOptions = options.getColors().errorStatements;
   const themeOptions = getThemeOptions(colorOptions, options.themeManager);
   const icon = colorOptions?.icon ? `${colorOptions.icon} ` : "";
   const style = buildStyle(themeOptions);

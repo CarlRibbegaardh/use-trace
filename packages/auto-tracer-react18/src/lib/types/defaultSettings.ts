@@ -49,6 +49,16 @@ export const defaultAutoTracerOptions: AutoTracerOptions = {
       lightMode: { text: "#00aa00" }, // Green
       darkMode: { text: "#4ade80" }, // Lighter green for dark mode
     },
+    warnStatements: {
+      icon: "⚠️", // Warning statements
+      lightMode: { text: "#000000", background: "#fbf6d7" }, // Black on light yellow
+      darkMode: { text: "#f9f2a3", background: "#3f3c28" }, // Light yellow on dark yellow-brown
+    },
+    errorStatements: {
+      icon: "❌", // Error statements
+      lightMode: { text: "#000000", background: "#f6eceb" }, // Black on light red
+      darkMode: { text: "#f0dfd2", background: "#473635" }, // Light red on dark red-brown
+    },
     reconciled: {
       lightMode: { text: "#9ca3af" }, // Gray-500
       darkMode: { text: "#9ca3af" }, // Gray-500

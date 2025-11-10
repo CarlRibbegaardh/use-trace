@@ -12,6 +12,8 @@ import {
   logIdenticalStateValueWarning as logIdenticalStateValueWarningStyled,
   logIdenticalPropValueWarning as logIdenticalPropValueWarningStyled,
   logLogStatement as logLogStatementStyled,
+  logWarnStatement as logWarnStatementStyled,
+  logErrorStatement as logErrorStatementStyled,
   logPropChange as logPropChangeStyled,
   logReconciled as logReconciledStyled,
   logSkipped as logSkippedStyled,
@@ -72,10 +74,26 @@ export function logStateChange(
 
 /**
  * Styled logging for log statements with theme-aware colors
- * Prefix is monochrome, icon+message are styled: "  │   Log: Custom message"
+ * Prefix is monochrome, icon+message are styled: "  │   📝 Custom message"
  */
 export function logLogStatement(prefix: string, message: string): void {
   logLogStatementStyled(prefix, message, styledLoggerOptions);
+}
+
+/**
+ * Styled logging for warn statements with theme-aware colors
+ * Prefix is monochrome, icon+message are styled: "  │   ⚠️ Warning message"
+ */
+export function logWarnStatement(prefix: string, message: string): void {
+  logWarnStatementStyled(prefix, message, styledLoggerOptions);
+}
+
+/**
+ * Styled logging for error statements with theme-aware colors
+ * Prefix is monochrome, icon+message are styled: "  │   ❌ Error message"
+ */
+export function logErrorStatement(prefix: string, message: string): void {
+  logErrorStatementStyled(prefix, message, styledLoggerOptions);
 }
 
 /**
@@ -98,11 +116,17 @@ export function logSkipped(prefix: string, message: string): void {
  * Styled logging for identical value warnings with theme-aware colors
  * Prefix is monochrome, icon+message are styled: "  │   ⚠️ Identical value: {x:1} → {x:1}"
  */
-export function logIdenticalStateValueWarning(prefix: string, message: string): void {
+export function logIdenticalStateValueWarning(
+  prefix: string,
+  message: string
+): void {
   logIdenticalStateValueWarningStyled(prefix, message, styledLoggerOptions);
 }
 
-export function logIdenticalPropValueWarning(prefix: string, message: string): void {
+export function logIdenticalPropValueWarning(
+  prefix: string,
+  message: string
+): void {
   logIdenticalPropValueWarningStyled(prefix, message, styledLoggerOptions);
 }
 

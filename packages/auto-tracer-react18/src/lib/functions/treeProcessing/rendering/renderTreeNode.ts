@@ -8,6 +8,8 @@ import {
   logStateChange,
   logPropChange,
   logLogStatement,
+  logWarnStatement,
+  logErrorStatement,
   logIdenticalStateValueWarning,
   logIdenticalPropValueWarning,
 } from "../../log.js";
@@ -43,7 +45,13 @@ export function renderTreeNode(
   lastVisualDepth: number,
   previousWasMarker: boolean
 ): number {
-  const { depth: originalDepth, displayName, renderType, flags, isTracked } = node;
+  const {
+    depth: originalDepth,
+    displayName,
+    renderType,
+    flags,
+    isTracked,
+  } = node;
 
   // Handle marker nodes specially
   if (renderType === "Marker") {
@@ -127,7 +135,10 @@ export function renderTreeNode(
       const formatted = formatStateChange(change.prevValue, change.value);
 
       // Use identical value warning logger if detected, otherwise normal state change logger
-      if (change.isIdenticalValueChange === true && traceOptions.detectIdenticalValueChanges) {
+      if (
+        change.isIdenticalValueChange === true &&
+        traceOptions.detectIdenticalValueChanges
+      ) {
         const msg = `State change ${change.name} (identical value): ${formatted}`;
         logIdenticalStateValueWarning(`${indent}│   `, msg);
       } else {
@@ -159,7 +170,10 @@ export function renderTreeNode(
       const formatted = formatPropChange(change.prevValue, change.value);
 
       // Use identical value warning logger if detected, otherwise normal prop change logger
-      if (change.isIdenticalValueChange === true && traceOptions.detectIdenticalValueChanges) {
+      if (
+        change.isIdenticalValueChange === true &&
+        traceOptions.detectIdenticalValueChanges
+      ) {
         const msg = `Prop change ${change.name} (identical value): ${formatted}`;
         logIdenticalPropValueWarning(`${indent}│   `, msg);
       } else {
@@ -171,12 +185,17 @@ export function renderTreeNode(
 
   // Render component logs
   node.componentLogs.forEach((logEntry) => {
-    const icon = logEntry.level === 'error' ? '❌'
-               : logEntry.level === 'warn' ? '⚠️'
-               : '📝';
     const argsStr =
       logEntry.args.length > 0 ? ` ${JSON.stringify(logEntry.args)}` : "";
-    logLogStatement(`${indent}│   `, `${icon} ${logEntry.message}${argsStr}`);
+    const message = `${logEntry.message}${argsStr}`;
+
+    if (logEntry.level === "error") {
+      logErrorStatement(`${indent}│   `, message);
+    } else if (logEntry.level === "warn") {
+      logWarnStatement(`${indent}│   `, message);
+    } else {
+      logLogStatement(`${indent}│   `, message);
+    }
   });
 
   return visualDepth;
