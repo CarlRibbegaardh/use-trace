@@ -14,8 +14,6 @@ export function detectUpdatedComponents(root: unknown): void {
       traceOptions.enableAutoTracerInternalsLogging ?? false;
     const totalStartTime = shouldLogTiming ? performance.now() : 0;
 
-    logGroup("Component render cycle:");
-
     // Step 1: Build tree from fiber
     const buildStartTime = shouldLogTiming ? performance.now() : 0;
     const nodes = buildTreeFromFiber(rootNode.current, 0);
@@ -41,6 +39,12 @@ export function detectUpdatedComponents(root: unknown): void {
       );
     }
 
+    // Only open the group if there are nodes to render
+    const hasNodesToRender = filtered.length > 0;
+    if (hasNodesToRender) {
+      logGroup("Component render cycle:");
+    }
+
     // Step 3: Render the filtered tree
     const renderStartTime = shouldLogTiming ? performance.now() : 0;
     renderTree(filtered);
@@ -50,7 +54,10 @@ export function detectUpdatedComponents(root: unknown): void {
     }
 
     clearRenderRegistry(); // Clear tracked fibers for next cycle
-    logGroupEnd();
+
+    if (hasNodesToRender) {
+      logGroupEnd();
+    }
 
     if (shouldLogTiming) {
       const totalDuration = performance.now() - totalStartTime;

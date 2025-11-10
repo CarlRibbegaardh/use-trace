@@ -182,6 +182,16 @@ interface AutoTracerOptions {
     /** Styling for component log statements. Default: #00aa00 */
     logStatements?: ColorOptions;
 
+    /** Styling for component log statements.
+     * Light: Foreground: #000000, Background: #fbf6d7, ⚠️
+     * Dark: Foreground: #f9f2a3, Background: #3f3c28, ⚠️   */
+    warnStatements?: ColorOptions;
+
+    /** Styling for component log statements.
+     * Default: Foreground: #000000, Background: #f6eceb, ⛔
+     * Default: Foreground: #f0dfd2, Background: #473635, ⛔  */
+    errorStatements?: ColorOptions;
+
     /** Styling for reconciled components (evaluated but not changed). Default: #6b7280 (Gray-500) */
     reconciled?: ColorOptions;
 

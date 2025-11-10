@@ -148,7 +148,7 @@ describe("isEmptyNode", () => {
       it("should NOT consider node empty when has component logs", () => {
         const node = createNode({
           renderType: "Rendering",
-          componentLogs: [{ message: "test", args: [], timestamp: Date.now() }],
+          componentLogs: [{ message: "test", args: [], timestamp: Date.now(), level: 'log' }],
         });
         const options = { includeReconciled: true, includeSkipped: true };
 

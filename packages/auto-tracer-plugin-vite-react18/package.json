@@ -1,6 +1,6 @@
 {
   "name": "@auto-tracer/plugin-vite-react18",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "description": "Vite plugin for auto-injecting useAutoTracer via unplugin",
   "author": "Carl Ribbegårdh",
   "license": "MIT",
@@ -28,7 +28,7 @@
     "unplugin": "^1.5.0"
   },
   "peerDependencies": {
-    "@auto-tracer/react18": "1.0.0-alpha.3",
+    "@auto-tracer/react18": "1.0.0-alpha.4",
     "vite": "^4.0.0 || ^5.0.0"
   },
   "peerDependenciesMeta": {

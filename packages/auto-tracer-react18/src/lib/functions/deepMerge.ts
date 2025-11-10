@@ -138,6 +138,36 @@ export function deepMergeOptions(
       };
     }
 
+    if (source.colors.warnStatements) {
+      result.colors.warnStatements = {
+        ...target.colors?.warnStatements,
+        ...source.colors.warnStatements,
+        lightMode: {
+          ...target.colors?.warnStatements?.lightMode,
+          ...source.colors.warnStatements.lightMode,
+        },
+        darkMode: {
+          ...target.colors?.warnStatements?.darkMode,
+          ...source.colors.warnStatements.darkMode,
+        },
+      };
+    }
+
+    if (source.colors.errorStatements) {
+      result.colors.errorStatements = {
+        ...target.colors?.errorStatements,
+        ...source.colors.errorStatements,
+        lightMode: {
+          ...target.colors?.errorStatements?.lightMode,
+          ...source.colors.errorStatements.lightMode,
+        },
+        darkMode: {
+          ...target.colors?.errorStatements?.darkMode,
+          ...source.colors.errorStatements.darkMode,
+        },
+      };
+    }
+
     if (source.colors.reconciled) {
       result.colors.reconciled = {
         ...target.colors?.reconciled,

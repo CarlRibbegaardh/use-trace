@@ -534,7 +534,7 @@ describe("walkFiberForUpdates", () => {
 
       const mockConsumeLogs = vi.mocked(componentLogRegistry.consumeLogs);
       mockConsumeLogs.mockReturnValue([
-        { message: "test log", args: ["arg1"], timestamp: Date.now() },
+        { message: "test log", args: ["arg1"], timestamp: Date.now(), level: 'log' },
       ]);
 
       const fiber = {

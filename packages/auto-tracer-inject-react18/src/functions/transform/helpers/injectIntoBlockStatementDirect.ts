@@ -221,8 +221,72 @@ export function injectIntoBlockStatementDirect(
     }
   }
 
-  // If no hooks to label, nothing to do
-  if (hooksToLabel.length === 0) {
+  // Third pass: check if there are any console.log/warn/error calls anywhere in the component
+  let hasConsoleCalls = false;
+
+  function checkForConsoleCalls(stmts: t.Statement[]): void {
+    if (hasConsoleCalls) return; // Early exit if already found
+
+    for (const stmt of stmts) {
+      // Check for console calls at this level
+      if (t.isExpressionStatement(stmt) && t.isCallExpression(stmt.expression)) {
+        const callee = stmt.expression.callee;
+        if (t.isMemberExpression(callee) &&
+            t.isIdentifier(callee.object, { name: "console" }) &&
+            t.isIdentifier(callee.property) &&
+            (callee.property.name === "log" || callee.property.name === "warn" || callee.property.name === "error")) {
+          hasConsoleCalls = true;
+          return;
+        }
+      }
+
+      // Recursively check nested blocks
+      if (t.isIfStatement(stmt)) {
+        if (t.isBlockStatement(stmt.consequent)) {
+          checkForConsoleCalls(stmt.consequent.body);
+        }
+        if (stmt.alternate && t.isBlockStatement(stmt.alternate)) {
+          checkForConsoleCalls(stmt.alternate.body);
+        }
+      } else if (t.isForStatement(stmt) || t.isWhileStatement(stmt) || t.isDoWhileStatement(stmt)) {
+        if (t.isBlockStatement(stmt.body)) {
+          checkForConsoleCalls(stmt.body.body);
+        }
+      } else if (t.isTryStatement(stmt)) {
+        checkForConsoleCalls(stmt.block.body);
+        if (stmt.handler) {
+          checkForConsoleCalls(stmt.handler.body.body);
+        }
+        if (stmt.finalizer) {
+          checkForConsoleCalls(stmt.finalizer.body);
+        }
+      } else if (t.isSwitchStatement(stmt)) {
+        for (const switchCase of stmt.cases) {
+          checkForConsoleCalls(switchCase.consequent);
+        }
+      }
+
+      // Also check inside nested function bodies
+      if (t.isFunctionDeclaration(stmt) && stmt.body && t.isBlockStatement(stmt.body)) {
+        checkForConsoleCalls(stmt.body.body);
+      } else if (t.isVariableDeclaration(stmt)) {
+        for (const decl of stmt.declarations) {
+          if (decl.init) {
+            if (t.isArrowFunctionExpression(decl.init) && t.isBlockStatement(decl.init.body)) {
+              checkForConsoleCalls(decl.init.body.body);
+            } else if (t.isFunctionExpression(decl.init) && decl.init.body && t.isBlockStatement(decl.init.body)) {
+              checkForConsoleCalls(decl.init.body.body);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  checkForConsoleCalls(blockStatement.body);
+
+  // If no hooks to label and no console calls, nothing to do
+  if (hooksToLabel.length === 0 && !hasConsoleCalls) {
     return;
   }
 
@@ -258,4 +322,101 @@ export function injectIntoBlockStatementDirect(
     );
     blockStatement.body.splice(index + 1, 0, labelStateCall);
   }
+
+  // Fourth pass: inject logger calls in ALL blocks (including top-level) recursively
+  // At this point, tracerId is guaranteed to exist (either found or injected above)
+  const finalTracerId = tracerId!;
+
+  function injectConsoleLoggersInNestedBlocks(stmts: t.Statement[]): void {
+    for (let i = stmts.length - 1; i >= 0; i--) {
+      const stmt = stmts[i];
+
+      // Check for expression statements containing console calls at this level
+      if (t.isExpressionStatement(stmt)) {
+        const expr = stmt.expression;
+
+        if (t.isCallExpression(expr)) {
+          const callee = expr.callee;
+
+          // Check if this is console.log/warn/error
+          if (
+            t.isMemberExpression(callee) &&
+            t.isIdentifier(callee.object, { name: 'console' }) &&
+            t.isIdentifier(callee.property) &&
+            (callee.property.name === 'log' ||
+             callee.property.name === 'warn' ||
+             callee.property.name === 'error')
+          ) {
+            // Filter out ArgumentPlaceholder
+            const validArgs = expr.arguments.filter(
+              (arg): arg is t.Expression | t.SpreadElement =>
+                !t.isArgumentPlaceholder(arg)
+            );
+
+            const method = callee.property.name as 'log' | 'warn' | 'error';
+
+            // Create logger call
+            const loggerCall = t.expressionStatement(
+              t.callExpression(
+                t.memberExpression(finalTracerId, t.identifier(method)),
+                validArgs
+              )
+            );
+
+            // Insert right after the console call (i+1 because we're going reverse)
+            stmts.splice(i + 1, 0, loggerCall);
+          }
+        }
+      }
+
+      // Recursively process nested blocks
+      if (t.isIfStatement(stmt)) {
+        if (t.isBlockStatement(stmt.consequent)) {
+          injectConsoleLoggersInNestedBlocks(stmt.consequent.body);
+        }
+        if (stmt.alternate) {
+          if (t.isBlockStatement(stmt.alternate)) {
+            injectConsoleLoggersInNestedBlocks(stmt.alternate.body);
+          }
+        }
+      } else if (t.isForStatement(stmt) || t.isWhileStatement(stmt) || t.isDoWhileStatement(stmt)) {
+        if (t.isBlockStatement(stmt.body)) {
+          injectConsoleLoggersInNestedBlocks(stmt.body.body);
+        }
+      } else if (t.isTryStatement(stmt)) {
+        injectConsoleLoggersInNestedBlocks(stmt.block.body);
+        if (stmt.handler) {
+          injectConsoleLoggersInNestedBlocks(stmt.handler.body.body);
+        }
+        if (stmt.finalizer) {
+          injectConsoleLoggersInNestedBlocks(stmt.finalizer.body);
+        }
+      } else if (t.isSwitchStatement(stmt)) {
+        for (const switchCase of stmt.cases) {
+          injectConsoleLoggersInNestedBlocks(switchCase.consequent);
+        }
+      }
+
+      // Also traverse into nested function bodies (arrow functions, function expressions, function declarations)
+      if (t.isFunctionDeclaration(stmt) && stmt.body && t.isBlockStatement(stmt.body)) {
+        injectConsoleLoggersInNestedBlocks(stmt.body.body);
+      } else if (t.isVariableDeclaration(stmt)) {
+        for (const decl of stmt.declarations) {
+          if (decl.init) {
+            // Arrow function: const handleSubmit = () => { ... }
+            if (t.isArrowFunctionExpression(decl.init) && t.isBlockStatement(decl.init.body)) {
+              injectConsoleLoggersInNestedBlocks(decl.init.body.body);
+            }
+            // Function expression: const handleSubmit = function() { ... }
+            else if (t.isFunctionExpression(decl.init) && decl.init.body && t.isBlockStatement(decl.init.body)) {
+              injectConsoleLoggersInNestedBlocks(decl.init.body.body);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Inject in nested blocks
+  injectConsoleLoggersInNestedBlocks(blockStatement.body);
 }

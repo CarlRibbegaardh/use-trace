@@ -50,7 +50,13 @@ export function useAutoTracer(): ComponentLogger {
   const logger = useMemo<ComponentLogger>(() => {
     return {
       log: (message: string, ...args: unknown[]) => {
-        componentLogRegistry.addLog(guidRef.current!, message, ...args);
+        componentLogRegistry.addLog(guidRef.current!, 'log', message, ...args);
+      },
+      warn: (message: string, ...args: unknown[]) => {
+        componentLogRegistry.addLog(guidRef.current!, 'warn', message, ...args);
+      },
+      error: (message: string, ...args: unknown[]) => {
+        componentLogRegistry.addLog(guidRef.current!, 'error', message, ...args);
       },
       /**
        * **Internal API - Not intended for direct developer use**

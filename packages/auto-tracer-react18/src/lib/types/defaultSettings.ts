@@ -49,6 +49,16 @@ export const defaultAutoTracerOptions: AutoTracerOptions = {
       lightMode: { text: "#00aa00" }, // Green
       darkMode: { text: "#4ade80" }, // Lighter green for dark mode
     },
+    warnStatements: {
+      icon: "⚠️", // Warning statements
+      lightMode: { text: "#000000", background: "#fbf6d7" }, // Black on light yellow
+      darkMode: { text: "#f9f2a3", background: "#3f3c28" }, // Light yellow on dark yellow-brown
+    },
+    errorStatements: {
+      icon: "❌", // Error statements
+      lightMode: { text: "#000000", background: "#f6eceb" }, // Black on light red
+      darkMode: { text: "#f0dfd2", background: "#473635" }, // Light red on dark red-brown
+    },
     reconciled: {
       lightMode: { text: "#9ca3af" }, // Gray-500
       darkMode: { text: "#9ca3af" }, // Gray-500
@@ -62,14 +72,14 @@ export const defaultAutoTracerOptions: AutoTracerOptions = {
     // Distinct identical state value warning styling (icon only; inherit rest)
     identicalStateValueWarning: {
       icon: "⚠️", // Warning icon
-      lightMode: { bold: true }, // Rely on existing stateChange color layering (no hue override)
-      darkMode: { bold: true },
+      lightMode: { text: "#df7f02", bold: true }, // Orange
+      darkMode: { text: "#ffcf33", bold: true }, // Lighter orange for dark mode
     },
     // Distinct identical prop value warning styling (icon only; inherit rest)
     identicalPropValueWarning: {
       icon: "⚠️", // Warning icon
-      lightMode: { bold: true }, // Rely on existing propChange color layering (no hue override)
-      darkMode: { bold: true },
+      lightMode: { text: "#c900bf", bold: true }, // Magenta
+      darkMode: { text: "#ff77e8", bold: true }, // Lighter magenta for dark mode
     },
     other: {
       lightMode: { text: "#000000" }, // Black
