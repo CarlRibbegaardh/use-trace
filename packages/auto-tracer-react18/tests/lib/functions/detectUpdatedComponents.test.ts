@@ -142,6 +142,26 @@ describe("detectUpdatedComponents", () => {
     const mockFiberNode = { type: "div", props: {} };
     const root = { current: mockFiberNode };
 
+    // Mock buildTreeFromFiber to return nodes so the group is opened
+    const mockTreeNode = {
+      componentName: "TestComponent",
+      displayName: "TestComponent",
+      depth: 0,
+      renderType: "Rendering" as const,
+      flags: 0,
+      stateChanges: [],
+      propChanges: [],
+      componentLogs: [],
+      isTracked: false,
+      trackingGUID: null,
+      hasIdenticalValueWarning: false,
+    };
+    buildTreeFromFiber.mockReturnValue([mockTreeNode]);
+
+    // Mock the filter function to return the nodes
+    const mockFilterFn = vi.fn((nodes) => nodes);
+    applyEmptyNodeFilter.mockReturnValue(mockFilterFn);
+
     detectUpdatedComponents(root);
 
     expect(logGroup).toHaveBeenCalledWith("Component render cycle:");
@@ -176,7 +196,22 @@ describe("detectUpdatedComponents", () => {
     });
     buildTreeFromFiber.mockImplementation(() => {
       callOrder.push("buildTreeFromFiber");
-      return [];
+      // Return a mock node so the group is opened
+      return [
+        {
+          componentName: "TestComponent",
+          displayName: "TestComponent",
+          depth: 0,
+          renderType: "Rendering" as const,
+          flags: 0,
+          stateChanges: [],
+          propChanges: [],
+          componentLogs: [],
+          isTracked: false,
+          trackingGUID: null,
+          hasIdenticalValueWarning: false,
+        },
+      ];
     });
     const mockFilterFn = vi.fn((nodes) => {
       callOrder.push("filterFn");
@@ -200,10 +235,10 @@ describe("detectUpdatedComponents", () => {
     detectUpdatedComponents(root);
 
     expect(callOrder).toEqual([
-      "logGroup",
       "buildTreeFromFiber",
       "applyEmptyNodeFilter",
       "filterFn",
+      "logGroup",
       "renderTree",
       "clearRenderRegistry",
       "logGroupEnd",
@@ -235,13 +270,66 @@ describe("detectUpdatedComponents", () => {
     const root = { current: {} };
     detectUpdatedComponents(root);
 
-    expect(logGroup).toHaveBeenCalledWith("Component render cycle:");
+    // Group should NOT be opened since buildTreeFromFiber throws before we can check for nodes
+    expect(logGroup).not.toHaveBeenCalled();
     expect(buildTreeFromFiber).toHaveBeenCalled();
     expect(logGroupEnd).toHaveBeenCalledTimes(1); // Once in catch
     expect(logError).toHaveBeenCalledWith(
       "AutoTracer: Error during component detection:",
       testError
     );
+    expect(clearRenderRegistry).toHaveBeenCalled();
+  });
+
+  it("should not create console group when no nodes to render", async () => {
+    const { buildTreeFromFiber } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/building/buildTreeFromFiber.js")
+    );
+    const { applyEmptyNodeFilter } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/filtering/applyEmptyNodeFilter.js")
+    );
+    const { renderTree } = vi.mocked(
+      await import("@src/lib/functions/treeProcessing/rendering/renderTree.js")
+    );
+    const { clearRenderRegistry } = vi.mocked(
+      await import("@src/lib/functions/renderRegistry.js")
+    );
+    const { logGroup, logGroupEnd } = vi.mocked(
+      await import("@src/lib/functions/log.js")
+    );
+
+    const mockFiberNode = { type: "div", props: {} };
+    const root = { current: mockFiberNode };
+
+    // Build returns nodes but filter removes them all
+    const mockTreeNode = {
+      componentName: "TestComponent",
+      displayName: "TestComponent",
+      depth: 0,
+      renderType: "Rendering" as const,
+      flags: 0,
+      stateChanges: [],
+      propChanges: [],
+      componentLogs: [],
+      isTracked: false,
+      trackingGUID: null,
+      hasIdenticalValueWarning: false,
+    };
+    buildTreeFromFiber.mockReturnValue([mockTreeNode]);
+
+    // Filter returns empty array (all nodes filtered out)
+    const mockFilterFn = vi.fn(() => []);
+    applyEmptyNodeFilter.mockReturnValue(mockFilterFn);
+
+    detectUpdatedComponents(root);
+
+    // Group should NOT be opened since filtered result is empty
+    expect(logGroup).not.toHaveBeenCalled();
+    expect(logGroupEnd).not.toHaveBeenCalled();
+    expect(buildTreeFromFiber).toHaveBeenCalledWith(mockFiberNode, 0);
+    expect(applyEmptyNodeFilter).toHaveBeenCalled();
+    // renderTree should still be called with empty array
+    expect(renderTree).toHaveBeenCalledWith([]);
     expect(clearRenderRegistry).toHaveBeenCalled();
   });
 

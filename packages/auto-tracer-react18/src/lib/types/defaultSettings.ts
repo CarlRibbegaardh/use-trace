@@ -72,14 +72,14 @@ export const defaultAutoTracerOptions: AutoTracerOptions = {
     // Distinct identical state value warning styling (icon only; inherit rest)
     identicalStateValueWarning: {
       icon: "⚠️", // Warning icon
-      lightMode: { bold: true }, // Rely on existing stateChange color layering (no hue override)
-      darkMode: { bold: true },
+      lightMode: { text: "#df7f02", bold: true }, // Orange
+      darkMode: { text: "#ffcf33", bold: true }, // Lighter orange for dark mode
     },
     // Distinct identical prop value warning styling (icon only; inherit rest)
     identicalPropValueWarning: {
       icon: "⚠️", // Warning icon
-      lightMode: { bold: true }, // Rely on existing propChange color layering (no hue override)
-      darkMode: { bold: true },
+      lightMode: { text: "#c900bf", bold: true }, // Magenta
+      darkMode: { text: "#ff77e8", bold: true }, // Lighter magenta for dark mode
     },
     other: {
       lightMode: { text: "#000000" }, // Black
