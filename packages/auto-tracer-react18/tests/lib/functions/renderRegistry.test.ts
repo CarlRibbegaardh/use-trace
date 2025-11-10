@@ -99,6 +99,7 @@ describe("renderRegistry", () => {
       expect(componentLogRegistry.addLog).toHaveBeenCalledTimes(1);
       expect(componentLogRegistry.addLog).toHaveBeenCalledWith(
         expect.stringMatching(/^render-track-\d+-\d+$/),
+        'log',
         "test message",
         "arg1",
         42
@@ -147,9 +148,11 @@ describe("renderRegistry", () => {
 
       const [firstCall, secondCall] = calls;
       expect(firstCall![0]).toBe(secondCall![0]); // Same GUID
-      expect(firstCall![1]).toBe("message 1");
-      expect(secondCall![1]).toBe("message 2");
-      expect(secondCall![2]).toBe("arg");
+      expect(firstCall![1]).toBe('log'); // Log level
+      expect(firstCall![2]).toBe("message 1");
+      expect(secondCall![1]).toBe('log'); // Log level
+      expect(secondCall![2]).toBe("message 2");
+      expect(secondCall![3]).toBe("arg");
     });
 
     it("should store label at explicit index when provided", async () => {
@@ -185,6 +188,39 @@ describe("renderRegistry", () => {
       expect(labels.length).toBe(1);
       expect(labels[0]?.label).toBe("filteredTodos");
       expect(labels[0]?.index).toBe(9);
+    });
+
+    it("should expose log method", async () => {
+      const { useAutoTracer } = await import(
+        "@src/lib/functions/renderRegistry.js"
+      );
+      const { result } = renderHook(() => useAutoTracer());
+      const logger = result.current;
+
+      expect(logger.log).toBeDefined();
+      expect(typeof logger.log).toBe('function');
+    });
+
+    it("should expose warn method", async () => {
+      const { useAutoTracer } = await import(
+        "@src/lib/functions/renderRegistry.js"
+      );
+      const { result } = renderHook(() => useAutoTracer());
+      const logger = result.current;
+
+      expect(logger.warn).toBeDefined();
+      expect(typeof logger.warn).toBe('function');
+    });
+
+    it("should expose error method", async () => {
+      const { useAutoTracer } = await import(
+        "@src/lib/functions/renderRegistry.js"
+      );
+      const { result } = renderHook(() => useAutoTracer());
+      const logger = result.current;
+
+      expect(logger.error).toBeDefined();
+      expect(typeof logger.error).toBe('function');
     });
 
     it("should expose labelState with mandatory index and value parameters (arity 3)", async () => {

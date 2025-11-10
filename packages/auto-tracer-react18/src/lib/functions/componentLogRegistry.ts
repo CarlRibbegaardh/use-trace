@@ -9,7 +9,12 @@ class ComponentLogRegistry {
   /**
    * Add a log entry for a component GUID
    */
-  addLog(guid: string, message: string, ...args: unknown[]): void {
+  addLog(
+    guid: string,
+    level: "log" | "warn" | "error",
+    message: string,
+    ...args: unknown[]
+  ): void {
     if (!this.logs.has(guid)) {
       this.logs.set(guid, []);
     }
@@ -17,7 +22,8 @@ class ComponentLogRegistry {
     this.logs.get(guid)!.push({
       message,
       args,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      level,
     });
   }
 

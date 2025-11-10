@@ -171,9 +171,12 @@ export function renderTreeNode(
 
   // Render component logs
   node.componentLogs.forEach((logEntry) => {
+    const icon = logEntry.level === 'error' ? '❌'
+               : logEntry.level === 'warn' ? '⚠️'
+               : '📝';
     const argsStr =
       logEntry.args.length > 0 ? ` ${JSON.stringify(logEntry.args)}` : "";
-    logLogStatement(`${indent}│   `, `📝 ${logEntry.message}${argsStr}`);
+    logLogStatement(`${indent}│   `, `${icon} ${logEntry.message}${argsStr}`);
   });
 
   return visualDepth;

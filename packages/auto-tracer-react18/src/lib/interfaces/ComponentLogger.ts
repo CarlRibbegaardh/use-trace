@@ -10,6 +10,20 @@ export interface ComponentLogger {
   log: (message: string, ...args: unknown[]) => void;
 
   /**
+   * Log a warning message that will be displayed when the component is rendered by autoTracer
+   * @param message The warning message to log
+   * @param args Additional arguments (similar to console.warn)
+   */
+  warn: (message: string, ...args: unknown[]) => void;
+
+  /**
+   * Log an error message that will be displayed when the component is rendered by autoTracer
+   * @param message The error message to log
+   * @param args Additional arguments (similar to console.error)
+   */
+  error: (message: string, ...args: unknown[]) => void;
+
+  /**
    * INTERNAL: Associates a human-readable label with a state hook using its stable index
    * in React's _debugHookTypes ordering. Intended for code injection only.
    *
@@ -30,4 +44,5 @@ export interface ComponentLogEntry {
   message: string;
   args: unknown[];
   timestamp: number;
+  level: 'log' | 'warn' | 'error';
 }

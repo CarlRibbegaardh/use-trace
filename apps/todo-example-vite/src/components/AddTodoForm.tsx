@@ -12,13 +12,22 @@ interface AddTodoFormProps {
 
 export const AddTodoForm: React.FC<AddTodoFormProps> = ({ todoService }) => {
   const logger = useAutoTracer();
-  logger.log("AddTodoForm component rendered");
+
+  logger.log("AddTodoForm rendered", { timestamp: Date.now() });
 
   const [title, setTitle] = useState("");
   logger.labelState("title", 0, title);
 
   const [description, setDescription] = useState("");
   logger.labelState("description", 1, description);
+
+  // Example of warn() and error() usage
+  if (title.length > 50) {
+    logger.warn("Title is very long", { length: title.length });
+  }
+  if (title.length > 100) {
+    logger.error("Title exceeds maximum length!", { length: title.length, max: 100 });
+  }
 
   const dispatch = useAppDispatch();
 

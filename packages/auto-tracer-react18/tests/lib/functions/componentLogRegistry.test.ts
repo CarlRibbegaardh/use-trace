@@ -13,20 +13,21 @@ describe("ComponentLogRegistry", () => {
       const message = "Test message";
       const args = ["arg1", "arg2"];
 
-      componentLogRegistry.addLog(guid, message, ...args);
+      componentLogRegistry.addLog(guid, 'log', message, ...args);
 
       const logs = componentLogRegistry.consumeLogs(guid);
       expect(logs).toHaveLength(1);
       expect(logs[0]!.message).toBe(message);
       expect(logs[0]!.args).toEqual(args);
       expect(logs[0]!.timestamp).toBeTypeOf("number");
+      expect(logs[0]!.level).toBe('log');
     });
 
     it("should add multiple log entries for the same component GUID", () => {
       const guid = "test-guid-2";
 
-      componentLogRegistry.addLog(guid, "First message", "arg1");
-      componentLogRegistry.addLog(guid, "Second message", "arg2");
+      componentLogRegistry.addLog(guid, 'log', "First message", "arg1");
+      componentLogRegistry.addLog(guid, 'log', "Second message", "arg2");
 
       const logs = componentLogRegistry.consumeLogs(guid);
       expect(logs).toHaveLength(2);
@@ -40,8 +41,8 @@ describe("ComponentLogRegistry", () => {
       const guid1 = "test-guid-1";
       const guid2 = "test-guid-2";
 
-      componentLogRegistry.addLog(guid1, "Message for guid1");
-      componentLogRegistry.addLog(guid2, "Message for guid2");
+      componentLogRegistry.addLog(guid1, 'log', "Message for guid1");
+      componentLogRegistry.addLog(guid2, 'log', "Message for guid2");
 
       const logs1 = componentLogRegistry.consumeLogs(guid1);
       const logs2 = componentLogRegistry.consumeLogs(guid2);
@@ -56,7 +57,7 @@ describe("ComponentLogRegistry", () => {
       const guid = "test-guid-3";
       const message = "Message with no args";
 
-      componentLogRegistry.addLog(guid, message);
+      componentLogRegistry.addLog(guid, 'log', message);
 
       const logs = componentLogRegistry.consumeLogs(guid);
       expect(logs).toHaveLength(1);
@@ -76,7 +77,7 @@ describe("ComponentLogRegistry", () => {
         "string",
       ];
 
-      componentLogRegistry.addLog(guid, message, ...complexArgs);
+      componentLogRegistry.addLog(guid, 'log', message, ...complexArgs);
 
       const logs = componentLogRegistry.consumeLogs(guid);
       expect(logs).toHaveLength(1);
@@ -92,7 +93,7 @@ describe("ComponentLogRegistry", () => {
 
     it("should return and remove logs for existing GUID", () => {
       const guid = "test-guid-5";
-      componentLogRegistry.addLog(guid, "Test message");
+      componentLogRegistry.addLog(guid, 'log', "Test message");
 
       // First consumption should return the logs
       const logs1 = componentLogRegistry.consumeLogs(guid);
@@ -108,8 +109,8 @@ describe("ComponentLogRegistry", () => {
       const guid1 = "test-guid-1";
       const guid2 = "test-guid-2";
 
-      componentLogRegistry.addLog(guid1, "Message 1");
-      componentLogRegistry.addLog(guid2, "Message 2");
+      componentLogRegistry.addLog(guid1, 'log', "Message 1");
+      componentLogRegistry.addLog(guid2, 'log', "Message 2");
 
       // Consume logs for guid1
       const logs1 = componentLogRegistry.consumeLogs(guid1);
@@ -127,8 +128,8 @@ describe("ComponentLogRegistry", () => {
       const guid1 = "test-guid-1";
       const guid2 = "test-guid-2";
 
-      componentLogRegistry.addLog(guid1, "Message 1");
-      componentLogRegistry.addLog(guid2, "Message 2");
+      componentLogRegistry.addLog(guid1, 'log', "Message 1");
+      componentLogRegistry.addLog(guid2, 'log', "Message 2");
 
       // Verify logs exist
       expect(componentLogRegistry.getLogCount()).toBe(2);
@@ -159,13 +160,13 @@ describe("ComponentLogRegistry", () => {
     it("should return correct count with single GUID", () => {
       const guid = "test-guid";
 
-      componentLogRegistry.addLog(guid, "Message 1");
+      componentLogRegistry.addLog(guid, 'log', "Message 1");
       expect(componentLogRegistry.getLogCount()).toBe(1);
 
-      componentLogRegistry.addLog(guid, "Message 2");
+      componentLogRegistry.addLog(guid, 'log', "Message 2");
       expect(componentLogRegistry.getLogCount()).toBe(2);
 
-      componentLogRegistry.addLog(guid, "Message 3");
+      componentLogRegistry.addLog(guid, 'log', "Message 3");
       expect(componentLogRegistry.getLogCount()).toBe(3);
     });
 
@@ -174,13 +175,13 @@ describe("ComponentLogRegistry", () => {
       const guid2 = "test-guid-2";
       const guid3 = "test-guid-3";
 
-      componentLogRegistry.addLog(guid1, "Message 1");
-      componentLogRegistry.addLog(guid2, "Message 2");
-      componentLogRegistry.addLog(guid3, "Message 3");
+      componentLogRegistry.addLog(guid1, 'log', "Message 1");
+      componentLogRegistry.addLog(guid2, 'log', "Message 2");
+      componentLogRegistry.addLog(guid3, 'log', "Message 3");
       expect(componentLogRegistry.getLogCount()).toBe(3);
 
-      componentLogRegistry.addLog(guid1, "Message 4");
-      componentLogRegistry.addLog(guid2, "Message 5");
+      componentLogRegistry.addLog(guid1, 'log', "Message 4");
+      componentLogRegistry.addLog(guid2, 'log', "Message 5");
       expect(componentLogRegistry.getLogCount()).toBe(5);
     });
 
@@ -188,8 +189,8 @@ describe("ComponentLogRegistry", () => {
       const guid1 = "test-guid-1";
       const guid2 = "test-guid-2";
 
-      componentLogRegistry.addLog(guid1, "Message 1");
-      componentLogRegistry.addLog(guid2, "Message 2");
+      componentLogRegistry.addLog(guid1, 'log', "Message 1");
+      componentLogRegistry.addLog(guid2, 'log', "Message 2");
       expect(componentLogRegistry.getLogCount()).toBe(2);
 
       // Consume logs for guid1
@@ -205,8 +206,8 @@ describe("ComponentLogRegistry", () => {
       const guid1 = "test-guid-1";
       const guid2 = "test-guid-2";
 
-      componentLogRegistry.addLog(guid1, "Message 1");
-      componentLogRegistry.addLog(guid2, "Message 2");
+      componentLogRegistry.addLog(guid1, 'log', "Message 1");
+      componentLogRegistry.addLog(guid2, 'log', "Message 2");
       expect(componentLogRegistry.getLogCount()).toBe(2);
 
       componentLogRegistry.clear();
@@ -218,14 +219,14 @@ describe("ComponentLogRegistry", () => {
     it("should assign different timestamps to logs added at different times", async () => {
       const guid = "test-guid";
 
-      componentLogRegistry.addLog(guid, "First message");
+      componentLogRegistry.addLog(guid, 'log', "First message");
 
       // Wait a small amount to ensure timestamp difference
       await new Promise((resolve) => {
         setTimeout(resolve, 10); // Increase timeout to ensure timestamp difference
       });
 
-      componentLogRegistry.addLog(guid, "Second message");
+      componentLogRegistry.addLog(guid, 'log', "Second message");
 
       const logs = componentLogRegistry.consumeLogs(guid);
       expect(logs).toHaveLength(2);
@@ -234,7 +235,7 @@ describe("ComponentLogRegistry", () => {
 
     it("should have valid timestamp format", () => {
       const guid = "test-guid";
-      componentLogRegistry.addLog(guid, "Test message");
+      componentLogRegistry.addLog(guid, 'log', "Test message");
 
       const logs = componentLogRegistry.consumeLogs(guid);
       const timestamp = logs[0]!.timestamp;
@@ -242,6 +243,45 @@ describe("ComponentLogRegistry", () => {
       expect(typeof timestamp).toBe("number");
       expect(timestamp).toBeGreaterThan(0);
       expect(timestamp).toBeLessThanOrEqual(Date.now());
+    });
+  });
+
+  describe("log levels", () => {
+    it("should store log level correctly for 'log'", () => {
+      const guid = "test-guid";
+      componentLogRegistry.addLog(guid, 'log', "Log message");
+
+      const logs = componentLogRegistry.consumeLogs(guid);
+      expect(logs[0]!.level).toBe('log');
+    });
+
+    it("should store log level correctly for 'warn'", () => {
+      const guid = "test-guid";
+      componentLogRegistry.addLog(guid, 'warn', "Warning message");
+
+      const logs = componentLogRegistry.consumeLogs(guid);
+      expect(logs[0]!.level).toBe('warn');
+    });
+
+    it("should store log level correctly for 'error'", () => {
+      const guid = "test-guid";
+      componentLogRegistry.addLog(guid, 'error', "Error message");
+
+      const logs = componentLogRegistry.consumeLogs(guid);
+      expect(logs[0]!.level).toBe('error');
+    });
+
+    it("should handle mixed log levels for same component", () => {
+      const guid = "test-guid";
+      componentLogRegistry.addLog(guid, 'log', "Log message");
+      componentLogRegistry.addLog(guid, 'warn', "Warning message");
+      componentLogRegistry.addLog(guid, 'error', "Error message");
+
+      const logs = componentLogRegistry.consumeLogs(guid);
+      expect(logs).toHaveLength(3);
+      expect(logs[0]!.level).toBe('log');
+      expect(logs[1]!.level).toBe('warn');
+      expect(logs[2]!.level).toBe('error');
     });
   });
 });
