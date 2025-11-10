@@ -4,18 +4,21 @@ import { Add as AddIcon } from "@mui/icons-material";
 import { useAppDispatch } from "../hooks/redux";
 import { createTodo } from "../store/todoSlice";
 import { TodoService } from "../domain/TodoService";
-import { useAutoTracer } from "@auto-tracer/react18";
 
 interface AddTodoFormProps {
   todoService: TodoService;
 }
 
 export const AddTodoForm: React.FC<AddTodoFormProps> = ({ todoService }) => {
-  const logger = useAutoTracer();
-  logger.log("AddTodoForm component rendered");
+  console.log("Component is rendering", { timestamp: Date.now() });
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+
+  if (title.length > 50) {
+    console.warn("Title is getting long", { length: title.length });
+  }
+
   const dispatch = useAppDispatch();
 
   const handleSubmit = async (e: React.FormEvent) => {
