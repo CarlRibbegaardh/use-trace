@@ -90,7 +90,7 @@ export function useAutoTracer(): ComponentLogger {
               "AutoTracer: labelState requires an explicit index as first argument."
             );
           }
-          // Clear old labels on first call (index 0) for this render
+          // On first call (index 0), clear previous labels
           if (index === 0) {
             clearLabelsForGuid(guid);
           }

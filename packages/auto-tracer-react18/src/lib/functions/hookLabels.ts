@@ -4,8 +4,14 @@
 
 import { stringify } from "./stringify.js";
 import { normalizeValue } from "./normalizeValue.js";
-import { classifyObjectProperties, type PropertyMetadata } from "./classifyObjectProperties.js";
-import { reconstructObjectFromFiber, type FiberHook } from "./reconstructObjectFromFiber.js";
+import {
+  classifyObjectProperties,
+  type PropertyMetadata,
+} from "./classifyObjectProperties.js";
+import {
+  reconstructObjectFromFiber,
+  type FiberHook,
+} from "./reconstructObjectFromFiber.js";
 import { matchByStructure } from "./matchByStructure.js";
 
 /**
@@ -26,6 +32,8 @@ export interface LabelEntry {
 // Registry mapping GUID -> array of label entries
 const guidToLabelsMap = new Map<string, LabelEntry[]>();
 
+// Registry for storing previous render's labels (before they get cleared)
+const guidToPrevLabelsMap = new Map<string, LabelEntry[]>();
 
 /**
  * Adds a label with value for a component's hook.
@@ -39,10 +47,7 @@ const guidToLabelsMap = new Map<string, LabelEntry[]>();
  * @param guid - The unique identifier for the component instance
  * @param entry - Label entry containing label, index, and value
  */
-export function addLabelForGuid(
-  guid: string,
-  entry: LabelEntry
-): void {
+export function addLabelForGuid(guid: string, entry: LabelEntry): void {
   // Compute metadata from the ORIGINAL value (so functions are still detectable)
   const metadataOriginal = classifyObjectProperties(entry.value);
   // Normalize value AFTER metadata extraction (functions replaced with placeholder for matching)
@@ -80,6 +85,29 @@ export function getLabelsForGuid(guid: string): LabelEntry[] {
 }
 
 /**
+ * Retrieves previous render's label entries for a component.
+ *
+ * @param guid - The unique identifier for the component instance
+ * @returns An array of label entries from previous render
+ */
+export function getPrevLabelsForGuid(guid: string): LabelEntry[] {
+  return guidToPrevLabelsMap.get(guid) || [];
+}
+
+/**
+ * Saves current labels as "previous" for comparison in next render.
+ * This should be called during commit phase when labels are complete.
+ *
+ * @param guid - The unique identifier for the component instance
+ */
+export function savePrevLabelsForGuid(guid: string): void {
+  const currentLabels = guidToLabelsMap.get(guid);
+  if (currentLabels) {
+    guidToPrevLabelsMap.set(guid, currentLabels);
+  }
+}
+
+/**
  * Clears all labels for a specific component.
  *
  * @param guid - The unique identifier for the component instance
@@ -90,9 +118,11 @@ export function clearLabelsForGuid(guid: string): void {
 
 /**
  * Clears all hook labels from the registry.
+ * Note: Previous labels are preserved to enable comparison in the next render.
  */
 export function clearAllHookLabels(): void {
   guidToLabelsMap.clear();
+  // Don't clear guidToPrevLabelsMap - we need it for the next render cycle
 }
 
 /**
@@ -246,7 +276,8 @@ function tryStructuralMatching(
 
       // Check if the primitive matches any property value in the registered object
       const matchingProperty = Object.entries(labelObject).find(
-        ([_key, propValue]) => stringify(normalizeValue(propValue)) === normalizedCurrentStr
+        ([_key, propValue]) =>
+          stringify(normalizeValue(propValue)) === normalizedCurrentStr
       );
 
       if (matchingProperty) {
@@ -265,8 +296,12 @@ function tryStructuralMatching(
       typeof labelEntry.value === "object" &&
       labelEntry.value !== null
     ) {
-      const storedKeys = Object.keys(labelEntry.value as Record<string, unknown>);
-      const currentKeys = Object.keys(normalizedCurrent as Record<string, unknown>);
+      const storedKeys = Object.keys(
+        labelEntry.value as Record<string, unknown>
+      );
+      const currentKeys = Object.keys(
+        normalizedCurrent as Record<string, unknown>
+      );
       if (
         storedKeys.length === currentKeys.length &&
         storedKeys.every((k, i) => k === currentKeys[i])
@@ -311,4 +346,3 @@ function tryStructuralMatching(
 
   return null; // No structural match found
 }
-

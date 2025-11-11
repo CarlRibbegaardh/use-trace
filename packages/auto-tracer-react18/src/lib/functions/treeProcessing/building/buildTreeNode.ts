@@ -8,6 +8,7 @@ import { getTrackingGUID } from "../../renderRegistry.js";
 import { hasRenderWork } from "../../reactFiberFlags.js";
 import { isReactInternal } from "../../isReactInternal.js";
 import { AUTOTRACER_STATE_MARKER } from "../../../types/marker.js";
+import { getLabelsForGuid, getPrevLabelsForGuid, savePrevLabelsForGuid } from "../../hookLabels.js";
 import { areValuesIdentical } from "../../areValuesIdentical.js";
 import { traceOptions } from "../../../types/globalState.js";
 import { componentLogRegistry } from "../../componentLogRegistry.js";
@@ -81,7 +82,7 @@ export function buildTreeNode(fiber: unknown, depth: number): TreeNode {
   const stateChanges = (() => {
     if (isNewMount) {
       // On mount, collect initial state values (not deltas)
-      return useStateValues
+      const fiberStateChanges = useStateValues
         .filter(({ name, value }) => {
           return !isReactInternal(name) && value !== AUTOTRACER_STATE_MARKER;
         })
@@ -101,10 +102,29 @@ export function buildTreeNode(fiber: unknown, depth: number): TreeNode {
             isIdenticalValueChange: false,
           };
         });
+
+      // Track which labels were matched by fiber hooks
+      const matchedLabels = new Set(fiberStateChanges.map(change => change.name));
+
+      // Also include labeled values that weren't matched by fiber hooks
+      // (e.g., functions from destructured custom hooks)
+      const unmatchedLabelChanges = trackingGUID
+        ? getLabelsForGuid(trackingGUID)
+            .filter(({ label }) => !matchedLabels.has(label))
+            .map(({ label, value }) => ({
+              name: label,
+              value,
+              prevValue: undefined as unknown,
+              hook: null as unknown as Hook, // No actual hook for labeled-only values
+              isIdenticalValueChange: false,
+            }))
+        : [];
+
+      return [...fiberStateChanges, ...unmatchedLabelChanges];
     }
 
     // On updates, collect meaningful deltas only
-    return useStateValues
+    const fiberStateChanges = useStateValues
       .filter(({ name, value, prevValue }) => {
         return (
           prevValue !== undefined &&
@@ -138,6 +158,49 @@ export function buildTreeNode(fiber: unknown, depth: number): TreeNode {
           isIdenticalValueChange,
         };
       });
+
+    // Track which labels were matched by fiber hooks
+    const matchedLabels = new Set(fiberStateChanges.map(change => change.name));
+
+    // Also check for changes in labeled values that aren't in the fiber
+    // (e.g., functions from destructured custom hooks that change every render)
+    const unmatchedLabelChanges = (() => {
+      if (!trackingGUID) return [];
+
+      const currentLabels = getLabelsForGuid(trackingGUID);
+      // Get previous labels from the snapshot
+      // Note: Previous labels are the ones from the LAST commit, saved at the end of the last update
+      const prevLabels = getPrevLabelsForGuid(trackingGUID);
+
+      // Create a map of previous values by label name
+      const prevValueMap = new Map(
+        prevLabels.map((entry) => [entry.label, entry.value])
+      );
+
+      const changes = currentLabels
+        .filter(({ label }) => !matchedLabels.has(label))
+        .map(({ label, value }) => {
+          const prevValue = prevValueMap.get(label);
+          // Only include if the value changed AND we have a previous value
+          // (skip first update after mount where prevValue is undefined)
+          return prevValue !== undefined && prevValue !== value ? {
+            name: label,
+            value,
+            prevValue,
+            hook: null as unknown as Hook,
+            isIdenticalValueChange: false,
+          } : null;
+        })
+        .filter((change): change is NonNullable<typeof change> => change !== null);
+
+      // After processing, save current labels as "previous" for next render
+      // This ensures they're saved AFTER they're complete
+      savePrevLabelsForGuid(trackingGUID);
+
+      return changes;
+    })();
+
+    return [...fiberStateChanges, ...unmatchedLabelChanges];
   })();
 
   // Extract prop changes

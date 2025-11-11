@@ -3,6 +3,7 @@ import { areValuesIdentical } from "./areValuesIdentical.js";
 import { extractPropChanges } from "./extractPropChanges.js";
 import { extractUseStateValues } from "./extractUseStateValues.js";
 import { findStatefulHookAnchors } from "./hookMapping/findStatefulHookAnchors.js";
+import { getLabelsForGuid } from "./hookLabels.js";
 import { resolveHookLabel } from "./hookLabels.js";
 import type { Hook } from "./hookMapping/types.js";
 import { getComponentName } from "./getComponentName.js";
@@ -272,6 +273,9 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
           value: anchor.memoizedState,
         }));
 
+        // Track which labels were matched by fiber hooks
+        const matchedLabels = new Set<string>();
+
         allStateValues.forEach(({ name, value, hook }) => {
           if (!isReactInternal(name) && value !== AUTOTRACER_STATE_MARKER) {
             const anchorIndex = anchorsInitial.indexOf(hook as Hook);
@@ -282,6 +286,8 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
               allAnchorsInitial
             );
 
+            matchedLabels.add(label);
+
             logStateChange(
               `${indent}│   `,
               `Initial state ${label}: ${formatStateValue(value)}`,
@@ -289,6 +295,27 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
             );
           }
         });
+
+        // Also log any labeled values that weren't matched by fiber hooks
+        // (e.g., functions or other properties from destructured custom hooks)
+        if (trackingGUID) {
+          const allLabels = getLabelsForGuid(trackingGUID);
+
+          // DEBUG: Log what we found
+          console.log('[DEBUG] All labels for GUID:', trackingGUID, allLabels.map(l => l.label));
+          console.log('[DEBUG] Matched labels:', Array.from(matchedLabels));
+
+          allLabels.forEach(({ label, value }) => {
+            if (!matchedLabels.has(label)) {
+              console.log('[DEBUG] Logging unmatched label:', label, value);
+              logStateChange(
+                `${indent}│   `,
+                `Initial state ${label}: ${formatStateValue(value)}`,
+                true
+              );
+            }
+          });
+        }
       } else {
         // Show prop changes if any
         propChanges.forEach(({ name, value, prevValue }) => {
@@ -322,6 +349,9 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
           value: anchor.memoizedState,
         }));
 
+        // Track which labels were matched by fiber hooks
+        const matchedLabels = new Set<string>();
+
         // Map each state change to its label using value-based matching
         meaningfulStateChanges.forEach(
           ({ name, value, prevValue, hook, isIdenticalValueChange }) => {
@@ -332,6 +362,8 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
               (hook as Hook).memoizedState,
               allAnchors
             );
+
+            matchedLabels.add(label);
 
             const formattedChange = formatStateChange(prevValue, value);
 
@@ -345,6 +377,33 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
             }
           }
         );
+
+        // Also log changes for labeled values that aren't in the fiber
+        // (e.g., functions from destructured custom hooks)
+        if (trackingGUID) {
+          const currentLabels = getLabelsForGuid(trackingGUID);
+          // Get previous labels from alternate fiber if available
+          const alternateFiber = fiberNode.alternate as typeof fiberNode | undefined;
+          const prevGUID = alternateFiber ? getTrackingGUID(alternateFiber) : null;
+          const prevLabels = prevGUID ? getLabelsForGuid(prevGUID) : [];
+
+          // Create a map of previous values by label name
+          const prevValueMap = new Map(
+            prevLabels.map((entry) => [entry.label, entry.value])
+          );
+
+          currentLabels.forEach(({ label, value }) => {
+            if (!matchedLabels.has(label)) {
+              const prevValue = prevValueMap.get(label);
+              // Only log if the value changed or this is first render
+              if (prevValue !== value) {
+                const formattedChange = formatStateChange(prevValue, value);
+                const msg = `State change ${label}: ${formattedChange}`;
+                logStateChange(`${indent}│   `, msg);
+              }
+            }
+          });
+        }
       }
 
       // Show component logs if this component was tracked
