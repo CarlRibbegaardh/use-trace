@@ -43,14 +43,15 @@ export function addLabelForGuid(
   guid: string,
   entry: LabelEntry
 ): void {
-  // Normalize value and compute metadata for objects
+  // Compute metadata from the ORIGINAL value (so functions are still detectable)
+  const metadataOriginal = classifyObjectProperties(entry.value);
+  // Normalize value AFTER metadata extraction (functions replaced with placeholder for matching)
   const normalizedValue = normalizeValue(entry.value);
-  const metadata = classifyObjectProperties(normalizedValue);
 
   const processedEntry: LabelEntry = {
     ...entry,
     value: normalizedValue,
-    propertyMetadata: metadata ?? undefined,
+    propertyMetadata: metadataOriginal ?? undefined,
   };
 
   if (!guidToLabelsMap.has(guid)) {
@@ -118,23 +119,40 @@ export function resolveHookLabel(
 ): string {
   const labels = getLabelsForGuid(guid);
 
-  // Stringify values for proper object/array comparison
-  const anchorValueStr = stringify(anchorValue);
+  // Build comparable string using normalization (functions -> "(fn)")
+  const toComparableString = (v: unknown) => stringify(normalizeValue(v));
+  const anchorComparable = toComparableString(anchorValue);
 
-  // Group fiber anchors by value
+  // Group fiber anchors by comparable value
   const valueGroup = allFiberAnchors.filter(
-    (a) => stringify(a.value) === anchorValueStr
+    (a) => toComparableString(a.value) === anchorComparable
   );
 
   // Scenario 1: Unique value in fiber → direct match
   if (valueGroup.length === 1) {
-    const match = labels.find((l) => stringify(l.value) === anchorValueStr);
-    return match?.label ?? "unknown";
+    const match = labels.find(
+      (l) => toComparableString(l.value) === anchorComparable
+    );
+    if (match?.label) {
+      return match.label;
+    }
+
+    // Try structural matching before giving up (unique-value branch)
+    const structuralMatch = tryStructuralMatching(
+      labels,
+      anchorIndex,
+      anchorValue,
+      allFiberAnchors
+    );
+    if (structuralMatch) {
+      return structuralMatch;
+    }
+    return "unknown";
   }
 
   // Scenarios 2 & 3: Duplicate values
   const labelsWithValue = labels.filter(
-    (l) => stringify(l.value) === anchorValueStr
+    (l) => toComparableString(l.value) === anchorComparable
   );
 
   // Scenario 2: All occurrences labeled → ordinal match
@@ -207,19 +225,56 @@ function tryStructuralMatching(
   anchorValue: unknown,
   allFiberAnchors: Array<{ index: number; value: unknown }>
 ): string | null {
-  // Normalize current anchor value
+  // Normalize current anchor value (may be primitive)
   const normalizedCurrent = normalizeValue(anchorValue);
-  const currentMetadata = classifyObjectProperties(normalizedCurrent);
-
-  // Only try structural matching if current value is an object
-  if (!currentMetadata) {
-    return null;
-  }
 
   // Try to match against each labeled entry that has metadata
   for (const labelEntry of labels) {
     if (!labelEntry.propertyMetadata) {
       continue; // Skip non-object labels
+    }
+
+    // SPECIAL CASE: Fiber value is primitive, but label is an object (custom hook wrapper scenario)
+    // Check if the primitive matches any property value in the registered object
+    if (
+      (typeof normalizedCurrent !== "object" || normalizedCurrent === null) &&
+      typeof labelEntry.value === "object" &&
+      labelEntry.value !== null
+    ) {
+      const labelObject = labelEntry.value as Record<string, unknown>;
+      const normalizedCurrentStr = stringify(normalizedCurrent);
+
+      // Check if the primitive matches any property value in the registered object
+      const matchingProperty = Object.entries(labelObject).find(
+        ([_key, propValue]) => stringify(normalizeValue(propValue)) === normalizedCurrentStr
+      );
+
+      if (matchingProperty) {
+        // Don't update labelEntry.value here - keep the object for future wrapper matches
+        return labelEntry.label;
+      }
+
+      // No property matched - skip to next label (don't try reconstruction for primitive-vs-object mismatch)
+      continue;
+    }
+
+    // Fast-path: if current value is an object, compare normalized keys directly
+    if (
+      typeof normalizedCurrent === "object" &&
+      normalizedCurrent !== null &&
+      typeof labelEntry.value === "object" &&
+      labelEntry.value !== null
+    ) {
+      const storedKeys = Object.keys(labelEntry.value as Record<string, unknown>);
+      const currentKeys = Object.keys(normalizedCurrent as Record<string, unknown>);
+      if (
+        storedKeys.length === currentKeys.length &&
+        storedKeys.every((k, i) => k === currentKeys[i])
+      ) {
+        // Keys match exactly in order → structural match
+        labelEntry.value = normalizedCurrent; // update to latest normalized value
+        return labelEntry.label;
+      }
     }
 
     // Reconstruct the object from fiber hooks using stored metadata
