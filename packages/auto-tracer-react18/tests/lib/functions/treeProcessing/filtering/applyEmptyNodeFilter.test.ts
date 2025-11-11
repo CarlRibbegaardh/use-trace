@@ -27,6 +27,7 @@ describe("applyEmptyNodeFilter", () => {
   const defaultOptions: EmptyNodeOptions = {
     includeReconciled: true,
     includeSkipped: true,
+    includeMount: true,
   };
 
   describe("Mode: 'none'", () => {
@@ -210,6 +211,7 @@ describe("applyEmptyNodeFilter", () => {
       const options: EmptyNodeOptions = {
         includeReconciled: false,
         includeSkipped: true,
+        includeMount: true,
       };
 
       const filterFn = applyEmptyNodeFilter("first");
@@ -230,6 +232,7 @@ describe("applyEmptyNodeFilter", () => {
       const options: EmptyNodeOptions = {
         includeReconciled: true,
         includeSkipped: false,
+        includeMount: true,
       };
 
       const filterFn = applyEmptyNodeFilter("all");

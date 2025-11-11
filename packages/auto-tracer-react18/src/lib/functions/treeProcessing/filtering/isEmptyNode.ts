@@ -15,6 +15,13 @@ export interface EmptyNodeOptions {
    * When false, Skipped nodes are considered "empty" (filtered out).
    */
   readonly includeSkipped: boolean;
+
+  /**
+   * Whether to include mount nodes in output.
+   * When false, Mount nodes (without tracking) are considered "empty" (filtered out).
+   * Note: Tracked mount nodes (isTracked=true) are never filtered.
+   */
+  readonly includeMount: boolean;
 }
 
 /**
@@ -28,13 +35,14 @@ export interface EmptyNodeOptions {
  * **Phase 2: Visibility Filtering (only for nodes without content)**
  * - Reconciled nodes without content are empty when includeReconciled=false
  * - Skipped nodes without content are empty when includeSkipped=false
- * - Mount/Rendering nodes without content are always empty
+ * - Mount nodes without content (and not tracked) are empty when includeMount=false
+ * - Rendering nodes without content are always empty
  *
  * Content indicators (any makes node non-empty):
  * - stateChanges.length > 0
  * - propChanges.length > 0
  * - componentLogs.length > 0
- * - isTracked === true
+ * - isTracked === true (tracked nodes are never filtered, even Mount nodes)
  * - hasIdenticalValueWarning === true
  *
  * @param node - The TreeNode to check
@@ -45,19 +53,23 @@ export interface EmptyNodeOptions {
  * ```typescript
  * // Skipped node WITH prop changes is visible even when includeSkipped=false
  * const skippedWithChanges: TreeNode = { renderType: "Skipped", propChanges: [...], ... };
- * isEmptyNode(skippedWithChanges, { includeReconciled: true, includeSkipped: false }); // false
+ * isEmptyNode(skippedWithChanges, { includeReconciled: true, includeSkipped: false, includeMount: true }); // false
  *
  * // Skipped node WITHOUT changes is filtered when includeSkipped=false
  * const skippedEmpty: TreeNode = { renderType: "Skipped", propChanges: [], ... };
- * isEmptyNode(skippedEmpty, { includeReconciled: true, includeSkipped: false }); // true
+ * isEmptyNode(skippedEmpty, { includeReconciled: true, includeSkipped: false, includeMount: true }); // true
  *
- * // Mount node with no changes is empty
- * const mount: TreeNode = { renderType: "Mount", stateChanges: [], ... };
- * isEmptyNode(mount, { includeReconciled: true, includeSkipped: true }); // true
+ * // Mount node (not tracked) without changes is filtered when includeMount=false
+ * const mount: TreeNode = { renderType: "Mount", stateChanges: [], isTracked: false, ... };
+ * isEmptyNode(mount, { includeReconciled: true, includeSkipped: true, includeMount: false }); // true
+ *
+ * // Mount node (tracked) is NEVER filtered, even when includeMount=false
+ * const trackedMount: TreeNode = { renderType: "Mount", stateChanges: [], isTracked: true, ... };
+ * isEmptyNode(trackedMount, { includeReconciled: true, includeSkipped: true, includeMount: false }); // false
  *
  * // Rendering node with changes is not empty
  * const rendering: TreeNode = { renderType: "Rendering", stateChanges: [...], ... };
- * isEmptyNode(rendering, { includeReconciled: true, includeSkipped: true }); // false
+ * isEmptyNode(rendering, { includeReconciled: true, includeSkipped: true, includeMount: true }); // false
  * ```
  */
 export function isEmptyNode(
@@ -95,8 +107,18 @@ export function isEmptyNode(
     return true; // Filtered out by visibility
   }
 
-  // Reconciled/Skipped nodes without content but with visibility enabled are not empty
-  if (node.renderType === "Reconciled" || node.renderType === "Skipped") {
+  // Mount nodes without content (and not tracked) are filtered by includeMount
+  // Note: Tracked nodes (isTracked=true) are never filtered, which is already handled in Phase 1
+  if (node.renderType === "Mount" && !options.includeMount) {
+    return true; // Filtered out by visibility
+  }
+
+  // Reconciled/Skipped/Mount nodes without content but with visibility enabled are not empty
+  if (
+    node.renderType === "Reconciled" ||
+    node.renderType === "Skipped" ||
+    node.renderType === "Mount"
+  ) {
     return false;
   }
 

@@ -8,6 +8,7 @@ export const defaultAutoTracerOptions: AutoTracerOptions = {
   enabled: true, // Enable the autoTracer by default
   includeReconciled: false,
   includeSkipped: false,
+  includeMount: true, // Include mount components by default
   showFlags: false,
   enableAutoTracerInternalsLogging: false,
   maxFiberDepth: 100, // Maximum fiber traversal depth to prevent stack overflow

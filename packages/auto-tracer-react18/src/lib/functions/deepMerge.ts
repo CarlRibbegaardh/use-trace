@@ -17,6 +17,9 @@ export function deepMergeOptions(
   if (source.includeSkipped !== undefined) {
     result.includeSkipped = source.includeSkipped;
   }
+  if (source.includeMount !== undefined) {
+    result.includeMount = source.includeMount;
+  }
   if (source.showFlags !== undefined) {
     result.showFlags = source.showFlags;
   }
