@@ -29,6 +29,14 @@ export const AddTodoForm: React.FC<AddTodoFormProps> = ({ todoService }) => {
     logger.error("Title exceeds maximum length!", { length: title.length, max: 100 });
   }
 
+  // Example of warn() and error() usage
+  if (title.length > 50) {
+    logger.warn("Title is very long", { length: title.length });
+  }
+  if (title.length > 100) {
+    logger.error("Title exceeds maximum length!", { length: title.length, max: 100 });
+  }
+
   const dispatch = useAppDispatch();
 
   const handleSubmit = async (e: React.FormEvent) => {
