@@ -1,6 +1,6 @@
 {
   "name": "@auto-tracer/react18",
-  "version": "1.0.0-alpha.5",
+  "version": "1.0.0-alpha.6",
   "description": "Tracing library to detect rerender causes and state changes",
   "author": "Carl Ribbegårdh",
   "license": "MIT",
@@ -14,6 +14,7 @@
   "homepage": "https://github.com/CarlRibbegaardh/use-trace/",
   "type": "module",
   "dependencies": {
+    "ramda": "^0.32.0",
     "safe-stable-stringify": "^2.4.3",
     "tslib": "^2.6.3"
   },
@@ -34,7 +35,6 @@
     "eslint-plugin-sort-exports": "^0.9.1",
     "flatted": "^3.3.3",
     "jsdom": "^24.1.0",
-    "ramda": "^0.32.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "rimraf": "^6.0.1",
