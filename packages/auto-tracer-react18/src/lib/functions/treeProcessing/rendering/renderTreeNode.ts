@@ -85,12 +85,13 @@ export function renderTreeNode(
         missingLevel < visualDepth;
         missingLevel++
       ) {
-        log(formatConnector(missingLevel, showLevel));
+        // Show original depth for the connector (the depth of the component we're leading to)
+        log(formatConnector(missingLevel, originalDepth, showLevel));
       }
     }
 
-    // Add the final connector for the current level
-    log(formatConnector(visualDepth, showLevel));
+    // Add the final connector for the current level - show this component's original depth
+    log(formatConnector(visualDepth, originalDepth, showLevel));
   }
 
   // Prepare component display with optional flags
@@ -100,12 +101,8 @@ export function renderTreeNode(
     flagsDisplay = ` (${flagNames.join(", ")})`;
   }
 
-  // Add original depth to component line if debug logging enabled
-  const showLevel = traceOptions.enableAutoTracerInternalsLogging ?? false;
-  const depthLabel = showLevel ? ` (Level: ${originalDepth})` : "";
-
   const prefix = `${indent}├─ `;
-  const message = `[${displayName}] ${renderType}${flagsDisplay}${depthLabel}`;
+  const message = `[${displayName}] ${renderType}${flagsDisplay}`;
 
   // Use appropriate styled logging based on render type and tracking status
   if (isTracked) {

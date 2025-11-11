@@ -4,8 +4,14 @@
 
 import { stringify } from "./stringify.js";
 import { normalizeValue } from "./normalizeValue.js";
-import { classifyObjectProperties, type PropertyMetadata } from "./classifyObjectProperties.js";
-import { reconstructObjectFromFiber, type FiberHook } from "./reconstructObjectFromFiber.js";
+import {
+  classifyObjectProperties,
+  type PropertyMetadata,
+} from "./classifyObjectProperties.js";
+import {
+  reconstructObjectFromFiber,
+  type FiberHook,
+} from "./reconstructObjectFromFiber.js";
 import { matchByStructure } from "./matchByStructure.js";
 
 /**
@@ -26,6 +32,8 @@ export interface LabelEntry {
 // Registry mapping GUID -> array of label entries
 const guidToLabelsMap = new Map<string, LabelEntry[]>();
 
+// Registry for storing previous render's labels (before they get cleared)
+const guidToPrevLabelsMap = new Map<string, LabelEntry[]>();
 
 /**
  * Adds a label with value for a component's hook.
@@ -39,18 +47,16 @@ const guidToLabelsMap = new Map<string, LabelEntry[]>();
  * @param guid - The unique identifier for the component instance
  * @param entry - Label entry containing label, index, and value
  */
-export function addLabelForGuid(
-  guid: string,
-  entry: LabelEntry
-): void {
-  // Normalize value and compute metadata for objects
+export function addLabelForGuid(guid: string, entry: LabelEntry): void {
+  // Compute metadata from the ORIGINAL value (so functions are still detectable)
+  const metadataOriginal = classifyObjectProperties(entry.value);
+  // Normalize value AFTER metadata extraction (functions replaced with placeholder for matching)
   const normalizedValue = normalizeValue(entry.value);
-  const metadata = classifyObjectProperties(normalizedValue);
 
   const processedEntry: LabelEntry = {
     ...entry,
     value: normalizedValue,
-    propertyMetadata: metadata ?? undefined,
+    propertyMetadata: metadataOriginal ?? undefined,
   };
 
   if (!guidToLabelsMap.has(guid)) {
@@ -79,6 +85,29 @@ export function getLabelsForGuid(guid: string): LabelEntry[] {
 }
 
 /**
+ * Retrieves previous render's label entries for a component.
+ *
+ * @param guid - The unique identifier for the component instance
+ * @returns An array of label entries from previous render
+ */
+export function getPrevLabelsForGuid(guid: string): LabelEntry[] {
+  return guidToPrevLabelsMap.get(guid) || [];
+}
+
+/**
+ * Saves current labels as "previous" for comparison in next render.
+ * This should be called during commit phase when labels are complete.
+ *
+ * @param guid - The unique identifier for the component instance
+ */
+export function savePrevLabelsForGuid(guid: string): void {
+  const currentLabels = guidToLabelsMap.get(guid);
+  if (currentLabels) {
+    guidToPrevLabelsMap.set(guid, currentLabels);
+  }
+}
+
+/**
  * Clears all labels for a specific component.
  *
  * @param guid - The unique identifier for the component instance
@@ -89,9 +118,11 @@ export function clearLabelsForGuid(guid: string): void {
 
 /**
  * Clears all hook labels from the registry.
+ * Note: Previous labels are preserved to enable comparison in the next render.
  */
 export function clearAllHookLabels(): void {
   guidToLabelsMap.clear();
+  // Don't clear guidToPrevLabelsMap - we need it for the next render cycle
 }
 
 /**
@@ -118,23 +149,40 @@ export function resolveHookLabel(
 ): string {
   const labels = getLabelsForGuid(guid);
 
-  // Stringify values for proper object/array comparison
-  const anchorValueStr = stringify(anchorValue);
+  // Build comparable string using normalization (functions -> "(fn)")
+  const toComparableString = (v: unknown) => stringify(normalizeValue(v));
+  const anchorComparable = toComparableString(anchorValue);
 
-  // Group fiber anchors by value
+  // Group fiber anchors by comparable value
   const valueGroup = allFiberAnchors.filter(
-    (a) => stringify(a.value) === anchorValueStr
+    (a) => toComparableString(a.value) === anchorComparable
   );
 
   // Scenario 1: Unique value in fiber → direct match
   if (valueGroup.length === 1) {
-    const match = labels.find((l) => stringify(l.value) === anchorValueStr);
-    return match?.label ?? "unknown";
+    const match = labels.find(
+      (l) => toComparableString(l.value) === anchorComparable
+    );
+    if (match?.label) {
+      return match.label;
+    }
+
+    // Try structural matching before giving up (unique-value branch)
+    const structuralMatch = tryStructuralMatching(
+      labels,
+      anchorIndex,
+      anchorValue,
+      allFiberAnchors
+    );
+    if (structuralMatch) {
+      return structuralMatch;
+    }
+    return "unknown";
   }
 
   // Scenarios 2 & 3: Duplicate values
   const labelsWithValue = labels.filter(
-    (l) => stringify(l.value) === anchorValueStr
+    (l) => toComparableString(l.value) === anchorComparable
   );
 
   // Scenario 2: All occurrences labeled → ordinal match
@@ -207,19 +255,61 @@ function tryStructuralMatching(
   anchorValue: unknown,
   allFiberAnchors: Array<{ index: number; value: unknown }>
 ): string | null {
-  // Normalize current anchor value
+  // Normalize current anchor value (may be primitive)
   const normalizedCurrent = normalizeValue(anchorValue);
-  const currentMetadata = classifyObjectProperties(normalizedCurrent);
-
-  // Only try structural matching if current value is an object
-  if (!currentMetadata) {
-    return null;
-  }
 
   // Try to match against each labeled entry that has metadata
   for (const labelEntry of labels) {
     if (!labelEntry.propertyMetadata) {
       continue; // Skip non-object labels
+    }
+
+    // SPECIAL CASE: Fiber value is primitive, but label is an object (custom hook wrapper scenario)
+    // Check if the primitive matches any property value in the registered object
+    if (
+      (typeof normalizedCurrent !== "object" || normalizedCurrent === null) &&
+      typeof labelEntry.value === "object" &&
+      labelEntry.value !== null
+    ) {
+      const labelObject = labelEntry.value as Record<string, unknown>;
+      const normalizedCurrentStr = stringify(normalizedCurrent);
+
+      // Check if the primitive matches any property value in the registered object
+      const matchingProperty = Object.entries(labelObject).find(
+        ([_key, propValue]) =>
+          stringify(normalizeValue(propValue)) === normalizedCurrentStr
+      );
+
+      if (matchingProperty) {
+        // Don't update labelEntry.value here - keep the object for future wrapper matches
+        return labelEntry.label;
+      }
+
+      // No property matched - skip to next label (don't try reconstruction for primitive-vs-object mismatch)
+      continue;
+    }
+
+    // Fast-path: if current value is an object, compare normalized keys directly
+    if (
+      typeof normalizedCurrent === "object" &&
+      normalizedCurrent !== null &&
+      typeof labelEntry.value === "object" &&
+      labelEntry.value !== null
+    ) {
+      const storedKeys = Object.keys(
+        labelEntry.value as Record<string, unknown>
+      );
+      const currentKeys = Object.keys(
+        normalizedCurrent as Record<string, unknown>
+      );
+      if (
+        storedKeys.length === currentKeys.length &&
+        storedKeys.every((k, i) => k === currentKeys[i])
+      ) {
+        // Keys match exactly in order → structural match
+        labelEntry.value = normalizedCurrent; // update to latest normalized value
+        return labelEntry.label;
+      }
     }
 
     // Reconstruct the object from fiber hooks using stored metadata
@@ -256,4 +346,3 @@ function tryStructuralMatching(
 
   return null; // No structural match found
 }
-

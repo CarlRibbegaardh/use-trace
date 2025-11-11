@@ -193,8 +193,9 @@ describe("Marker Rendering Integration Tests", () => {
       // Should show original depth in marker label
       expect(fullOutput).toContain("Level: 1");
 
-      // Should show original depth in component label
-      expect(fullOutput).toContain("Level: 22");
+      // Components no longer show level labels (only markers and connectors do)
+      // The component should just show: ├─ [TodoList] Rendering
+      expect(fullOutput).toContain("[TodoList] Rendering");
 
       // Verify visual indentation still correct
       const componentLine = output.find((line) => line.includes("[TodoList]"));

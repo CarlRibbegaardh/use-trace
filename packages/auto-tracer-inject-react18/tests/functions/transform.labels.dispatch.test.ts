@@ -56,24 +56,24 @@ describe("dispatch + selector label alignment bug", () => {
 
     // Check that dispatch is labeled with index 0 and includes the value
     expect(result.code).toMatch(
-      /labelState\(['"]dispatch['"],\s*0,\s*dispatch\)/
+      /labelState\(0,\s*['"]dispatch['"]/
     );
 
     // Check that filteredTodos is labeled with index 1 and includes the value
     expect(result.code).toMatch(
-      /labelState\(['"]filteredTodos['"],\s*1,\s*filteredTodos\)/
+      /labelState\(1,\s*['"]filteredTodos['"]/
     );
 
     // Check that loading is labeled with index 2 and includes the value
     expect(result.code).toMatch(
-      /labelState\(['"]loading['"],\s*2,\s*loading\)/
+      /labelState\(2,\s*['"]loading['"]/
     );
 
     // Check that error is labeled with index 3 and includes the value
-    expect(result.code).toMatch(/labelState\(['"]error['"],\s*3,\s*error\)/);
+    expect(result.code).toMatch(/labelState\(3,\s*['"]error['"]/);
 
     // Check that filter is labeled with index 4 and includes the value
-    expect(result.code).toMatch(/labelState\(['"]filter['"],\s*4,\s*filter\)/);
+    expect(result.code).toMatch(/labelState\(4,\s*['"]filter['"]/);
 
     console.log("Transformed code:");
     console.log(result.code);

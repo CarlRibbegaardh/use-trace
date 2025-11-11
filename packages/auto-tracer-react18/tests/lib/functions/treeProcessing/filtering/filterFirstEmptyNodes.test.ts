@@ -23,6 +23,7 @@ describe("filterFirstEmptyNodes", () => {
   const defaultOptions: EmptyNodeOptions = {
     includeReconciled: true,
     includeSkipped: true,
+    includeMount: true,
   };
 
   describe("Empty array edge cases", () => {
@@ -200,6 +201,7 @@ describe("filterFirstEmptyNodes", () => {
       const options: EmptyNodeOptions = {
         includeReconciled: false,
         includeSkipped: true,
+        includeMount: true,
       };
 
       const result = filterFirstEmptyNodes(nodes, options);
@@ -230,6 +232,7 @@ describe("filterFirstEmptyNodes", () => {
       const options: EmptyNodeOptions = {
         includeReconciled: true,
         includeSkipped: false,
+        includeMount: true,
       };
 
       const result = filterFirstEmptyNodes(nodes, options);

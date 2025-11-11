@@ -61,51 +61,49 @@ export function useAutoTracer(): ComponentLogger {
       /**
        * **Internal API - Not intended for direct developer use**
        *
-       * Associates a human-readable label with a state hook for debugging purposes.
+       * Associates human-readable label(s) with a state hook for debugging purposes.
        * This method is primarily used by the auto-tracer Vite plugin during build-time
        * AST transformation to automatically label useState/useSelector hooks.
        *
        * While always available at runtime, developers should generally not call this
        * method directly as the Vite plugin handles labeling automatically.
        *
-       * @param label Human-readable name for the state hook (e.g., "filteredTodos", "loading")
        * @param index Build-time ordinal position (source order)
-       * @param value Current state value for matching (REQUIRED)
-       * @param additionalValues Additional values for multi-value hooks (optional)
+       * @param nameValuePairs Alternating name-value pairs: "name1", value1, "name2", value2, ...
        *
        * @example
        * ```tsx
        * // Automatically handled by Vite plugin:
        * const todos = useSelector(selectTodos);
-       * // Plugin injects: logger.labelState("todos", 0, todos);
+       * // Plugin injects: logger.labelState(0, "todos", todos);
        *
-       * // Manual usage (not recommended):
+       * // For multi-variable hooks:
        * const [count, setCount] = useState(0);
-       * logger.labelState("count", 1, count);
+       * // Plugin injects: logger.labelState(0, "count", count, "setCount", setCount);
        * ```
        */
-      labelState: (
-        label: string,
-        index: number,
-        value: unknown,
-        ...additionalValues: unknown[]
-      ) => {
+      labelState: (index: number, ...nameValuePairs: unknown[]) => {
         try {
           const guid = guidRef.current!;
           if (typeof index !== "number") {
             throw new Error(
-              "AutoTracer: labelState requires an explicit index. Manual mode is unsupported."
+              "AutoTracer: labelState requires an explicit index as first argument."
             );
           }
-          // Clear old labels on first call (index 0) for this render
+          // On first call (index 0), clear previous labels
           if (index === 0) {
             clearLabelsForGuid(guid);
           }
-          // First value is always used for matching
-          // Additional values (for multi-value hooks) are currently ignored
-          addLabelForGuid(guid, { label, index, value });
+          // Parse alternating name-value pairs: "name1", value1, "name2", value2, ...
+          for (let i = 0; i < nameValuePairs.length; i += 2) {
+            const label = nameValuePairs[i];
+            const value = nameValuePairs[i + 1];
+            if (typeof label === "string") {
+              addLabelForGuid(guid, { label, index, value });
+            }
+          }
         } catch (error) {
-          logWarn(`AutoTracer: Error storing label ${label}:`, error);
+          logWarn(`AutoTracer: Error storing labels for index ${index}:`, error);
         }
       },
     };

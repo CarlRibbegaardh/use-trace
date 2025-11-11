@@ -8,11 +8,13 @@ import { getTrackingGUID } from "../../renderRegistry.js";
 import { hasRenderWork } from "../../reactFiberFlags.js";
 import { isReactInternal } from "../../isReactInternal.js";
 import { AUTOTRACER_STATE_MARKER } from "../../../types/marker.js";
+import { getLabelsForGuid, getPrevLabelsForGuid, savePrevLabelsForGuid } from "../../hookLabels.js";
 import { areValuesIdentical } from "../../areValuesIdentical.js";
 import { traceOptions } from "../../../types/globalState.js";
 import { componentLogRegistry } from "../../componentLogRegistry.js";
 import { findStatefulHookAnchors } from "../../hookMapping/findStatefulHookAnchors.js";
 import { resolveHookLabel } from "../../hookLabels.js";
+import { getSkippedProps } from "../../getSkippedProps.js";
 
 /**
  * Builds a TreeNode from a React fiber node.
@@ -77,64 +79,181 @@ export function buildTreeNode(fiber: unknown, depth: number): TreeNode {
     value: anchor.memoizedState,
   }));
 
-  const stateChanges = useStateValues
-    .filter(({ name, value, prevValue }) => {
-      return (
-        prevValue !== undefined &&
-        prevValue !== value &&
-        !isReactInternal(name) &&
-        value !== AUTOTRACER_STATE_MARKER &&
-        prevValue !== AUTOTRACER_STATE_MARKER
-      );
-    })
-    .map(({ name, value, prevValue, hook }) => {
-      // Detect identical values
-      const isIdenticalValueChange =
-        !!traceOptions.detectIdenticalValueChanges &&
-        prevValue !== value &&
-        areValuesIdentical(prevValue, value);
+  const stateChanges = (() => {
+    if (isNewMount) {
+      // On mount, collect initial state values (not deltas)
+      const fiberStateChanges = useStateValues
+        .filter(({ name, value }) => {
+          return !isReactInternal(name) && value !== AUTOTRACER_STATE_MARKER;
+        })
+        .map(({ name: _name, value, hook }) => {
+          const anchorIndex = anchors.indexOf(hook as Hook);
+          const resolvedName = resolveHookLabel(
+            trackingGUID ?? "",
+            anchorIndex,
+            (hook as Hook).memoizedState,
+            allAnchors
+          );
+          return {
+            name: resolvedName,
+            value,
+            prevValue: undefined as unknown,
+            hook,
+            isIdenticalValueChange: false,
+          };
+        });
 
-      // Resolve the actual variable name using hook label resolution
-      const anchorIndex = anchors.indexOf(hook as Hook);
-      const resolvedName = resolveHookLabel(
-        trackingGUID ?? "",
-        anchorIndex,
-        (hook as Hook).memoizedState,
-        allAnchors
+      // Track which labels were matched by fiber hooks
+      const matchedLabels = new Set(fiberStateChanges.map(change => change.name));
+
+      // Also include labeled values that weren't matched by fiber hooks
+      // (e.g., functions from destructured custom hooks)
+      const unmatchedLabelChanges = trackingGUID
+        ? getLabelsForGuid(trackingGUID)
+            .filter(({ label }) => !matchedLabels.has(label))
+            .map(({ label, value }) => ({
+              name: label,
+              value,
+              prevValue: undefined as unknown,
+              hook: null as unknown as Hook, // No actual hook for labeled-only values
+              isIdenticalValueChange: false,
+            }))
+        : [];
+
+      return [...fiberStateChanges, ...unmatchedLabelChanges];
+    }
+
+    // On updates, collect meaningful deltas only
+    const fiberStateChanges = useStateValues
+      .filter(({ name, value, prevValue }) => {
+        return (
+          prevValue !== undefined &&
+          prevValue !== value &&
+          !isReactInternal(name) &&
+          value !== AUTOTRACER_STATE_MARKER &&
+          prevValue !== AUTOTRACER_STATE_MARKER
+        );
+      })
+      .map(({ name: _name, value, prevValue, hook }) => {
+        // Detect identical values
+        const isIdenticalValueChange =
+          !!traceOptions.detectIdenticalValueChanges &&
+          prevValue !== value &&
+          areValuesIdentical(prevValue, value);
+
+        // Resolve the actual variable name using hook label resolution
+        const anchorIndex = anchors.indexOf(hook as Hook);
+        const resolvedName = resolveHookLabel(
+          trackingGUID ?? "",
+          anchorIndex,
+          (hook as Hook).memoizedState,
+          allAnchors
+        );
+
+        return {
+          name: resolvedName, // Use resolved name instead of generic fallback
+          value,
+          prevValue,
+          hook,
+          isIdenticalValueChange,
+        };
+      });
+
+    // Track which labels were matched by fiber hooks
+    const matchedLabels = new Set(fiberStateChanges.map(change => change.name));
+
+    // Also check for changes in labeled values that aren't in the fiber
+    // (e.g., functions from destructured custom hooks that change every render)
+    const unmatchedLabelChanges = (() => {
+      if (!trackingGUID) return [];
+
+      const currentLabels = getLabelsForGuid(trackingGUID);
+      // Get previous labels from the snapshot
+      // Note: Previous labels are the ones from the LAST commit, saved at the end of the last update
+      const prevLabels = getPrevLabelsForGuid(trackingGUID);
+
+      // Create a map of previous values by label name
+      const prevValueMap = new Map(
+        prevLabels.map((entry) => [entry.label, entry.value])
       );
 
-      return {
-        name: resolvedName, // Use resolved name instead of generic fallback
-        value,
-        prevValue,
-        hook,
-        isIdenticalValueChange,
-      };
-    });
+      const changes = currentLabels
+        .filter(({ label }) => !matchedLabels.has(label))
+        .map(({ label, value }) => {
+          const prevValue = prevValueMap.get(label);
+          // Only include if the value changed AND we have a previous value
+          // (skip first update after mount where prevValue is undefined)
+          return prevValue !== undefined && prevValue !== value ? {
+            name: label,
+            value,
+            prevValue,
+            hook: null as unknown as Hook,
+            isIdenticalValueChange: false,
+          } : null;
+        })
+        .filter((change): change is NonNullable<typeof change> => change !== null);
+
+      // After processing, save current labels as "previous" for next render
+      // This ensures they're saved AFTER they're complete
+      savePrevLabelsForGuid(trackingGUID);
+
+      return changes;
+    })();
+
+    return [...fiberStateChanges, ...unmatchedLabelChanges];
+  })();
 
   // Extract prop changes
-  const rawPropChanges = extractPropChanges(
-    fiberNode as {
-      memoizedProps?: Record<string, unknown>;
-      pendingProps?: Record<string, unknown>;
-      alternate?: { memoizedProps?: Record<string, unknown> };
-    },
-    displayName || undefined
-  );
+  const propChanges = (() => {
+    if (isNewMount) {
+      // On mount, surface initial props directly
+      const currentProps = fiberNode.memoizedProps || fiberNode.pendingProps;
+      const result: Array<{
+        name: string;
+        value: unknown;
+        prevValue: unknown;
+        isIdenticalValueChange?: boolean;
+      }> = [];
 
-  // Add identical value change detection to prop changes
-  const propChanges = rawPropChanges.map((change) => {
-    // Detect identical values
-    const isIdenticalValueChange =
-      !!traceOptions.detectIdenticalValueChanges &&
-      change.prevValue !== change.value &&
-      areValuesIdentical(change.prevValue, change.value);
+      if (currentProps && typeof currentProps === "object") {
+        const skipped = getSkippedProps(displayName || undefined);
+        for (const [name, value] of Object.entries(currentProps)) {
+          if (
+            isReactInternal(name) ||
+            name === "children" ||
+            skipped.has(name)
+          ) {
+            continue;
+          }
+          result.push({
+            name,
+            value,
+            prevValue: undefined,
+            isIdenticalValueChange: false,
+          });
+        }
+      }
+      return result;
+    }
 
-    return {
-      ...change,
-      isIdenticalValueChange,
-    };
-  });
+    // On updates, compute prop delta changes
+    const raw = extractPropChanges(
+      fiberNode as {
+        memoizedProps?: Record<string, unknown>;
+        pendingProps?: Record<string, unknown>;
+        alternate?: { memoizedProps?: Record<string, unknown> };
+      },
+      displayName || undefined
+    );
+
+    return raw.map((change) => {
+      const isIdenticalValueChange =
+        !!traceOptions.detectIdenticalValueChanges &&
+        change.prevValue !== change.value &&
+        areValuesIdentical(change.prevValue, change.value);
+      return { ...change, isIdenticalValueChange };
+    });
+  })();
 
   // Check if any change has identical value warning
   const hasIdenticalValueWarning =

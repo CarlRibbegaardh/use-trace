@@ -53,28 +53,28 @@ describe("isEmptyNode", () => {
   describe("Phase 1: Content Filtering (takes precedence)", () => {
     it("should consider Reconciled node as empty when includeReconciled=false and no content", () => {
       const node = createNode({ renderType: "Reconciled" });
-      const options = { includeReconciled: false, includeSkipped: true };
+      const options = { includeReconciled: false, includeSkipped: true, includeMount: true };
 
       expect(isEmptyNode(node, options)).toBe(true);
     });
 
     it("should NOT consider Reconciled node as empty when includeReconciled=true and no content", () => {
       const node = createNode({ renderType: "Reconciled" });
-      const options = { includeReconciled: true, includeSkipped: true };
+      const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
       expect(isEmptyNode(node, options)).toBe(false);
     });
 
     it("should consider Skipped node as empty when includeSkipped=false and no content", () => {
       const node = createNode({ renderType: "Skipped" });
-      const options = { includeReconciled: true, includeSkipped: false };
+      const options = { includeReconciled: true, includeSkipped: false, includeMount: true };
 
       expect(isEmptyNode(node, options)).toBe(true);
     });
 
     it("should NOT consider Skipped node as empty when includeSkipped=true and no content", () => {
       const node = createNode({ renderType: "Skipped" });
-      const options = { includeReconciled: true, includeSkipped: true };
+      const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
       expect(isEmptyNode(node, options)).toBe(false);
     });
@@ -84,7 +84,7 @@ describe("isEmptyNode", () => {
         renderType: "Reconciled",
         stateChanges: [createStateChange("state0", 1, 0)],
       });
-      const options = { includeReconciled: false, includeSkipped: true };
+      const options = { includeReconciled: false, includeSkipped: true, includeMount: true };
 
       // Content takes precedence - nodes with changes are NEVER filtered
       expect(isEmptyNode(node, options)).toBe(false);
@@ -95,7 +95,7 @@ describe("isEmptyNode", () => {
         renderType: "Skipped",
         propChanges: [createPropChange("value", 10, 5)],
       });
-      const options = { includeReconciled: true, includeSkipped: false };
+      const options = { includeReconciled: true, includeSkipped: false, includeMount: true };
 
       // Content takes precedence - nodes with changes are NEVER filtered
       expect(isEmptyNode(node, options)).toBe(false);
@@ -104,16 +104,16 @@ describe("isEmptyNode", () => {
 
   describe("Phase 2: Visibility Filtering (only for empty nodes)", () => {
     describe("Mount and Rendering nodes (always visible)", () => {
-      it("should consider Mount node empty when no changes", () => {
+      it("should NOT consider Mount node empty when includeMount=true (default)", () => {
         const node = createNode({ renderType: "Mount" });
-        const options = { includeReconciled: true, includeSkipped: true };
+        const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
-        expect(isEmptyNode(node, options)).toBe(true);
+        expect(isEmptyNode(node, options)).toBe(false);
       });
 
       it("should consider Rendering node empty when no changes", () => {
         const node = createNode({ renderType: "Rendering" });
-        const options = { includeReconciled: true, includeSkipped: true };
+        const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
         expect(isEmptyNode(node, options)).toBe(true);
       });
@@ -130,7 +130,7 @@ describe("isEmptyNode", () => {
             },
           ],
         });
-        const options = { includeReconciled: true, includeSkipped: true };
+        const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
         expect(isEmptyNode(node, options)).toBe(false);
       });
@@ -140,7 +140,7 @@ describe("isEmptyNode", () => {
           renderType: "Rendering",
           propChanges: [{ name: "value", value: 10, prevValue: 5 }],
         });
-        const options = { includeReconciled: true, includeSkipped: true };
+        const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
         expect(isEmptyNode(node, options)).toBe(false);
       });
@@ -150,7 +150,7 @@ describe("isEmptyNode", () => {
           renderType: "Rendering",
           componentLogs: [{ message: "test", args: [], timestamp: Date.now(), level: 'log' }],
         });
-        const options = { includeReconciled: true, includeSkipped: true };
+        const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
         expect(isEmptyNode(node, options)).toBe(false);
       });
@@ -161,7 +161,7 @@ describe("isEmptyNode", () => {
           isTracked: true,
           trackingGUID: "test-guid",
         });
-        const options = { includeReconciled: true, includeSkipped: true };
+        const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
         expect(isEmptyNode(node, options)).toBe(false);
       });
@@ -171,7 +171,7 @@ describe("isEmptyNode", () => {
           renderType: "Rendering",
           hasIdenticalValueWarning: true,
         });
-        const options = { includeReconciled: true, includeSkipped: true };
+        const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
         expect(isEmptyNode(node, options)).toBe(false);
       });
@@ -191,7 +191,7 @@ describe("isEmptyNode", () => {
           isTracked: true,
           trackingGUID: "test-guid",
         });
-        const options = { includeReconciled: true, includeSkipped: true };
+        const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
         expect(isEmptyNode(node, options)).toBe(false);
       });
@@ -200,7 +200,7 @@ describe("isEmptyNode", () => {
     describe("Reconciled nodes (visible when includeReconciled=true)", () => {
       it("should NOT consider Reconciled node empty when visible (even without changes)", () => {
         const node = createNode({ renderType: "Reconciled" });
-        const options = { includeReconciled: true, includeSkipped: true };
+        const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
         // Reconciled nodes are never considered empty when visible
         expect(isEmptyNode(node, options)).toBe(false);
@@ -218,7 +218,7 @@ describe("isEmptyNode", () => {
             },
           ],
         });
-        const options = { includeReconciled: true, includeSkipped: true };
+        const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
         expect(isEmptyNode(node, options)).toBe(false);
       });
@@ -227,7 +227,7 @@ describe("isEmptyNode", () => {
     describe("Skipped nodes (visible when includeSkipped=true)", () => {
       it("should NOT consider Skipped node empty when visible (even without changes)", () => {
         const node = createNode({ renderType: "Skipped" });
-        const options = { includeReconciled: true, includeSkipped: true };
+        const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
         // Skipped nodes are never considered empty when visible
         expect(isEmptyNode(node, options)).toBe(false);
@@ -238,7 +238,7 @@ describe("isEmptyNode", () => {
           renderType: "Skipped",
           propChanges: [{ name: "value", value: 10, prevValue: 5 }],
         });
-        const options = { includeReconciled: true, includeSkipped: true };
+        const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
         expect(isEmptyNode(node, options)).toBe(false);
       });
@@ -250,7 +250,7 @@ describe("isEmptyNode", () => {
           renderType: "Marker",
           componentName: "... (3 empty levels)",
         });
-        const options = { includeReconciled: true, includeSkipped: true };
+        const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
         expect(isEmptyNode(node, options)).toBe(false);
       });
@@ -262,7 +262,7 @@ describe("isEmptyNode", () => {
       const reconciled = createNode({ renderType: "Reconciled" });
       const skipped = createNode({ renderType: "Skipped" });
       const rendering = createNode({ renderType: "Rendering" });
-      const options = { includeReconciled: false, includeSkipped: false };
+      const options = { includeReconciled: false, includeSkipped: false, includeMount: true };
 
       expect(isEmptyNode(reconciled, options)).toBe(true);
       expect(isEmptyNode(skipped, options)).toBe(true);
@@ -273,7 +273,7 @@ describe("isEmptyNode", () => {
       const reconciled = createNode({ renderType: "Reconciled" });
       const skipped = createNode({ renderType: "Skipped" });
       const rendering = createNode({ renderType: "Rendering" });
-      const options = { includeReconciled: true, includeSkipped: true };
+      const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
       expect(isEmptyNode(reconciled, options)).toBe(false); // Visible, never empty
       expect(isEmptyNode(skipped, options)).toBe(false); // Visible, never empty
@@ -287,7 +287,7 @@ describe("isEmptyNode", () => {
         propChanges: [],
         componentLogs: [],
       });
-      const options = { includeReconciled: true, includeSkipped: true };
+      const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 
       expect(isEmptyNode(node, options)).toBe(true);
     });

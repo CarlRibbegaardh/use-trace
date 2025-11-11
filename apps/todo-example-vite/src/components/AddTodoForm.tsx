@@ -16,10 +16,18 @@ export const AddTodoForm: React.FC<AddTodoFormProps> = ({ todoService }) => {
   logger.log("AddTodoForm rendered", { timestamp: Date.now() });
 
   const [title, setTitle] = useState("");
-  logger.labelState("title", 0, title);
+  logger.labelState(0, "title", title);
 
   const [description, setDescription] = useState("");
-  logger.labelState("description", 1, description);
+  logger.labelState(1, "description", description);
+
+  // Example of warn() and error() usage
+  if (title.length > 50) {
+    logger.warn("Title is very long", { length: title.length });
+  }
+  if (title.length > 100) {
+    logger.error("Title exceeds maximum length!", { length: title.length, max: 100 });
+  }
 
   // Example of warn() and error() usage
   if (title.length > 50) {

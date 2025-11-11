@@ -329,9 +329,10 @@ describe("buildTreeNode - useState label resolution integration", () => {
 
       const treeNode = buildTreeNode(currentFiber, 0);
 
-      // On mount, there are no state changes (no previous values)
+      // On mount, we surface initial state entries (prevValue is undefined)
       expect(treeNode.renderType).toBe("Mount");
-      expect(treeNode.stateChanges).toHaveLength(0);
+      expect(treeNode.stateChanges).toHaveLength(1);
+      expect(treeNode.stateChanges[0]?.prevValue).toBeUndefined();
     });
   });
 

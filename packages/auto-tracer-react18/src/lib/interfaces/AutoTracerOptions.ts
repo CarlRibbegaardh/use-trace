@@ -47,6 +47,14 @@ interface AutoTracerOptions {
   includeSkipped?: boolean;
 
   /**
+   * Include mount components in the output.
+   * Mount components are those rendering for the first time.
+   * Note: Tracked mount components (those with useAutoTracer) are always shown regardless of this setting.
+   * @default true
+   */
+  includeMount?: boolean;
+
+  /**
    * Show React fiber flags in the output.
    * Flags indicate internal React operations like Placement, Update, etc.
    * Useful for deep debugging of React's reconciliation process.
