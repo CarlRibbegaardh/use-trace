@@ -13,6 +13,7 @@ import { traceOptions } from "../../../types/globalState.js";
 import { componentLogRegistry } from "../../componentLogRegistry.js";
 import { findStatefulHookAnchors } from "../../hookMapping/findStatefulHookAnchors.js";
 import { resolveHookLabel } from "../../hookLabels.js";
+import { getSkippedProps } from "../../getSkippedProps.js";
 
 /**
  * Builds a TreeNode from a React fiber node.
@@ -77,64 +78,119 @@ export function buildTreeNode(fiber: unknown, depth: number): TreeNode {
     value: anchor.memoizedState,
   }));
 
-  const stateChanges = useStateValues
-    .filter(({ name, value, prevValue }) => {
-      return (
-        prevValue !== undefined &&
-        prevValue !== value &&
-        !isReactInternal(name) &&
-        value !== AUTOTRACER_STATE_MARKER &&
-        prevValue !== AUTOTRACER_STATE_MARKER
-      );
-    })
-    .map(({ name, value, prevValue, hook }) => {
-      // Detect identical values
-      const isIdenticalValueChange =
-        !!traceOptions.detectIdenticalValueChanges &&
-        prevValue !== value &&
-        areValuesIdentical(prevValue, value);
+  const stateChanges = (() => {
+    if (isNewMount) {
+      // On mount, collect initial state values (not deltas)
+      return useStateValues
+        .filter(({ name, value }) => {
+          return !isReactInternal(name) && value !== AUTOTRACER_STATE_MARKER;
+        })
+        .map(({ name: _name, value, hook }) => {
+          const anchorIndex = anchors.indexOf(hook as Hook);
+          const resolvedName = resolveHookLabel(
+            trackingGUID ?? "",
+            anchorIndex,
+            (hook as Hook).memoizedState,
+            allAnchors
+          );
+          return {
+            name: resolvedName,
+            value,
+            prevValue: undefined as unknown,
+            hook,
+            isIdenticalValueChange: false,
+          };
+        });
+    }
 
-      // Resolve the actual variable name using hook label resolution
-      const anchorIndex = anchors.indexOf(hook as Hook);
-      const resolvedName = resolveHookLabel(
-        trackingGUID ?? "",
-        anchorIndex,
-        (hook as Hook).memoizedState,
-        allAnchors
-      );
+    // On updates, collect meaningful deltas only
+    return useStateValues
+      .filter(({ name, value, prevValue }) => {
+        return (
+          prevValue !== undefined &&
+          prevValue !== value &&
+          !isReactInternal(name) &&
+          value !== AUTOTRACER_STATE_MARKER &&
+          prevValue !== AUTOTRACER_STATE_MARKER
+        );
+      })
+      .map(({ name: _name, value, prevValue, hook }) => {
+        // Detect identical values
+        const isIdenticalValueChange =
+          !!traceOptions.detectIdenticalValueChanges &&
+          prevValue !== value &&
+          areValuesIdentical(prevValue, value);
 
-      return {
-        name: resolvedName, // Use resolved name instead of generic fallback
-        value,
-        prevValue,
-        hook,
-        isIdenticalValueChange,
-      };
-    });
+        // Resolve the actual variable name using hook label resolution
+        const anchorIndex = anchors.indexOf(hook as Hook);
+        const resolvedName = resolveHookLabel(
+          trackingGUID ?? "",
+          anchorIndex,
+          (hook as Hook).memoizedState,
+          allAnchors
+        );
+
+        return {
+          name: resolvedName, // Use resolved name instead of generic fallback
+          value,
+          prevValue,
+          hook,
+          isIdenticalValueChange,
+        };
+      });
+  })();
 
   // Extract prop changes
-  const rawPropChanges = extractPropChanges(
-    fiberNode as {
-      memoizedProps?: Record<string, unknown>;
-      pendingProps?: Record<string, unknown>;
-      alternate?: { memoizedProps?: Record<string, unknown> };
-    },
-    displayName || undefined
-  );
+  const propChanges = (() => {
+    if (isNewMount) {
+      // On mount, surface initial props directly
+      const currentProps = fiberNode.memoizedProps || fiberNode.pendingProps;
+      const result: Array<{
+        name: string;
+        value: unknown;
+        prevValue: unknown;
+        isIdenticalValueChange?: boolean;
+      }> = [];
 
-  // Add identical value change detection to prop changes
-  const propChanges = rawPropChanges.map((change) => {
-    // Detect identical values
-    const isIdenticalValueChange =
-      !!traceOptions.detectIdenticalValueChanges &&
-      change.prevValue !== change.value &&
-      areValuesIdentical(change.prevValue, change.value);
+      if (currentProps && typeof currentProps === "object") {
+        const skipped = getSkippedProps(displayName || undefined);
+        for (const [name, value] of Object.entries(currentProps)) {
+          if (
+            isReactInternal(name) ||
+            name === "children" ||
+            skipped.has(name)
+          ) {
+            continue;
+          }
+          result.push({
+            name,
+            value,
+            prevValue: undefined,
+            isIdenticalValueChange: false,
+          });
+        }
+      }
+      return result;
+    }
 
-    return {
-      ...change,
-      isIdenticalValueChange,
-    };
-  });
+    // On updates, compute prop delta changes
+    const raw = extractPropChanges(
+      fiberNode as {
+        memoizedProps?: Record<string, unknown>;
+        pendingProps?: Record<string, unknown>;
+        alternate?: { memoizedProps?: Record<string, unknown> };
+      },
+      displayName || undefined
+    );
+
+    return raw.map((change) => {
+      const isIdenticalValueChange =
+        !!traceOptions.detectIdenticalValueChanges &&
+        change.prevValue !== change.value &&
+        areValuesIdentical(change.prevValue, change.value);
+      return { ...change, isIdenticalValueChange };
+    });
+  })();
 
   // Check if any change has identical value warning
   const hasIdenticalValueWarning =
