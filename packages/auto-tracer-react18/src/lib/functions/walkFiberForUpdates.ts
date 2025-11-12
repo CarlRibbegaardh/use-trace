@@ -397,9 +397,15 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
               const prevValue = prevValueMap.get(label);
               // Only log if the value changed or this is first render
               if (prevValue !== value) {
+                const isIdenticalValueChange = !!traceOptions.detectIdenticalValueChanges && prevValue !== undefined && areValuesIdentical(prevValue, value);
                 const formattedChange = formatStateChange(prevValue, value);
-                const msg = `State change ${label}: ${formattedChange}`;
-                logStateChange(`${indent}│   `, msg);
+                if (isIdenticalValueChange) {
+                  const msg = `State change ${label} (identical value): ${formattedChange}`;
+                  logIdenticalStateValueWarning(`${indent}│   `, msg);
+                } else {
+                  const msg = `State change ${label}: ${formattedChange}`;
+                  logStateChange(`${indent}│   `, msg);
+                }
               }
             }
           });

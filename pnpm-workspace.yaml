@@ -1,6 +1,11 @@
 packages:
   - apps/*
-  - packages/*
+  - packages/auto-tracer-react18
+  - packages/auto-tracer-react18-proof
+  - packages/auto-tracer-inject-react18
+  - packages/auto-tracer-plugin-babel-react18
+  - packages/auto-tracer-plugin-vite-react18
+  - packages/use-trace
 
 onlyBuiltDependencies:
   - esbuild

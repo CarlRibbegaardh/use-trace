@@ -1,5 +1,6 @@
 import type { PluginObj, PluginPass, ParserOptions, ParseResult } from "@babel/core";
 import * as babel from "@babel/core";
+import * as babelParser from "@babel/parser";
 import {
   transform,
   normalizeConfig,
@@ -46,7 +47,12 @@ function autoTracerBabelPlugin(
 
         const result = transform(code, { filename, config });
         if (result.code !== code) {
-          return parse(result.code, parserOpts);
+          // IMPORTANT: We intentionally bypass @babel/core.parse to avoid re-running the full
+          // Babel transform pipeline (and thereby this plugin) on already transformed code.
+          // Using @babel/parser directly ensures a single injection pass and prevents recursion.
+          // We return the AST directly which satisfies Babel's parserOverride contract.
+          // Side-effect: this path will NOT apply other parser stage transformations again.
+          return babelParser.parse(result.code, parserOpts as any) as unknown as ParseResult;
         }
         return parse(code, parserOpts);
       } catch (error) {

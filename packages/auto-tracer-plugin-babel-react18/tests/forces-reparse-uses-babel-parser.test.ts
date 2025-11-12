@@ -1,21 +1,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { transformSync } from "@babel/core";
-import * as babelCore from "@babel/core";
+import * as babelParser from "@babel/parser";
 
 describe("@auto-tracer/plugin-babel-react18 reparsing path", () => {
-  let coreParseSpy: ReturnType<typeof vi.spyOn>;
+  let parserParseSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     process.env.NODE_ENV = "development";
-    coreParseSpy = vi
-      .spyOn(babelCore as any, "parse")
-      .mockImplementation(() => {
-        throw new Error("@babel/core.parse must not be called by the plugin");
-      });
+    parserParseSpy = vi.spyOn(babelParser as any, "parse");
   });
 
   afterEach(() => {
-    coreParseSpy.mockRestore();
+    parserParseSpy.mockRestore();
     delete process.env.TRACE_INJECT;
     delete process.env.NODE_ENV;
   });
@@ -48,5 +44,7 @@ describe("@auto-tracer/plugin-babel-react18 reparsing path", () => {
     });
 
     expect(result?.code).toBeTypeOf("string");
+    // Ensure reparsing happened via @babel/parser
+    expect(parserParseSpy).toHaveBeenCalled();
   });
 });

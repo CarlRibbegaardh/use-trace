@@ -181,15 +181,18 @@ export function buildTreeNode(fiber: unknown, depth: number): TreeNode {
         .filter(({ label }) => !matchedLabels.has(label))
         .map(({ label, value }) => {
           const prevValue = prevValueMap.get(label);
-          // Only include if the value changed AND we have a previous value
-          // (skip first update after mount where prevValue is undefined)
-          return prevValue !== undefined && prevValue !== value ? {
+          // Only include if we have a previous value
+          if (prevValue === undefined) return null;
+          // Only include when reference changed
+          if (prevValue === value) return null;
+          const isIdenticalValueChange = !!traceOptions.detectIdenticalValueChanges && areValuesIdentical(prevValue, value);
+          return {
             name: label,
             value,
             prevValue,
             hook: null as unknown as Hook,
-            isIdenticalValueChange: false,
-          } : null;
+            isIdenticalValueChange,
+          };
         })
         .filter((change): change is NonNullable<typeof change> => change !== null);
 
