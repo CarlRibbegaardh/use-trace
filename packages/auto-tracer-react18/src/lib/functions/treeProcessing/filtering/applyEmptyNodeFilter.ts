@@ -27,7 +27,7 @@ export type TreeNodeFilterFn = (
  * @param nodes - The array of tree nodes
  * @returns The same array reference (identity)
  */
-const identityFilter: TreeNodeFilterFn = (nodes) => nodes;
+const identityFilter: TreeNodeFilterFn = (nodes) => {return nodes};
 
 /**
  * Lookup table mapping filter modes to their corresponding filter functions.

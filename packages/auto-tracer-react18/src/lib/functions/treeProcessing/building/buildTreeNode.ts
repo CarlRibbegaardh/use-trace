@@ -8,7 +8,11 @@ import { getTrackingGUID } from "../../renderRegistry.js";
 import { hasRenderWork } from "../../reactFiberFlags.js";
 import { isReactInternal } from "../../isReactInternal.js";
 import { AUTOTRACER_STATE_MARKER } from "../../../types/marker.js";
-import { getLabelsForGuid, getPrevLabelsForGuid, savePrevLabelsForGuid } from "../../hookLabels.js";
+import {
+  getLabelsForGuid,
+  getPrevLabelsForGuid,
+  savePrevLabelsForGuid,
+} from "../../hookLabels.js";
 import { areValuesIdentical } from "../../areValuesIdentical.js";
 import { traceOptions } from "../../../types/globalState.js";
 import { componentLogRegistry } from "../../componentLogRegistry.js";
@@ -74,10 +78,10 @@ export function buildTreeNode(fiber: unknown, depth: number): TreeNode {
   const anchors = findStatefulHookAnchors(memoizedState);
 
   // Map anchors to the format expected by resolveHookLabel
-  const allAnchors = anchors.map((anchor, idx) => ({
+  const allAnchors = anchors.map((anchor, idx) => {return {
     index: idx,
     value: anchor.memoizedState,
-  }));
+  }});
 
   const stateChanges = (() => {
     if (isNewMount) {
@@ -104,20 +108,22 @@ export function buildTreeNode(fiber: unknown, depth: number): TreeNode {
         });
 
       // Track which labels were matched by fiber hooks
-      const matchedLabels = new Set(fiberStateChanges.map(change => change.name));
+      const matchedLabels = new Set(
+        fiberStateChanges.map((change) => {return change.name})
+      );
 
       // Also include labeled values that weren't matched by fiber hooks
       // (e.g., functions from destructured custom hooks)
       const unmatchedLabelChanges = trackingGUID
         ? getLabelsForGuid(trackingGUID)
-            .filter(({ label }) => !matchedLabels.has(label))
-            .map(({ label, value }) => ({
+            .filter(({ label }) => {return !matchedLabels.has(label)})
+            .map(({ label, value }) => {return {
               name: label,
               value,
               prevValue: undefined as unknown,
               hook: null as unknown as Hook, // No actual hook for labeled-only values
               isIdenticalValueChange: false,
-            }))
+            }})
         : [];
 
       return [...fiberStateChanges, ...unmatchedLabelChanges];
@@ -160,7 +166,9 @@ export function buildTreeNode(fiber: unknown, depth: number): TreeNode {
       });
 
     // Track which labels were matched by fiber hooks
-    const matchedLabels = new Set(fiberStateChanges.map(change => change.name));
+    const matchedLabels = new Set(
+      fiberStateChanges.map((change) => {return change.name})
+    );
 
     // Also check for changes in labeled values that aren't in the fiber
     // (e.g., functions from destructured custom hooks that change every render)
@@ -174,18 +182,20 @@ export function buildTreeNode(fiber: unknown, depth: number): TreeNode {
 
       // Create a map of previous values by label name
       const prevValueMap = new Map(
-        prevLabels.map((entry) => [entry.label, entry.value])
+        prevLabels.map((entry) => {return [entry.label, entry.value]})
       );
 
       const changes = currentLabels
-        .filter(({ label }) => !matchedLabels.has(label))
+        .filter(({ label }) => {return !matchedLabels.has(label)})
         .map(({ label, value }) => {
           const prevValue = prevValueMap.get(label);
           // Only include if we have a previous value
           if (prevValue === undefined) return null;
           // Only include when reference changed
           if (prevValue === value) return null;
-          const isIdenticalValueChange = !!traceOptions.detectIdenticalValueChanges && areValuesIdentical(prevValue, value);
+          const isIdenticalValueChange =
+            !!traceOptions.detectIdenticalValueChanges &&
+            areValuesIdentical(prevValue, value);
           return {
             name: label,
             value,
@@ -194,7 +204,9 @@ export function buildTreeNode(fiber: unknown, depth: number): TreeNode {
             isIdenticalValueChange,
           };
         })
-        .filter((change): change is NonNullable<typeof change> => change !== null);
+        .filter(
+          (change): change is NonNullable<typeof change> => {return change !== null}
+        );
 
       // After processing, save current labels as "previous" for next render
       // This ensures they're saved AFTER they're complete
@@ -260,8 +272,8 @@ export function buildTreeNode(fiber: unknown, depth: number): TreeNode {
 
   // Check if any change has identical value warning
   const hasIdenticalValueWarning =
-    stateChanges.some((change) => change.isIdenticalValueChange === true) ||
-    propChanges.some((change) => change.isIdenticalValueChange === true);
+    stateChanges.some((change) => {return change.isIdenticalValueChange === true}) ||
+    propChanges.some((change) => {return change.isIdenticalValueChange === true});
 
   // Get component logs if tracked (logs are keyed by GUID)
   const componentLogs = trackingGUID

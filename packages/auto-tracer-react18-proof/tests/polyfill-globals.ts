@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/ban-types */
 /**
  * Manual React DevTools Hook Polyfill for Vitest
  *
@@ -70,25 +72,25 @@ let uidCounter = 0;
     return id;
   },
 
-  checkDCE(fn: Function) {
+  checkDCE(_fn: Function) {
     // Minimal implementation - React checks for dead code elimination
     // In tests we can just no-op this
   },
 
-  onCommitFiberRoot(id: unknown, root: unknown, priorityLevel?: unknown) {
+  onCommitFiberRoot(_id: unknown, _root: unknown, _priorityLevel?: unknown) {
     //console.log(">>> onCommitFiberRoot", id, root);
   },
 
-  onCommitFiberUnmount(id: unknown, fiber: unknown) {
+  onCommitFiberUnmount(_id: unknown, _fiber: unknown) {
     //console.log(">>> onCommitFiberUnmount", id, fiber);
   },
 
   // React v18.0+
-  onPostCommitFiberRoot(id: unknown, root: unknown) {
+  onPostCommitFiberRoot(_id: unknown, _root: unknown) {
     // Optional hook for post-commit work
   },
 
-  setStrictMode(id: unknown, isStrictMode: boolean) {
+  setStrictMode(_id: unknown, _isStrictMode: boolean) {
     // StrictMode console patching - can be no-op in tests
   },
 
@@ -118,7 +120,7 @@ let uidCounter = 0;
     return () => this.off(event, fn);
   },
 
-  getFiberRoots(rendererID: number) {
+  getFiberRoots(_rendererID: number) {
     // Return empty set - not needed for basic functionality
     return new Set();
   },
@@ -128,11 +130,11 @@ let uidCounter = 0;
     return [];
   },
 
-  registerInternalModuleStart(moduleStartError: Error) {
+  registerInternalModuleStart(_moduleStartError: Error) {
     // No-op for tests
   },
 
-  registerInternalModuleStop(moduleStopError: Error) {
+  registerInternalModuleStop(_moduleStopError: Error) {
     // No-op for tests
   },
 };

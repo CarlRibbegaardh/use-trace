@@ -11,7 +11,7 @@ import { getFunctionId } from "./getFunctionId.js";
  * @param value - The property value
  * @returns The value to use in stringification
  */
-export function functionReplacer(key: string, value: unknown): unknown {
+export function functionReplacer(_key: string, value: unknown): unknown {
   if (typeof value === "function") {
     const id = getFunctionId(value);
     return `(fn:${id})`;

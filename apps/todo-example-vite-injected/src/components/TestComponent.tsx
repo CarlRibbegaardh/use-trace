@@ -18,7 +18,7 @@ export const TestComponent: React.FC<TestComponentProps> = ({
   useEffect(() => {
     setCount(5);
     setValue("updated-value");
-  }, []);
+  }, [setCount, setValue]);
 
   console.log("TestComponent render:", { count, value, increment, reset });
   return (

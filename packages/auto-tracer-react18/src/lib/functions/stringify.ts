@@ -5,7 +5,6 @@
 
 import safeStringify from "safe-stable-stringify";
 
-import { stringify as flattedStringify } from "flatted";
 import { getFunctionId } from "./getFunctionId.js";
 import { functionReplacer } from "./functionReplacer.js";
 

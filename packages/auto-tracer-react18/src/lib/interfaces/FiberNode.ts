@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * @file Defines the structure of a React Fiber node for type-safe access.
  */

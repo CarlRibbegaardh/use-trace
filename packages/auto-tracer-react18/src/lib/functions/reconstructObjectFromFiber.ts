@@ -93,7 +93,7 @@ export function reconstructObjectFromFiber(
     } else {
       // Value properties consume the next available hook
       const hookIndex = startIndex + hookOffset;
-      const hook = availableHooks.find((h) => h.index === hookIndex);
+      const hook = availableHooks.find((h) => {return h.index === hookIndex});
 
       if (!hook) {
         // Not enough hooks available for reconstruction

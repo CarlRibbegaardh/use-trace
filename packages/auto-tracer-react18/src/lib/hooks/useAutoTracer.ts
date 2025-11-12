@@ -1,7 +1,4 @@
-import {
-  getTrackingGUID,
-  useAutoTracer as useAutoTracerImpl,
-} from "../functions/renderRegistry.js";
+import { useAutoTracer as useAutoTracerImpl } from "../functions/renderRegistry.js";
 import { AUTOTRACER_STATE_MARKER } from "../types/marker.js";
 import { useState } from "react";
 

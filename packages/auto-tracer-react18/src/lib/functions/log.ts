@@ -9,16 +9,16 @@ import {
 import {
   type StyledLoggerOptions,
   logDefinitive as logDefinitiveStyled,
-  logIdenticalStateValueWarning as logIdenticalStateValueWarningStyled,
-  logIdenticalPropValueWarning as logIdenticalPropValueWarningStyled,
-  logLogStatement as logLogStatementStyled,
-  logWarnStatement as logWarnStatementStyled,
   logErrorStatement as logErrorStatementStyled,
+  logIdenticalPropValueWarning as logIdenticalPropValueWarningStyled,
+  logIdenticalStateValueWarning as logIdenticalStateValueWarningStyled,
+  logLogStatement as logLogStatementStyled,
   logPropChange as logPropChangeStyled,
   logReconciled as logReconciledStyled,
   logSkipped as logSkippedStyled,
   logStateChange as logStateChangeStyled,
   logStyled as logStyledStyled,
+  logWarnStatement as logWarnStatementStyled,
 } from "./styledLogger.js";
 
 // Create dependency injection configuration for styled logger

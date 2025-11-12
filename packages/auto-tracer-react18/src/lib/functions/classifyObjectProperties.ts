@@ -60,7 +60,7 @@ export function classifyObjectProperties(value: unknown): PropertyMetadata | nul
   }
 
   // Determine if all properties are functions
-  const allFunctions = entries.every(([_, val]) => typeof val === "function");
+  const allFunctions = entries.every(([_, val]) => {return typeof val === "function"});
 
   const names: string[] = [];
   const types: PropertyType[] = [];

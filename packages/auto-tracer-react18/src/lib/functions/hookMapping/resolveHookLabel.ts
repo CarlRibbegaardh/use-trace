@@ -35,7 +35,7 @@ import type { Hook } from "./types.js";
 export function resolveHookLabel(
   hook: Hook,
   anchors: readonly Hook[],
-  chainIndexMap: ReadonlyMap<Hook, number>,
+  _chainIndexMap: ReadonlyMap<Hook, number>,
   targets: readonly number[],
   labels: Record<number, string>,
   fallback: string

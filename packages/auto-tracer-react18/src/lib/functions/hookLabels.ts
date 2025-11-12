@@ -5,12 +5,12 @@
 import { stringify } from "./stringify.js";
 import { normalizeValue } from "./normalizeValue.js";
 import {
-  classifyObjectProperties,
   type PropertyMetadata,
+  classifyObjectProperties,
 } from "./classifyObjectProperties.js";
 import {
-  reconstructObjectFromFiber,
   type FiberHook,
+  reconstructObjectFromFiber,
 } from "./reconstructObjectFromFiber.js";
 import { matchByStructure } from "./matchByStructure.js";
 
@@ -150,19 +150,21 @@ export function resolveHookLabel(
   const labels = getLabelsForGuid(guid);
 
   // Build comparable string using normalization (functions -> "(fn)")
-  const toComparableString = (v: unknown) => stringify(normalizeValue(v));
+  const toComparableString = (v: unknown) => {
+    return stringify(normalizeValue(v));
+  };
   const anchorComparable = toComparableString(anchorValue);
 
   // Group fiber anchors by comparable value
-  const valueGroup = allFiberAnchors.filter(
-    (a) => toComparableString(a.value) === anchorComparable
-  );
+  const valueGroup = allFiberAnchors.filter((a) => {
+    return toComparableString(a.value) === anchorComparable;
+  });
 
   // Scenario 1: Unique value in fiber → direct match
   if (valueGroup.length === 1) {
-    const match = labels.find(
-      (l) => toComparableString(l.value) === anchorComparable
-    );
+    const match = labels.find((l) => {
+      return toComparableString(l.value) === anchorComparable;
+    });
     if (match?.label) {
       return match.label;
     }
@@ -181,27 +183,37 @@ export function resolveHookLabel(
   }
 
   // Scenarios 2 & 3: Duplicate values
-  const labelsWithValue = labels.filter(
-    (l) => toComparableString(l.value) === anchorComparable
-  );
+  const labelsWithValue = labels.filter((l) => {
+    return toComparableString(l.value) === anchorComparable;
+  });
 
   // Scenario 2: All occurrences labeled → ordinal match
   if (labelsWithValue.length === valueGroup.length) {
-    const sortedAnchors = valueGroup.sort((a, b) => a.index - b.index);
-    const sortedLabels = labelsWithValue.sort((a, b) => a.index - b.index);
+    const sortedAnchors = valueGroup.sort((a, b) => {
+      return a.index - b.index;
+    });
+    const sortedLabels = labelsWithValue.sort((a, b) => {
+      return a.index - b.index;
+    });
 
-    const ordinal = sortedAnchors.findIndex((a) => a.index === anchorIndex);
+    const ordinal = sortedAnchors.findIndex((a) => {
+      return a.index === anchorIndex;
+    });
     return sortedLabels[ordinal]?.label ?? "unknown";
   }
 
   // Scenario 3: Partial coverage → use ordinal constraints
-  const sortedLabels = labelsWithValue.sort((a, b) => a.index - b.index);
-  const sortedAnchors = valueGroup.sort((a, b) => a.index - b.index);
-  const currentAnchorOrdinal = sortedAnchors.findIndex(
-    (a) => a.index === anchorIndex
-  );
+  const sortedLabels = labelsWithValue.sort((a, b) => {
+    return a.index - b.index;
+  });
+  const sortedAnchors = valueGroup.sort((a, b) => {
+    return a.index - b.index;
+  });
+  const currentAnchorOrdinal = sortedAnchors.findIndex((a) => {
+    return a.index === anchorIndex;
+  });
 
-  const possibleLabels = sortedLabels.filter((label, labelOrdinal) => {
+  const possibleLabels = sortedLabels.filter((_label, labelOrdinal) => {
     const labelsBefore = labelOrdinal;
     const labelsAfter = sortedLabels.length - labelOrdinal - 1;
 
@@ -213,8 +225,12 @@ export function resolveHookLabel(
 
   // Return union of possible labels + unknown (in source order, not alphabetical)
   const labelNames = possibleLabels
-    .sort((a, b) => a.index - b.index) // Preserve source order for developer clarity
-    .map((l) => l.label);
+    .sort((a, b) => {
+      return a.index - b.index;
+    }) // Preserve source order for developer clarity
+    .map((l) => {
+      return l.label;
+    });
 
   // If no labels match, try structural matching before giving up
   if (labelNames.length === 0) {
@@ -276,8 +292,9 @@ function tryStructuralMatching(
 
       // Check if the primitive matches any property value in the registered object
       const matchingProperty = Object.entries(labelObject).find(
-        ([_key, propValue]) =>
-          stringify(normalizeValue(propValue)) === normalizedCurrentStr
+        ([_key, propValue]) => {
+          return stringify(normalizeValue(propValue)) === normalizedCurrentStr;
+        }
       );
 
       if (matchingProperty) {
@@ -304,7 +321,9 @@ function tryStructuralMatching(
       );
       if (
         storedKeys.length === currentKeys.length &&
-        storedKeys.every((k, i) => k === currentKeys[i])
+        storedKeys.every((k, i) => {
+          return k === currentKeys[i];
+        })
       ) {
         // Keys match exactly in order → structural match
         labelEntry.value = normalizedCurrent; // update to latest normalized value
@@ -313,10 +332,12 @@ function tryStructuralMatching(
     }
 
     // Reconstruct the object from fiber hooks using stored metadata
-    const fiberHooks: FiberHook[] = allFiberAnchors.map((a) => ({
-      index: a.index,
-      value: a.value,
-    }));
+    const fiberHooks: FiberHook[] = allFiberAnchors.map((a) => {
+      return {
+        index: a.index,
+        value: a.value,
+      };
+    });
 
     const reconstructionResult = reconstructObjectFromFiber(
       anchorIndex,

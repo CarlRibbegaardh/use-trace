@@ -2,24 +2,24 @@ import type { TreeNode } from "../types/TreeNode.js";
 import { formatConnector } from "./formatConnector.js";
 import {
   log,
-  logStyled,
+  logErrorStatement,
+  logIdenticalPropValueWarning,
+  logIdenticalStateValueWarning,
+  logLogStatement,
+  logPropChange,
   logReconciled,
   logSkipped,
   logStateChange,
-  logPropChange,
-  logLogStatement,
+  logStyled,
   logWarnStatement,
-  logErrorStatement,
-  logIdenticalStateValueWarning,
-  logIdenticalPropValueWarning,
 } from "../../log.js";
 import { traceOptions } from "../../../types/globalState.js";
 import { getFlagNames } from "../../reactFiberFlags.js";
 import {
-  formatStateChange,
-  formatStateValue,
   formatPropChange,
   formatPropValue,
+  formatStateChange,
+  formatStateValue,
 } from "../../changeFormatting.js";
 import { getSkippedProps } from "../../getSkippedProps.js";
 import { isReactInternal } from "../../isReactInternal.js";

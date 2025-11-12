@@ -17,8 +17,8 @@ import {
 } from "./changeFormatting.js";
 import {
   log,
-  logIdenticalStateValueWarning,
   logIdenticalPropValueWarning,
+  logIdenticalStateValueWarning,
   logLogStatement,
   logPropChange,
   logReconciled,
@@ -268,10 +268,12 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
         const anchorsInitial = findStatefulHookAnchors(memoizedStateInitial);
 
         // Collect all anchor values for ordinal matching
-        const allAnchorsInitial = anchorsInitial.map((anchor, idx) => ({
-          index: idx,
-          value: anchor.memoizedState,
-        }));
+        const allAnchorsInitial = anchorsInitial.map((anchor, idx) => {
+          return {
+            index: idx,
+            value: anchor.memoizedState,
+          };
+        });
 
         // Track which labels were matched by fiber hooks
         const matchedLabels = new Set<string>();
@@ -302,12 +304,18 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
           const allLabels = getLabelsForGuid(trackingGUID);
 
           // DEBUG: Log what we found
-          console.log('[DEBUG] All labels for GUID:', trackingGUID, allLabels.map(l => l.label));
-          console.log('[DEBUG] Matched labels:', Array.from(matchedLabels));
+          console.log(
+            "[DEBUG] All labels for GUID:",
+            trackingGUID,
+            allLabels.map((l) => {
+              return l.label;
+            })
+          );
+          console.log("[DEBUG] Matched labels:", Array.from(matchedLabels));
 
           allLabels.forEach(({ label, value }) => {
             if (!matchedLabels.has(label)) {
-              console.log('[DEBUG] Logging unmatched label:', label, value);
+              console.log("[DEBUG] Logging unmatched label:", label, value);
               logStateChange(
                 `${indent}│   `,
                 `Initial state ${label}: ${formatStateValue(value)}`,
@@ -329,13 +337,19 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
           const formattedChange = formatPropChange(prevValue, value);
 
           // Use warning log for identical value changes if enabled
-          if (isIdenticalValueChange && traceOptions.detectIdenticalValueChanges) {
+          if (
+            isIdenticalValueChange &&
+            traceOptions.detectIdenticalValueChanges
+          ) {
             logIdenticalPropValueWarning(
               `${indent}│   `,
               `Prop change ${name} (identical value): ${formattedChange}`
             );
           } else {
-            logPropChange(`${indent}│   `, `Prop change ${name}: ${formattedChange}`);
+            logPropChange(
+              `${indent}│   `,
+              `Prop change ${name}: ${formattedChange}`
+            );
           }
         });
 
@@ -344,17 +358,19 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
         const anchors = findStatefulHookAnchors(memoizedState);
 
         // Collect all anchor values for ordinal matching
-        const allAnchors = anchors.map((anchor, idx) => ({
-          index: idx,
-          value: anchor.memoizedState,
-        }));
+        const allAnchors = anchors.map((anchor, idx) => {
+          return {
+            index: idx,
+            value: anchor.memoizedState,
+          };
+        });
 
         // Track which labels were matched by fiber hooks
         const matchedLabels = new Set<string>();
 
         // Map each state change to its label using value-based matching
         meaningfulStateChanges.forEach(
-          ({ name, value, prevValue, hook, isIdenticalValueChange }) => {
+          ({ name: _name, value, prevValue, hook, isIdenticalValueChange }) => {
             const anchorIndex = anchors.indexOf(hook as Hook);
             const label = resolveHookLabel(
               trackingGUID ?? "",
@@ -368,7 +384,10 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
             const formattedChange = formatStateChange(prevValue, value);
 
             // Use warning log for identical value changes if enabled
-            if (isIdenticalValueChange && traceOptions.detectIdenticalValueChanges) {
+            if (
+              isIdenticalValueChange &&
+              traceOptions.detectIdenticalValueChanges
+            ) {
               const msg = `State change ${label} (identical value): ${formattedChange}`;
               logIdenticalStateValueWarning(`${indent}│   `, msg);
             } else {
@@ -383,13 +402,19 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
         if (trackingGUID) {
           const currentLabels = getLabelsForGuid(trackingGUID);
           // Get previous labels from alternate fiber if available
-          const alternateFiber = fiberNode.alternate as typeof fiberNode | undefined;
-          const prevGUID = alternateFiber ? getTrackingGUID(alternateFiber) : null;
+          const alternateFiber = fiberNode.alternate as
+            | typeof fiberNode
+            | undefined;
+          const prevGUID = alternateFiber
+            ? getTrackingGUID(alternateFiber)
+            : null;
           const prevLabels = prevGUID ? getLabelsForGuid(prevGUID) : [];
 
           // Create a map of previous values by label name
           const prevValueMap = new Map(
-            prevLabels.map((entry) => [entry.label, entry.value])
+            prevLabels.map((entry) => {
+              return [entry.label, entry.value];
+            })
           );
 
           currentLabels.forEach(({ label, value }) => {
@@ -397,7 +422,10 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
               const prevValue = prevValueMap.get(label);
               // Only log if the value changed or this is first render
               if (prevValue !== value) {
-                const isIdenticalValueChange = !!traceOptions.detectIdenticalValueChanges && prevValue !== undefined && areValuesIdentical(prevValue, value);
+                const isIdenticalValueChange =
+                  !!traceOptions.detectIdenticalValueChanges &&
+                  prevValue !== undefined &&
+                  areValuesIdentical(prevValue, value);
                 const formattedChange = formatStateChange(prevValue, value);
                 if (isIdenticalValueChange) {
                   const msg = `State change ${label} (identical value): ${formattedChange}`;
