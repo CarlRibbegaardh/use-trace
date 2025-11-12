@@ -1,6 +1,6 @@
 {
   "name": "@auto-tracer/inject-react18",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.7",
   "description": "Shared AST transform logic for auto-injecting useAutoTracer",
   "author": "Carl Ribbegårdh",
   "license": "MIT",
