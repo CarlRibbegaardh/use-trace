@@ -90,6 +90,7 @@ export function filterAllEmptyNodes(
 
     const marker = createMarkerNode(
       state.currentEmptySequence.startDepth,
+      state.currentEmptySequence.count,
       state.currentEmptySequence.count
     );
 

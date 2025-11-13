@@ -122,4 +122,11 @@ export interface TreeNode {
    * Nodes with warnings are never considered "empty".
    */
   readonly hasIdenticalValueWarning: boolean;
+
+  /**
+   * For Marker nodes only: count of filtered nodes this marker represents.
+   * Used for debug mode display: "... (Level: N, Filtered nodes: M)".
+   * Undefined for non-marker nodes.
+   */
+  readonly filteredNodeCount?: number;
 }

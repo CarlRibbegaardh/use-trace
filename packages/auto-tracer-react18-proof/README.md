@@ -2,7 +2,7 @@
 
 > **Proof-of-concept package with comprehensive test coverage for React 18 auto-tracing functionality**
 
-[![Tests](https://img.shields.io/badge/tests-42%2F42%20passing-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-63%2F63%20passing-brightgreen)]()
 [![Coverage](https://img.shields.io/badge/scenario%20coverage-100%25-brightgreen)]()
 [![React](https://img.shields.io/badge/React-18.3.1-blue)]()
 [![Vitest](https://img.shields.io/badge/Vitest-4.0.3-yellow)]()
@@ -13,7 +13,7 @@
 # Run all tests
 pnpm --filter @auto-tracer/react18-proof test
 
-# Expected: ✅ 42/42 tests passing in ~3 seconds
+# Expected: ✅ 63/63 tests passing in ~4 seconds
 ```
 
 ## Overview
@@ -29,6 +29,7 @@ This package contains proof-of-concept React components and comprehensive Vitest
 - **No Build-Time Injection**: All `useAutoTracer` and `labelState` calls are manual, avoiding build-time complexity
 - **Scenario-Based Organization**: Components and tests are organized by the scenarios defined in `spec-highlevel-draft.md`
 - **React Internals Validation**: Tests verify behavior matches React's internal hook storage (values from fiber, setters from labels)
+- **Public API Only**: Tests ONLY import from the public package exports (`@auto-tracer/react18`). Deep imports from internal paths (e.g., `/src/lib/...`) are **strictly forbidden** and will cause tests to fail. This ensures the library's public API contract is validated, not internal implementation details.
 
 ## Project Structure
 
@@ -52,6 +53,11 @@ src/
 ├── state-changes/          # Scenario 7-8: State change detection and formatting
 │   ├── StateUpdateComponent.tsx     # Basic state updates
 │   └── FormattingStateComponent.tsx # Primitive, object, array, function updates
+│
+├── tree-rendering/         # Tree Rendering and Filter Modes
+│   ├── DeepTreeComponent.tsx        # Deep nested structure with empty wrappers
+│   ├── EmptyWrapper.tsx             # Untracked wrapper component (empty node)
+│   └── TrackedComponent.tsx         # Tracked component with state (non-empty)
 │
 └── special-cases/          # Special scenarios
     ├── UnlabeledStateComponent.tsx  # Unlabeled state → "unknown"
@@ -99,28 +105,33 @@ pnpm --filter @auto-tracer/react18-proof test --coverage
 pnpm --filter @auto-tracer/react18-proof test --watch
 ```
 
-**Expected Result**: All 42 tests pass in ~3 seconds
+**Expected Result**: All 63 tests pass in ~3 seconds
 
 ## Test Matrix
 
-Comprehensive coverage of all specification scenarios with 42 tests across 13 test suites:
+Comprehensive coverage of all specification scenarios with 63 tests across 18 test suites:
 
-| Category | Component | Tests | Scenarios Covered |
-|----------|-----------|-------|-------------------|
-| **Initial Props** | `SimplePropComponent` | 3 | Mount detection, primitive props, React internal prop skipping |
-| | `FunctionPropComponent` | 2 | Function prop formatting `(fn:N)`, stable function IDs |
-| | `ObjectPropComponent` | 3 | Object JSON stringification, nested objects, rendering |
-| **Initial State** | `SimpleStateComponent` | 3 | useState detection, setter formatting `(fn:N)`, initial mount |
-| | `MultiStateComponent` | 3 | Multiple useState hooks, React fiber order (values→setters), correct values |
-| | `ObjectStateComponent` | 5 | Boolean/object/array formatting, all setter functions, rendering |
-| **Prop Changes** | `PropChangeParent` + `PropChangeChild` | 3 | Re-render detection, before→after values, child updates |
-| | `FormattingPropComponent` | 4 | Short (<20 chars), medium (20-200), function changes, identical value skip |
-| **State Changes** | `StateUpdateComponent` | 3 | State change detection, before→after values, UI updates |
-| | `FormattingStateComponent` | 4 | Primitive/object/array/function changes, formatting rules |
-| **Special Cases** | `UnlabeledStateComponent` | 3 | Unlabeled state as "unknown", value detection, rendering |
-| | `CustomHookComponent` | 3 | Custom hook labels, state change detection, rendering |
-| | `IdenticalValueComponent` | 3 | Identical value detection, warning when enabled, rendering |
-| **Total** | **13 test suites** | **42 tests** | **All 8 core scenarios + 3 special cases** |
+| Category             | Component                              | Tests        | Scenarios Covered                                                           |
+| -------------------- | -------------------------------------- | ------------ | --------------------------------------------------------------------------- |
+| **Initial Props**    | `SimplePropComponent`                  | 3            | Mount detection, primitive props, React internal prop skipping              |
+|                      | `FunctionPropComponent`                | 2            | Function prop formatting `(fn:N)`, stable function IDs                      |
+|                      | `ObjectPropComponent`                  | 3            | Object JSON stringification, nested objects, rendering                      |
+| **Initial State**    | `SimpleStateComponent`                 | 3            | useState detection, setter formatting `(fn:N)`, initial mount               |
+|                      | `MultiStateComponent`                  | 3            | Multiple useState hooks, React fiber order (values→setters), correct values |
+|                      | `ObjectStateComponent`                 | 5            | Boolean/object/array formatting, all setter functions, rendering            |
+| **Prop Changes**     | `PropChangeParent` + `PropChangeChild` | 3            | Re-render detection, before→after values, child updates                     |
+|                      | `FormattingPropComponent`              | 4            | Short (<20 chars), medium (20-200), function changes, identical value skip  |
+| **State Changes**    | `StateUpdateComponent`                 | 3            | State change detection, before→after values, UI updates                     |
+|                      | `FormattingStateComponent`             | 4            | Primitive/object/array/function changes, formatting rules                   |
+| **Tree Rendering**   | `DeepTreeComponent` (filter: none)     | 3            | No filtering, all nodes visible, no markers, tree connectors                |
+|                      | `DeepTreeComponent` (filter: first)    | 4            | First empty sequence collapsed, marker appears, reduced lines               |
+|                      | `DeepTreeComponent` (filter: all)      | 5            | All empty sequences collapsed, multiple markers, maximum clarity            |
+|                      | `MarkerCalculation`                    | 4            | Standard mode (N levels), debug mode (Level: N), singular/plural, depth     |
+|                      | `ConnectorDisplay`                     | 5            | Tree connectors (├─, └─┐), marker integration, debug patterns              |
+| **Special Cases**    | `UnlabeledStateComponent`              | 3            | Unlabeled state as "unknown", value detection, rendering                    |
+|                      | `CustomHookComponent`                  | 3            | Custom hook labels, state change detection, rendering                       |
+|                      | `IdenticalValueComponent`              | 3            | Identical value detection, warning when enabled, rendering                  |
+| **Total**            | **18 test suites**                     | **63 tests** | **All 8 core scenarios + tree rendering + 3 special cases**                 |
 
 ### Test Coverage Tree
 
@@ -177,6 +188,34 @@ tests/unit/
 │       ✓ Formats array changes as JSON
 │       ✓ Formats function changes as (fn:N)→(fn:M)
 │
+├── tree-rendering/ (21 tests)
+│   ├── DeepTreeComponent.none.test.tsx (3)
+│   │   ✓ Shows all nodes without filtering
+│   │   ✓ No markers appear
+│   │   ✓ Renders DOM correctly
+│   ├── DeepTreeComponent.first.test.tsx (4)
+│   │   ✓ Collapses initial empty sequence
+│   │   ✓ Shows marker with correct format
+│   │   ✓ Empty nodes reappear after first tracked
+│   │   ✓ Reduces output lines vs none mode
+│   ├── DeepTreeComponent.all.test.tsx (5)
+│   │   ✓ Collapses all empty sequences
+│   │   ✓ Shows multiple markers
+│   │   ✓ Fewest lines compared to other modes
+│   │   ✓ Maximum clarity (no empty wrapper noise)
+│   │   ✓ Renders DOM correctly
+│   ├── MarkerCalculation.test.tsx (4)
+│   │   ✓ Shows count format in standard mode
+│   │   ✓ Shows depth format in debug mode
+│   │   ✓ Handles singular vs plural correctly
+│   │   ✓ Maintains visual depth consistency
+│   └── ConnectorDisplay.test.tsx (5)
+│       ✓ Shows tree connectors with filter none
+│       ✓ Skips intermediate connectors with markers
+│       ✓ Maintains depth transitions
+│       ✓ Consistent patterns in debug mode
+│       ✓ Proper spacing with multiple tracked components
+│
 └── special-cases/ (9 tests)
     ├── UnlabeledStateComponent.test.tsx (3)
     │   ✓ Shows unlabeled state as 'unknown'
@@ -191,20 +230,22 @@ tests/unit/
         ✓ Shows warning when enabled
         ✓ Renders correctly
 
-Total: 42 tests across 13 suites ✅
+Total: 63 tests across 18 suites ✅
 ```
 
 ### Scenario Coverage Details
 
 #### ✅ Scenario 1: Initial Prop Detection (Mount)
+
 - **Files**: `SimplePropComponent.test.tsx`
 - **Tests**:
   - Detects and logs primitive props on mount
-  - Skips React internal props (children, key, ref, __self, __source)
+  - Skips React internal props (children, key, ref, **self, **source)
   - Component renders correctly
 - **Verified**: Mount logs appear, prop names and values are correct
 
 #### ✅ Scenario 2: Initial Prop Output Formatting
+
 - **Files**: `FunctionPropComponent.test.tsx`, `ObjectPropComponent.test.tsx`
 - **Tests**:
   - Function props formatted as `(fn:N)` with stable IDs
@@ -213,6 +254,7 @@ Total: 42 tests across 13 suites ✅
 - **Verified**: Function IDs are stable across renders, JSON formatting is correct
 
 #### ✅ Scenario 3: Initial State Detection (Mount)
+
 - **Files**: `SimpleStateComponent.test.tsx`, `MultiStateComponent.test.tsx`
 - **Tests**:
   - useState hooks detected on mount
@@ -221,6 +263,7 @@ Total: 42 tests across 13 suites ✅
 - **Verified**: Order is `count, name, setCount, setName` (values from fiber, then setters from labels)
 
 #### ✅ Scenario 4: Initial State Output Formatting
+
 - **Files**: `ObjectStateComponent.test.tsx`
 - **Tests**:
   - Boolean state formatted correctly (`true`/`false`)
@@ -230,6 +273,7 @@ Total: 42 tests across 13 suites ✅
 - **Verified**: All state value types format correctly, setters have stable IDs
 
 #### ✅ Scenario 5: Prop Change Detection (Update)
+
 - **Files**: `PropChangeParent.test.tsx`
 - **Tests**:
   - Prop changes detected when parent updates
@@ -238,6 +282,7 @@ Total: 42 tests across 13 suites ✅
 - **Verified**: Re-render logs show "Rendering" with prop changes
 
 #### ✅ Scenario 6: Prop Change Output Formatting
+
 - **Files**: `FormattingPropComponent.test.tsx`
 - **Tests**:
   - Short changes (<20 chars): inline format `5 → 10`
@@ -247,6 +292,7 @@ Total: 42 tests across 13 suites ✅
 - **Verified**: Formatting rules apply correctly based on content length
 
 #### ✅ Scenario 7: State Change Detection (Update)
+
 - **Files**: `StateUpdateComponent.test.tsx`
 - **Tests**:
   - State changes detected on button click
@@ -255,6 +301,7 @@ Total: 42 tests across 13 suites ✅
 - **Verified**: State change logs appear after user interaction
 
 #### ✅ Scenario 8: State Change Output Formatting
+
 - **Files**: `FormattingStateComponent.test.tsx`
 - **Tests**:
   - Primitive state: inline format (`0 → 5`)
@@ -264,6 +311,7 @@ Total: 42 tests across 13 suites ✅
 - **Verified**: All state value types format correctly on changes
 
 #### ✅ Special Case: Unlabeled State
+
 - **Files**: `UnlabeledStateComponent.test.tsx`
 - **Tests**:
   - Unlabeled hooks show as "unknown" (not `<unlabeled>`)
@@ -272,6 +320,7 @@ Total: 42 tests across 13 suites ✅
 - **Verified**: Missing labels don't break detection, generic label used
 
 #### ✅ Special Case: Custom Hooks
+
 - **Files**: `CustomHookComponent.test.tsx`, `useCounter.tsx`
 - **Tests**:
   - Custom hook state detected with labels
@@ -280,12 +329,43 @@ Total: 42 tests across 13 suites ✅
 - **Verified**: Custom hooks work same as built-in hooks with proper labeling
 
 #### ✅ Special Case: Identical Value Changes
+
 - **Files**: `IdenticalValueComponent.test.tsx`
 - **Tests**:
   - State changes detected even with identical values (different references)
   - Warning shown when `detectIdenticalValueChanges` enabled
   - Component renders correctly
 - **Verified**: Matches both `"State change data:"` and `"State change data (identical value):"` formats
+
+#### ✅ Tree Rendering and Filter Modes
+
+- **Files**: `DeepTreeComponent.tsx`, `EmptyWrapper.tsx`, `TrackedComponent.tsx`
+- **Tests (21 total)**:
+  - **Filter Mode: none** (3 tests)
+    - All nodes visible including empty wrappers
+    - No marker insertion
+    - Full tree structure with connectors
+  - **Filter Mode: first** (4 tests)
+    - Only initial empty sequence collapsed
+    - Single marker appears before first tracked component
+    - Empty nodes reappear after first tracked
+    - Fewer output lines than none mode
+  - **Filter Mode: all** (5 tests)
+    - All empty sequences collapsed throughout tree
+    - Multiple markers inserted
+    - Fewest output lines (maximum clarity)
+    - No empty wrapper noise in output
+  - **Marker Calculation** (4 tests)
+    - Standard mode: "... (N empty level[s])" format
+    - Debug mode: "... (Level: N)" format
+    - Correct singular/plural handling
+    - Visual depth consistency
+  - **Connector Display** (5 tests)
+    - Tree connectors (├─, └─┐) display correctly
+    - Proper integration with markers
+    - Depth transitions maintained
+    - Debug mode patterns consistent
+- **Verified**: All three filter modes work correctly, markers display proper format, tree structure preserved
 
 ## Testing Approach
 

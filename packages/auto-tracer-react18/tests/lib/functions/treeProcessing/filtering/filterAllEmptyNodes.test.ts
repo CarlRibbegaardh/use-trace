@@ -97,7 +97,7 @@ describe("filterAllEmptyNodes", () => {
 
       expect(result).toHaveLength(2);
       expect(result[0]!.renderType).toBe("Marker");
-      expect(result[0]!.componentName).toBe("... (2 empty levels)");
+      expect(result[0]!.componentName).toBe("... (2 levels collapsed)");
       expect(result[0]!.depth).toBe(0);
       expect(result[1]).toBe(nodes[2]);
     });
@@ -124,7 +124,7 @@ describe("filterAllEmptyNodes", () => {
       expect(result).toHaveLength(2);
       expect(result[0]).toBe(nodes[0]);
       expect(result[1]!.renderType).toBe("Marker");
-      expect(result[1]!.componentName).toBe("... (2 empty levels)");
+      expect(result[1]!.componentName).toBe("... (2 levels collapsed)");
       expect(result[1]!.depth).toBe(1);
     });
 
@@ -139,7 +139,7 @@ describe("filterAllEmptyNodes", () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]!.renderType).toBe("Marker");
-      expect(result[0]!.componentName).toBe("... (3 empty levels)");
+      expect(result[0]!.componentName).toBe("... (3 levels collapsed)");
       expect(result[0]!.depth).toBe(0);
     });
   });
@@ -168,11 +168,11 @@ describe("filterAllEmptyNodes", () => {
 
       expect(result).toHaveLength(3);
       expect(result[0]!.renderType).toBe("Marker");
-      expect(result[0]!.componentName).toBe("... (2 empty levels)");
+      expect(result[0]!.componentName).toBe("... (2 levels collapsed)");
       expect(result[0]!.depth).toBe(0);
       expect(result[1]).toBe(nodes[2]);
       expect(result[2]!.renderType).toBe("Marker");
-      expect(result[2]!.componentName).toBe("... (2 empty levels)");
+      expect(result[2]!.componentName).toBe("... (2 levels collapsed)");
       expect(result[2]!.depth).toBe(3);
     });
 
@@ -203,15 +203,15 @@ describe("filterAllEmptyNodes", () => {
 
       expect(result).toHaveLength(5);
       expect(result[0]!.renderType).toBe("Marker");
-      expect(result[0]!.componentName).toBe("... (1 empty level)");
+      expect(result[0]!.componentName).toBe("... (1 levels collapsed)");
       expect(result[0]!.depth).toBe(0);
       expect(result[1]).toBe(nodes[1]);
       expect(result[2]!.renderType).toBe("Marker");
-      expect(result[2]!.componentName).toBe("... (2 empty levels)");
+      expect(result[2]!.componentName).toBe("... (2 levels collapsed)");
       expect(result[2]!.depth).toBe(2);
       expect(result[3]).toBe(nodes[4]);
       expect(result[4]!.renderType).toBe("Marker");
-      expect(result[4]!.componentName).toBe("... (1 empty level)");
+      expect(result[4]!.componentName).toBe("... (1 levels collapsed)");
       expect(result[4]!.depth).toBe(5);
     });
 
@@ -253,7 +253,7 @@ describe("filterAllEmptyNodes", () => {
     it("should treat existing markers as non-empty", () => {
       const marker = createNode({
         depth: 1,
-        componentName: "... (5 empty levels)",
+        componentName: "... (5 levels collapsed)",
         renderType: "Marker",
       });
       const nodes = [
@@ -305,7 +305,7 @@ describe("filterAllEmptyNodes", () => {
       expect(result[0]!.depth).toBe(0);
       expect(result[1]).toBe(nodes[1]);
       expect(result[2]!.renderType).toBe("Marker");
-      expect(result[2]!.componentName).toBe("... (2 empty levels)");
+      expect(result[2]!.componentName).toBe("... (2 levels collapsed)");
       expect(result[2]!.depth).toBe(2);
     });
 

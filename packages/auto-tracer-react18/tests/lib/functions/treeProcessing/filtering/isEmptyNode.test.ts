@@ -248,7 +248,7 @@ describe("isEmptyNode", () => {
       it("should NOT consider Marker node as empty", () => {
         const node = createNode({
           renderType: "Marker",
-          componentName: "... (3 empty levels)",
+          componentName: "... (3 levels collapsed)",
         });
         const options = { includeReconciled: true, includeSkipped: true, includeMount: true };
 

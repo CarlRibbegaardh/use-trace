@@ -37,13 +37,15 @@ import { isReactInternal } from "../../isReactInternal.js";
  * @param visualDepth - Calculated visual depth for indentation
  * @param lastVisualDepth - Previous visual depth for connector logic
  * @param previousWasMarker - Whether the previous node was a marker
+ * @param nextNode - The next node in the tree (for marker debug info)
  * @returns New lastVisualDepth value
  */
 export function renderTreeNode(
   node: TreeNode,
   visualDepth: number,
   lastVisualDepth: number,
-  previousWasMarker: boolean
+  previousWasMarker: boolean,
+  nextNode?: TreeNode
 ): number {
   const {
     depth: originalDepth,
@@ -59,8 +61,12 @@ export function renderTreeNode(
     const showLevel = traceOptions.enableAutoTracerInternalsLogging ?? false;
 
     if (showLevel) {
-      // Show original depth in level label
-      log(`${indent}└─┐ ... (Level: ${originalDepth})`);
+      // Show next node's depth and filtered node count in debug mode
+      const nextNodeDepth = nextNode?.depth ?? originalDepth;
+      const filteredCount = node.filteredNodeCount ?? 0;
+      log(
+        `${indent}└─┐ ... (Level: ${nextNodeDepth}, Filtered nodes: ${filteredCount})`
+      );
     } else {
       // Show the component name which includes the count
       log(`${indent}└─┐ ${node.componentName}`);

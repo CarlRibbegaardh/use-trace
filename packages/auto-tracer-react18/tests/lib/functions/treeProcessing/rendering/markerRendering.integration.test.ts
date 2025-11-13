@@ -47,12 +47,11 @@ function getIndentLength(line: string): number {
 /**
  * Helper to create a marker node for testing
  */
-function createMarkerNode(depth: number, count: number): TreeNode {
-  const plural = count !== 1 ? "s" : "";
+function createMarkerNode(depth: number, count: number, filteredNodeCount: number = count): TreeNode {
   return {
     depth,
-    componentName: `... (${count} empty level${plural})`,
-    displayName: `... (${count} empty level${plural})`,
+    componentName: `... (${count} levels collapsed)`,
+    displayName: `... (${count} levels collapsed)`,
     renderType: "Marker",
     flags: 0,
     stateChanges: [],
@@ -61,6 +60,7 @@ function createMarkerNode(depth: number, count: number): TreeNode {
     isTracked: false,
     trackingGUID: null,
     hasIdenticalValueWarning: false,
+    filteredNodeCount,
   };
 }
 
@@ -147,14 +147,14 @@ describe("Marker Rendering Integration Tests", () => {
       const fullOutput = output.join("\n");
 
       // Should contain marker
-      expect(fullOutput).toContain("21 empty level");
+      expect(fullOutput).toContain("21 levels collapsed");
 
       // Should contain component
       expect(fullOutput).toContain("[TodoList]");
       expect(fullOutput).toContain("Rendering");
 
       // Verify visual indentation
-      const markerLine = output.find((line) => line.includes("21 empty level"));
+      const markerLine = output.find((line) => line.includes("21 levels collapsed"));
       const componentLine = output.find((line) => line.includes("[TodoList]"));
 
       expect(markerLine).toBeDefined();
@@ -168,7 +168,7 @@ describe("Marker Rendering Integration Tests", () => {
 
       // Should NOT have 21 connector lines between marker and component
       const connectorLines = output.filter(
-        (line) => line.includes("└─┐") && !line.includes("empty level")
+        (line) => line.includes("└─┐") && !line.includes("levels collapsed")
       );
       expect(connectorLines.length).toBe(0);
     });
@@ -179,7 +179,7 @@ describe("Marker Rendering Integration Tests", () => {
       traceOptions.enableAutoTracerInternalsLogging = true;
 
       const nodes: readonly TreeNode[] = [
-        createMarkerNode(1, 21),
+        createMarkerNode(1, 21, 21),
         createRenderingNode(22, "TodoList"),
       ];
 
@@ -190,8 +190,9 @@ describe("Marker Rendering Integration Tests", () => {
       const output = logs.filter((line) => line.trim().length > 0);
       const fullOutput = output.join("\n");
 
-      // Should show original depth in marker label
-      expect(fullOutput).toContain("Level: 1");
+      // Should show next node's depth and filtered node count in debug mode
+      expect(fullOutput).toContain("Level: 22");
+      expect(fullOutput).toContain("Filtered nodes: 21");
 
       // Components no longer show level labels (only markers and connectors do)
       // The component should just show: ├─ [TodoList] Rendering
@@ -230,8 +231,8 @@ describe("Marker Rendering Integration Tests", () => {
       const fullOutput = output.join("\n");
 
       // Should contain both markers
-      expect(fullOutput).toContain("5 empty level");
-      expect(fullOutput).toContain("3 empty level");
+      expect(fullOutput).toContain("5 levels collapsed");
+      expect(fullOutput).toContain("3 levels collapsed");
 
       // Should contain both components
       expect(fullOutput).toContain("[TodoList]");
@@ -239,11 +240,11 @@ describe("Marker Rendering Integration Tests", () => {
 
       // Find the lines
       const firstMarkerLine = output.find((line) =>
-        line.includes("5 empty level")
+        line.includes("5 levels collapsed")
       );
       const todoListLine = output.find((line) => line.includes("[TodoList]"));
       const secondMarkerLine = output.find((line) =>
-        line.includes("3 empty level")
+        line.includes("3 levels collapsed")
       );
       const todoItemLine = output.find((line) => line.includes("[TodoItem]"));
 
@@ -269,7 +270,7 @@ describe("Marker Rendering Integration Tests", () => {
       const connectorLines = output.filter(
         (line) =>
           line.includes("└─┐") &&
-          !line.includes("empty level") &&
+          !line.includes("levels collapsed") &&
           line.trim() === "└─┐"
       );
       expect(connectorLines.length).toBe(0);
@@ -300,12 +301,12 @@ describe("Marker Rendering Integration Tests", () => {
 
       // Find the lines
       const firstMarkerLine = output.find((line) =>
-        line.includes("5 empty level")
+        line.includes("5 levels collapsed")
       );
       const todoListLine = output.find((line) => line.includes("[TodoList]"));
       const child1Line = output.find((line) => line.includes("[Child1]"));
       const secondMarkerLine = output.find((line) =>
-        line.includes("1 empty level")
+        line.includes("1 levels collapsed")
       );
       const child2Line = output.find((line) => line.includes("[Child2]"));
 
@@ -383,10 +384,10 @@ describe("Marker Rendering Integration Tests", () => {
       const output = logs.filter((line) => line.trim().length > 0);
 
       const firstMarkerLine = output.find((line) =>
-        line.includes("5 empty level")
+        line.includes("5 levels collapsed")
       );
       const secondMarkerLine = output.find((line) =>
-        line.includes("3 empty level")
+        line.includes("3 levels collapsed")
       );
       const todoListLine = output.find((line) => line.includes("[TodoList]"));
 

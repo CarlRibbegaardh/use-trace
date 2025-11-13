@@ -128,13 +128,15 @@ export function renderTree(nodes: readonly TreeNode[]): void {
   for (let i = 0; i < nodes.length; i++) {
     const node = nodes[i];
     const visualDepth = visualDepths[i];
+    const nextNode = i + 1 < nodes.length ? nodes[i + 1] : undefined;
 
     if (node !== undefined && visualDepth !== undefined) {
       lastVisualDepth = renderTreeNode(
         node,
         visualDepth,
         lastVisualDepth,
-        previousWasMarker
+        previousWasMarker,
+        nextNode
       );
 
       previousWasMarker = node.renderType === "Marker";

@@ -84,7 +84,7 @@ describe("applyEmptyNodeFilter", () => {
 
       expect(result).toHaveLength(3);
       expect(result[0]!.renderType).toBe("Marker");
-      expect(result[0]!.componentName).toBe("... (2 empty levels)");
+      expect(result[0]!.componentName).toBe("... (2 levels collapsed)");
       expect(result[1]).toBe(nodes[2]); // Non-empty node preserved
       expect(result[2]).toBe(nodes[3]); // Later empty node preserved
     });
@@ -130,10 +130,10 @@ describe("applyEmptyNodeFilter", () => {
 
       expect(result).toHaveLength(3);
       expect(result[0]!.renderType).toBe("Marker");
-      expect(result[0]!.componentName).toBe("... (2 empty levels)");
+      expect(result[0]!.componentName).toBe("... (2 levels collapsed)");
       expect(result[1]).toBe(nodes[2]); // Non-empty node preserved
       expect(result[2]!.renderType).toBe("Marker");
-      expect(result[2]!.componentName).toBe("... (2 empty levels)");
+      expect(result[2]!.componentName).toBe("... (2 levels collapsed)");
     });
 
     it("should filter all empty sequences in 'all' mode", () => {

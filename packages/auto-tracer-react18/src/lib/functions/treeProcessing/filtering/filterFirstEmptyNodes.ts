@@ -75,10 +75,14 @@ export function filterFirstEmptyNodes(
 
   // If all nodes are empty, return single marker
   if (firstNonEmptyIndex === nodes.length) {
-    return [createMarkerNode(firstNodeDepth, nodes.length)];
+    return [createMarkerNode(firstNodeDepth, nodes.length, nodes.length)];
   }
 
   // Replace initial empty sequence with marker + remaining nodes
-  const marker = createMarkerNode(firstNodeDepth, firstNonEmptyIndex);
+  const marker = createMarkerNode(
+    firstNodeDepth,
+    firstNonEmptyIndex,
+    firstNonEmptyIndex
+  );
   return [marker, ...nodes.slice(firstNonEmptyIndex)];
 }
