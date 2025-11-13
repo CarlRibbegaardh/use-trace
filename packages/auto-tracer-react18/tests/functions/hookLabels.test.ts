@@ -33,12 +33,18 @@ describe("hookLabels", () => {
       const labels = getLabelsForGuid(testGuid);
 
       expect(labels).toHaveLength(2);
-      expect(labels[0]).toEqual({
+      expect(labels[0]).toMatchObject({
         label: "filteredTodos",
         index: 0,
         value: [],
+        normalizedValue: [],
       });
-      expect(labels[1]).toEqual({ label: "loading", index: 1, value: false });
+      expect(labels[1]).toMatchObject({
+        label: "loading",
+        index: 1,
+        value: false,
+        normalizedValue: false,
+      });
     });
 
     it("allows multiple labels with same value", () => {

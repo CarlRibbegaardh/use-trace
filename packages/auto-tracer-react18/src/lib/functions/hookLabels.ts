@@ -21,8 +21,10 @@ import { matchByStructure } from "./matchByStructure.js";
 export interface LabelEntry {
   /** Build-time ordinal position for ordering (source order) */
   index: number;
-  /** Current state value for matching */
+  /** Original value (preserves function identity for display) */
   value: unknown;
+  /** Normalized value for structural comparison (functions → "(fn)") - computed internally */
+  normalizedValue?: unknown;
   /** Friendly name (e.g., "filteredTodos") */
   label: string;
   /** Property metadata for object-valued hooks (optional, for structural matching) */
@@ -39,23 +41,37 @@ const guidToPrevLabelsMap = new Map<string, LabelEntry[]>();
  * Adds a label with value for a component's hook.
  * This is used by the Babel plugin which knows the exact source position.
  *
+ * **Normalization**: Uses Structural Comparison Normalization
+ * - Functions → `"(fn)"` (literal string)
+ * - Enables structural matching when function instances change
+ * - **Trade-off**: Loses function instance information for display
+ *
  * For object-valued hooks:
  * - Normalizes function properties to "(fn)" placeholder
  * - Classifies properties and stores metadata for structural matching
  * - Enables matching custom hooks that return objects with changing values
  *
+ * **Known Issue**: Stored normalized value cannot use Value Equality Normalization
+ * for display. See STRUCTURAL_MATCHING_BUGS.md for details and planned fix.
+ *
  * @param guid - The unique identifier for the component instance
  * @param entry - Label entry containing label, index, and value
+ *
+ * @see {@link normalizeValue} for Structural Comparison Normalization details
+ * @see {@link resolveHookLabel} which compares against these normalized values
  */
 export function addLabelForGuid(guid: string, entry: LabelEntry): void {
   // Compute metadata from the ORIGINAL value (so functions are still detectable)
   const metadataOriginal = classifyObjectProperties(entry.value);
-  // Normalize value AFTER metadata extraction (functions replaced with placeholder for matching)
+
+  // Apply Structural Comparison Normalization for matching
+  // Functions → "(fn)" placeholder for matching, but keep original for display
   const normalizedValue = normalizeValue(entry.value);
 
   const processedEntry: LabelEntry = {
     ...entry,
-    value: normalizedValue,
+    value: entry.value, // Keep original for display (function identity preserved)
+    normalizedValue: normalizedValue, // Store normalized for comparison
     propertyMetadata: metadataOriginal ?? undefined,
   };
 
@@ -128,10 +144,20 @@ export function clearAllHookLabels(): void {
 /**
  * Resolve hook label using value-based matching with ordinal disambiguation.
  *
+ * **Normalization**: Uses Structural Comparison Normalization for matching
+ * - Current value → structurally normalized → compared to stored normalized values
+ * - Functions → `"(fn)"` for comparison
+ * - Enables structural matching when function instances change
+ *
+ * **Known Issues**:
+ * 1. Stored values use Structural Comparison Normalization, preventing Value Equality display
+ * 2. Structural matching bugs when object structure changes (see STRUCTURAL_MATCHING_BUGS.md)
+ * 3. Ordinal disambiguation fails for multiple hooks with identical structure
+ *
  * Matching strategy:
  * 1. Primitive value matching (existing logic for strings, numbers, booleans, etc.)
  * 2. Structural matching fallback for objects (Solution 8):
- *    - Normalize current anchor value
+ *    - Normalize current anchor value (Structural Comparison)
  *    - Try to match by object structure (same property keys)
  *    - If structure matches, update values and return label
  *
@@ -140,6 +166,10 @@ export function clearAllHookLabels(): void {
  * @param anchorValue - Current value of the hook state
  * @param allFiberAnchors - All stateful hooks in the fiber (labeled + unlabeled)
  * @returns A resolved label, a union of possible labels with 'unknown' (in source order), or 'unknown' if no match
+ *
+ * @see {@link normalizeValue} for Structural Comparison Normalization details
+ * @see {@link addLabelForGuid} which stores the normalized values we compare against
+ * @see STRUCTURAL_MATCHING_BUGS.md for detailed analysis of bugs in this function
  */
 export function resolveHookLabel(
   guid: string,
@@ -149,7 +179,8 @@ export function resolveHookLabel(
 ): string {
   const labels = getLabelsForGuid(guid);
 
-  // Build comparable string using normalization (functions -> "(fn)")
+  // Build comparable string using Structural Comparison Normalization (functions -> "(fn)")
+  // This matches against stored normalized values from addLabelForGuid
   const toComparableString = (v: unknown) => {
     return stringify(normalizeValue(v));
   };
@@ -163,8 +194,44 @@ export function resolveHookLabel(
   // Scenario 1: Unique value in fiber → direct match
   if (valueGroup.length === 1) {
     const match = labels.find((l) => {
-      return toComparableString(l.value) === anchorComparable;
+      // First check if comparable strings match (value equality)
+      // Compare normalized values to normalized anchor
+      const labelComparable = stringify(l.normalizedValue);
+      if (labelComparable !== anchorComparable) {
+        return false;
+      }
+
+      // FIX FOR BUG 2: Verify key order matches for objects
+      // stringify() sorts keys alphabetically, so objects with different key orders
+      // can have the same comparable string. We need to check the actual key order.
+      if (
+        typeof l.normalizedValue === "object" &&
+        l.normalizedValue !== null &&
+        typeof anchorValue === "object" &&
+        anchorValue !== null &&
+        !Array.isArray(l.normalizedValue) &&
+        !Array.isArray(anchorValue)
+      ) {
+        const storedKeys = Object.keys(
+          l.normalizedValue as Record<string, unknown>
+        );
+        const currentNormalized = normalizeValue(anchorValue);
+        const currentKeys = Object.keys(
+          currentNormalized as Record<string, unknown>
+        );
+
+        // Check if key order matches
+        if (
+          storedKeys.length !== currentKeys.length ||
+          !storedKeys.every((k, i) => k === currentKeys[i])
+        ) {
+          return false; // Key mismatch (different count or order)
+        }
+      }
+
+      return true; // Comparable strings match AND key order matches (if applicable)
     });
+
     if (match?.label) {
       return match.label;
     }
@@ -184,7 +251,8 @@ export function resolveHookLabel(
 
   // Scenarios 2 & 3: Duplicate values
   const labelsWithValue = labels.filter((l) => {
-    return toComparableString(l.value) === anchorComparable;
+    const labelComparable = stringify(l.normalizedValue);
+    return labelComparable === anchorComparable;
   });
 
   // Scenario 2: All occurrences labeled → ordinal match
@@ -274,8 +342,15 @@ function tryStructuralMatching(
   // Normalize current anchor value (may be primitive)
   const normalizedCurrent = normalizeValue(anchorValue);
 
-  // Try to match against each labeled entry that has metadata
+  // Try to match against each labeled entry that has metadata AND matches the anchor index
   for (const labelEntry of labels) {
+    // CRITICAL: Only match labels at the same index position
+    // This prevents structural matching from returning the wrong label when
+    // multiple hooks have identical structure (Bug 3 & 4)
+    if (labelEntry.index !== anchorIndex) {
+      continue;
+    }
+
     if (!labelEntry.propertyMetadata) {
       continue; // Skip non-object labels
     }
@@ -284,10 +359,13 @@ function tryStructuralMatching(
     // Check if the primitive matches any property value in the registered object
     if (
       (typeof normalizedCurrent !== "object" || normalizedCurrent === null) &&
-      typeof labelEntry.value === "object" &&
-      labelEntry.value !== null
+      typeof labelEntry.normalizedValue === "object" &&
+      labelEntry.normalizedValue !== null
     ) {
-      const labelObject = labelEntry.value as Record<string, unknown>;
+      const labelObject = labelEntry.normalizedValue as Record<
+        string,
+        unknown
+      >;
       const normalizedCurrentStr = stringify(normalizedCurrent);
 
       // Check if the primitive matches any property value in the registered object
@@ -298,7 +376,7 @@ function tryStructuralMatching(
       );
 
       if (matchingProperty) {
-        // Don't update labelEntry.value here - keep the object for future wrapper matches
+        // Don't update labelEntry.normalizedValue here - keep the object for future wrapper matches
         return labelEntry.label;
       }
 
@@ -310,11 +388,11 @@ function tryStructuralMatching(
     if (
       typeof normalizedCurrent === "object" &&
       normalizedCurrent !== null &&
-      typeof labelEntry.value === "object" &&
-      labelEntry.value !== null
+      typeof labelEntry.normalizedValue === "object" &&
+      labelEntry.normalizedValue !== null
     ) {
       const storedKeys = Object.keys(
-        labelEntry.value as Record<string, unknown>
+        labelEntry.normalizedValue as Record<string, unknown>
       );
       const currentKeys = Object.keys(
         normalizedCurrent as Record<string, unknown>
@@ -326,7 +404,8 @@ function tryStructuralMatching(
         })
       ) {
         // Keys match exactly in order → structural match
-        labelEntry.value = normalizedCurrent; // update to latest normalized value
+        // Update normalized value for future comparisons
+        labelEntry.normalizedValue = normalizedCurrent;
         return labelEntry.label;
       }
     }
@@ -352,15 +431,41 @@ function tryStructuralMatching(
     // Normalize the reconstructed object
     const normalizedReconstructed = normalizeValue(reconstructionResult.value);
 
-    // Match by structure
+    // CRITICAL FIX FOR BUG 1 & 2: Verify reconstructed structure matches CURRENT structure
+    // The reconstruction only includes properties from stored metadata (old structure).
+    // If the current value has more/fewer keys or different key order, reject the match.
+    if (
+      typeof normalizedReconstructed === "object" &&
+      normalizedReconstructed !== null &&
+      typeof normalizedCurrent === "object" &&
+      normalizedCurrent !== null
+    ) {
+      const reconstructedKeys = Object.keys(
+        normalizedReconstructed as Record<string, unknown>
+      );
+      const currentKeys = Object.keys(
+        normalizedCurrent as Record<string, unknown>
+      );
+
+      // Check if structures match (same keys in same order)
+      if (
+        reconstructedKeys.length !== currentKeys.length ||
+        !reconstructedKeys.every((k, i) => k === currentKeys[i])
+      ) {
+        // Structure mismatch - current value has evolved (Bug 1: different keys, Bug 2: different order)
+        continue; // Skip this label, try next one
+      }
+    }
+
+    // Match by structure (this should now always succeed given the check above)
     const matchResult = matchByStructure(
-      labelEntry.value as Record<string, unknown>,
+      labelEntry.normalizedValue as Record<string, unknown>,
       normalizedReconstructed as Record<string, unknown>
     );
 
     if (matchResult.success) {
-      // Structure matches! Update the label entry value for future matches
-      labelEntry.value = normalizedReconstructed;
+      // Structure matches! Update the normalized value for future matches
+      labelEntry.normalizedValue = normalizedReconstructed;
       return labelEntry.label;
     }
   }
