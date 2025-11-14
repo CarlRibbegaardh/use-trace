@@ -15,9 +15,9 @@ describe("DeepTreeComponent - Filter Mode: all", () => {
     // Configure filter mode to 'all'
     updateAutoTracerOptions({
       filterEmptyNodes: "all",
-      includeReconciled: false,
-      includeSkipped: false,
-      includeMount: false, // Filter out Mount nodes without tracking
+      includeReconciled: "never" as const,
+      includeSkipped: "never" as const,
+      includeMount: "never" as const, // Filter out Mount nodes without tracking
       enableAutoTracerInternalsLogging: false,
       includeNonTrackedBranches: false, // Exclude non-tracked branches to enable filtering
     });

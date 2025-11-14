@@ -143,7 +143,7 @@ describe("validateOptions", () => {
       const options = {
         enabled: true,
         maxFiberDepth: 50,
-        includeReconciled: true,
+        includeReconciled: "always" as const,
       };
 
       const result = validateAutoTracerOptions(options);
@@ -151,7 +151,7 @@ describe("validateOptions", () => {
       expect(result).toEqual({
         enabled: true,
         maxFiberDepth: 50,
-        includeReconciled: true,
+        includeReconciled: "always",
       });
     });
 
@@ -159,8 +159,8 @@ describe("validateOptions", () => {
       const options = {
         enabled: false,
         enableAutoTracerInternalsLogging: true,
-        includeReconciled: true,
-        includeSkipped: false,
+        includeReconciled: "always" as const,
+        includeSkipped: "never" as const,
         showFlags: true,
         maxFiberDepth: 200,
         includeNonTrackedBranches: true,
@@ -181,8 +181,8 @@ describe("validateOptions", () => {
       expect(result).toEqual({
         enabled: false,
         enableAutoTracerInternalsLogging: true,
-        includeReconciled: true,
-        includeSkipped: false,
+        includeReconciled: "always",
+        includeSkipped: "never",
         showFlags: true,
         maxFiberDepth: 200,
         includeNonTrackedBranches: true,
@@ -203,7 +203,7 @@ describe("validateOptions", () => {
       const options = {
         enabled: true,
         maxFiberDepth: -10, // Invalid, should be clamped to 20
-        includeReconciled: false,
+        includeReconciled: "never" as const,
       };
 
       const result = validateAutoTracerOptions(options);
@@ -211,14 +211,14 @@ describe("validateOptions", () => {
       expect(result).toEqual({
         enabled: true,
         maxFiberDepth: 20, // Should be clamped
-        includeReconciled: false,
+        includeReconciled: "never",
       });
     });
 
     it("should handle options with undefined maxFiberDepth", () => {
       const options = {
         enabled: true,
-        includeReconciled: true,
+        includeReconciled: "always" as const,
         // maxFiberDepth is undefined
       };
 
@@ -227,7 +227,7 @@ describe("validateOptions", () => {
       expect(result).toEqual({
         enabled: true,
         maxFiberDepth: 100, // Should default to 100
-        includeReconciled: true,
+        includeReconciled: "always",
       });
     });
 
@@ -263,7 +263,7 @@ describe("validateOptions", () => {
       const originalOptions = {
         enabled: true,
         maxFiberDepth: -10,
-        includeReconciled: true,
+        includeReconciled: "always" as const,
       };
 
       const optionsCopy = { ...originalOptions };

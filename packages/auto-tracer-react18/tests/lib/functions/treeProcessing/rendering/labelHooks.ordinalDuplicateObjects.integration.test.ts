@@ -24,8 +24,8 @@ describe("treeProcessing rendering - ordinal resolution for duplicate object str
   beforeEach(() => {
     Object.assign(traceOptions, {
       filterEmptyNodes: "none",
-      includeReconciled: true,
-      includeSkipped: true,
+      includeReconciled: "always" as const,
+      includeSkipped: "always" as const,
       enableAutoTracerInternalsLogging: false,
       includeNonTrackedBranches: true,
       detectIdenticalValueChanges: false,

@@ -15,8 +15,8 @@ describe("DeepTreeComponent - Filter Mode: none", () => {
     // Configure filter mode to 'none'
     updateAutoTracerOptions({
       filterEmptyNodes: "none",
-      includeReconciled: true,
-      includeSkipped: true,
+      includeReconciled: "always" as const,
+      includeSkipped: "always" as const,
       enableAutoTracerInternalsLogging: false,
       includeNonTrackedBranches: false, // Show non-tracked nodes but don't filter them
     });

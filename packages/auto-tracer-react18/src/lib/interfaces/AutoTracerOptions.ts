@@ -15,6 +15,24 @@ interface SkippedObjectProp {
 }
 
 /**
+ * Controls visibility of non-tracked components in the tree.
+ * Tracked components (those with useAutoTracer) are ALWAYS visible regardless of these settings.
+ *
+ * @example
+ * "never" - Never show non-tracked components of this type
+ * "forProps" - Show only if component has initial props or prop changes
+ * "forState" - Show only if component has initial state or state changes
+ * "forPropsOrState" - Show if component has props OR state (most common for curious users)
+ * "always" - Always show non-tracked components of this type (full debug mode)
+ */
+type NonTrackedComponentVisibility =
+  | "never"
+  | "forProps"
+  | "forState"
+  | "forPropsOrState"
+  | "always";
+
+/**
  * Configuration options for detecting and warning about identical value changes.
  * This helps identify performance anti-patterns where components re-render due to
  * new object/array/function references that contain identical values.
@@ -32,27 +50,68 @@ interface AutoTracerOptions {
   enabled?: boolean;
 
   /**
-   * Include reconciled components in the output.
+   * Control visibility of reconciled non-tracked components.
    * Reconciled components are those that React checked but didn't need to re-render.
-   * Set to true to see all components React evaluates, even if they didn't change.
-   * @default false
+   *
+   * Tracked components are ALWAYS visible regardless of this setting.
+   *
+   * - "never": Hide all reconciled non-tracked components
+   * - "forProps": Show only if has props changes
+   * - "forState": Show only if has state changes
+   * - "forPropsOrState": Show if has props OR state
+   * - "always": Show all reconciled components
+   *
+   * @default "never"
    */
-  includeReconciled?: boolean;
+  includeReconciled?: NonTrackedComponentVisibility;
 
   /**
-   * Include skipped components in the output.
+   * Control visibility of skipped non-tracked components.
    * Skipped components are those where React did internal work but didn't execute the component function.
-   * @default false
+   *
+   * Tracked components are ALWAYS visible regardless of this setting.
+   *
+   * - "never": Hide all skipped non-tracked components
+   * - "forProps": Show only if has props changes
+   * - "forState": Show only if has state changes
+   * - "forPropsOrState": Show if has props OR state
+   * - "always": Show all skipped components
+   *
+   * @default "never"
    */
-  includeSkipped?: boolean;
+  includeSkipped?: NonTrackedComponentVisibility;
 
   /**
-   * Include mount components in the output.
+   * Control visibility of mount non-tracked components.
    * Mount components are those rendering for the first time.
-   * Note: Tracked mount components (those with useAutoTracer) are always shown regardless of this setting.
-   * @default true
+   *
+   * Tracked components are ALWAYS visible regardless of this setting.
+   *
+   * - "never": Hide all mount non-tracked components
+   * - "forProps": Show only if has initial props
+   * - "forState": Show only if has initial state
+   * - "forPropsOrState": Show if has props OR state
+   * - "always": Show all mount components
+   *
+   * @default "never"
    */
-  includeMount?: boolean;
+  includeMount?: NonTrackedComponentVisibility;
+
+  /**
+   * Control visibility of rendered (update phase) non-tracked components.
+   * Rendered components are those re-rendering due to props/state changes.
+   *
+   * Tracked components are ALWAYS visible regardless of this setting.
+   *
+   * - "never": Hide all rendered non-tracked components
+   * - "forProps": Show only if has props changes
+   * - "forState": Show only if has state changes
+   * - "forPropsOrState": Show if has props OR state
+   * - "always": Show all rendered components
+   *
+   * @default "never"
+   */
+  includeRendered?: NonTrackedComponentVisibility;
 
   /**
    * Show React fiber flags in the output.
@@ -219,6 +278,7 @@ interface AutoTracerOptions {
 
 export type {
   AutoTracerOptions,
+  NonTrackedComponentVisibility,
   ThemeOptions,
   ColorOptions,
   SkippedObjectProp,

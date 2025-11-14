@@ -27,9 +27,9 @@ export function detectUpdatedComponents(root: unknown): void {
     const filterMode = traceOptions.filterEmptyNodes ?? "none";
     const filterFn = applyEmptyNodeFilter(filterMode);
     const filtered = filterFn(nodes, {
-      includeReconciled: traceOptions.includeReconciled ?? false,
-      includeSkipped: traceOptions.includeSkipped ?? false,
-      includeMount: traceOptions.includeMount ?? true,
+      includeReconciled: traceOptions.includeReconciled ?? "never",
+      includeSkipped: traceOptions.includeSkipped ?? "never",
+      includeMount: traceOptions.includeMount ?? "never",
     });
     if (shouldLogTiming) {
       const filterDuration = performance.now() - filterStartTime;

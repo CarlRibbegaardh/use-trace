@@ -25,9 +25,10 @@ function createNode(overrides: Partial<TreeNode> = {}): TreeNode {
 
 describe("applyEmptyNodeFilter", () => {
   const defaultOptions: EmptyNodeOptions = {
-    includeReconciled: true,
-    includeSkipped: true,
-    includeMount: true,
+    includeReconciled: "always" as const,
+    includeSkipped: "always" as const,
+    includeMount: "always" as const,
+    includeRendered: "forPropsOrState" as const,
   };
 
   describe("Mode: 'none'", () => {
@@ -209,9 +210,10 @@ describe("applyEmptyNodeFilter", () => {
       ];
 
       const options: EmptyNodeOptions = {
-        includeReconciled: false,
-        includeSkipped: true,
-        includeMount: true,
+        includeReconciled: "never" as const,
+        includeSkipped: "always" as const,
+        includeMount: "always" as const,
+        includeRendered: "forPropsOrState" as const,
       };
 
       const filterFn = applyEmptyNodeFilter("first");
@@ -230,9 +232,10 @@ describe("applyEmptyNodeFilter", () => {
       ];
 
       const options: EmptyNodeOptions = {
-        includeReconciled: true,
-        includeSkipped: false,
-        includeMount: true,
+        includeReconciled: "always" as const,
+        includeSkipped: "never" as const,
+        includeMount: "always" as const,
+        includeRendered: "forPropsOrState" as const,
       };
 
       const filterFn = applyEmptyNodeFilter("all");

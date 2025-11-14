@@ -21,9 +21,10 @@ describe("filterFirstEmptyNodes", () => {
   });
 
   const defaultOptions: EmptyNodeOptions = {
-    includeReconciled: true,
-    includeSkipped: true,
-    includeMount: true,
+    includeReconciled: "always" as const,
+    includeSkipped: "always" as const,
+    includeMount: "always" as const,
+    includeRendered: "forPropsOrState" as const,
   };
 
   describe("Empty array edge cases", () => {
@@ -115,20 +116,22 @@ describe("filterFirstEmptyNodes", () => {
       expect(result[1]).toBe(nodes[3]); // Non-empty node unchanged
     });
 
-    it("should handle plural marker text correctly", () => {
+    it('should handle plural marker text correctly', () => {
       const nodes = [
         createNode({ depth: 10 }), // Empty
         createNode({ depth: 11 }), // Empty
         createNode({ depth: 12 }), // Empty
         createNode({ depth: 13 }), // Empty
         createNode({ depth: 14 }), // Empty
+        // Warnings now respect visibility, so this node is also empty with default "never" setting
         createNode({ depth: 15, hasIdenticalValueWarning: true }),
       ];
 
       const result = filterFirstEmptyNodes(nodes, defaultOptions);
 
-      expect(result).toHaveLength(2);
-      expect(result[0]!.componentName).toBe("... (5 levels collapsed)");
+      // All 6 nodes are now empty, so they should all be collapsed into one marker
+      expect(result).toHaveLength(1);
+      expect(result[0]!.componentName).toBe("... (6 levels collapsed)");
       expect(result[0]!.depth).toBe(10);
     });
   });
@@ -199,9 +202,9 @@ describe("filterFirstEmptyNodes", () => {
       ];
 
       const options: EmptyNodeOptions = {
-        includeReconciled: false,
-        includeSkipped: true,
-        includeMount: true,
+        includeReconciled: "never" as const,
+        includeSkipped: "always" as const,
+        includeMount: "always" as const,
       };
 
       const result = filterFirstEmptyNodes(nodes, options);
@@ -230,9 +233,10 @@ describe("filterFirstEmptyNodes", () => {
       ];
 
       const options: EmptyNodeOptions = {
-        includeReconciled: true,
-        includeSkipped: false,
-        includeMount: true,
+        includeReconciled: "always" as const,
+        includeSkipped: "never" as const,
+        includeMount: "always" as const,
+        includeRendered: "forPropsOrState" as const,
       };
 
       const result = filterFirstEmptyNodes(nodes, options);

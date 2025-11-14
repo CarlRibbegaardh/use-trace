@@ -29,8 +29,8 @@ describe("buildTreeNode - useState label resolution integration", () => {
     // Reset to default settings
     Object.assign(traceOptions, {
       filterEmptyNodes: "none",
-      includeReconciled: false,
-      includeSkipped: false,
+      includeReconciled: "never" as const,
+      includeSkipped: "never" as const,
       enableAutoTracerInternalsLogging: false,
       includeNonTrackedBranches: true,
       detectIdenticalValueChanges: false,

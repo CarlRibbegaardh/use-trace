@@ -21,9 +21,10 @@ describe("filterAllEmptyNodes", () => {
   });
 
   const defaultOptions: EmptyNodeOptions = {
-    includeReconciled: true,
-    includeSkipped: true,
-    includeMount: true,
+    includeReconciled: "always" as const,
+    includeSkipped: "always" as const,
+    includeMount: "always" as const,
+    includeRendered: "forPropsOrState" as const,
   };
 
   describe("Empty array edge cases", () => {
@@ -293,9 +294,10 @@ describe("filterAllEmptyNodes", () => {
       ];
 
       const options: EmptyNodeOptions = {
-        includeReconciled: false,
-        includeSkipped: true,
-        includeMount: true,
+        includeReconciled: "never" as const,
+        includeSkipped: "always" as const,
+        includeMount: "always" as const,
+        includeRendered: "forPropsOrState" as const,
       };
 
       const result = filterAllEmptyNodes(nodes, options);
@@ -316,9 +318,9 @@ describe("filterAllEmptyNodes", () => {
       ];
 
       const options: EmptyNodeOptions = {
-        includeReconciled: true,
-        includeSkipped: true,
-        includeMount: true,
+        includeReconciled: "always" as const,
+        includeSkipped: "always" as const,
+        includeMount: "always" as const,
       };
 
       const result = filterAllEmptyNodes(nodes, options);
@@ -339,9 +341,10 @@ describe("filterAllEmptyNodes", () => {
       ];
 
       const options: EmptyNodeOptions = {
-        includeReconciled: true,
-        includeSkipped: false,
-        includeMount: true,
+        includeReconciled: "always" as const,
+        includeSkipped: "never" as const,
+        includeMount: "always" as const,
+        includeRendered: "forPropsOrState" as const,
       };
 
       const result = filterAllEmptyNodes(nodes, options);

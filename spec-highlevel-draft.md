@@ -638,34 +638,305 @@ const MyComponent: React.FC = () => {
 
 ---
 
+## Component Visibility Settings
+
+### Overview
+
+The auto-tracer provides fine-grained control over which components appear in the console tree output. **Tracked components** (marked with ⚡) are **always visible** regardless of these settings. These visibility options control **non-tracked components only**.
+
+### Visibility Type Definition
+
+```typescript
+/**
+ * Controls visibility of non-tracked components in the tree.
+ * Tracked components are ALWAYS visible regardless of these settings.
+ */
+type NonTrackedComponentVisibility =
+  | "never"           // Never show, even if has props/state
+  | "forProps"        // Show only if has initial props or prop changes
+  | "forState"        // Show only if has initial state or state changes
+  | "forPropsOrState" // Show if has any props or state
+  | "always";         // Always show
+```
+
+### Visibility Options
+
+Four settings control different component lifecycle events:
+
+- **`includeReconciled`**: Controls components in "Reconciled" state (React compared but didn't update)
+- **`includeSkipped`**: Controls components that were skipped during reconciliation
+- **`includeMount`**: Controls components mounting for the first time
+- **`includeRendered`**: Controls components re-rendering (update phase)
+
+### Default Values
+
+```typescript
+{
+  includeReconciled: "never",  // Hide reconciled non-tracked components
+  includeSkipped: "never",     // Hide skipped non-tracked components
+  includeMount: "never",       // Hide mount of non-tracked components
+  includeRendered: "never",    // Hide renders of non-tracked components
+}
+```
+
+**Result**: Out of the box, users see **only their tracked components**. This provides a clean, focused output showing only the components explicitly marked for tracking.
+
+### User Personas and Recommended Settings
+
+#### Persona 1: "Just My Code" (Default - Most Users)
+
+**Goal**: Only see tracked components, everything else is noise
+
+**Settings**:
+```typescript
+{
+  includeReconciled: "never",
+  includeSkipped: "never",
+  includeMount: "never",
+  includeRendered: "never",
+}
+```
+
+**Example Output**:
+```
+└─┐ ... (21 levels collapsed)
+  ├─ [TodoList] Rendering ⚡
+  │   State change filteredTodos: []→[{...}]
+  │   State change loading: true → false
+  └─┐ ... (14 levels collapsed)
+    ├─ [TodoItem] Mount ⚡
+    │   Initial state dispatch: (fn:3)
+    │   Initial prop todo: {...}
+```
+
+Only tracked components visible, all framework/library components hidden.
+
+#### Persona 2: "Show Me Interesting Stuff" (Curious Users)
+
+**Goal**: See tracked components plus non-tracked components that have meaningful changes
+
+**Settings**:
+```typescript
+{
+  includeReconciled: "forPropsOrState",
+  includeSkipped: "forPropsOrState",
+  includeMount: "forPropsOrState",
+  includeRendered: "forPropsOrState",
+}
+```
+
+**Example Output**:
+```
+└─┐ ... (21 levels collapsed)
+  ├─ [TodoList] Rendering ⚡
+  │   State change filteredTodos: []→[{...}]
+  │   State change loading: true → false
+  └─┐ ... (1 levels collapsed)
+    ├─ [Styled(div)] Rendering
+    │   Prop change sx: {...}→{}
+    └─┐
+      ├─ [Insertion6] Rendering
+      │   Prop change serialized: {...}→{...}
+      ├─ [div] Rendering
+      │   Prop change className: MuiBox-root css-qd5mg9→MuiBox-root css-0
+      └─┐
+        ├─ [Box4] Mount
+        │   Initial prop display: flex
+        │   Initial prop justifyContent: space-between
+        ...
+        └─┐ ... (3 levels collapsed)
+          ├─ [TodoItem] Mount ⚡
+```
+
+Shows tracked components plus library components that receive prop/state changes.
+
+#### Persona 3: "I Want Everything" (Deep Debuggers)
+
+**Goal**: See the complete React fiber tree structure, accept performance impact
+
+**Settings**:
+```typescript
+{
+  includeReconciled: "always",
+  includeSkipped: "always",
+  includeMount: "always",
+  includeRendered: "always",
+}
+```
+
+**Example Output**:
+```
+├─ [App] Mount
+└─┐
+  ├─ [ThemeProvider] Mount
+  └─┐
+    ├─ [Unknown] Mount
+    └─┐
+      ├─ [CssBaseline] Mount
+      ├─ [Provider] Mount
+      └─┐
+        ├─ [Unknown] Mount
+        └─┐
+          ├─ [RouterProvider] Mount
+          └─┐
+            ├─ [Layout] Mount
+            └─┐
+              ├─ [Styled(div)] Mount
+              └─┐
+                ├─ [div] Mount
+                └─┐
+                  ├─ [Header] Mount
+                  └─┐
+                    ├─ [Navigation] Mount
+                    └─┐
+                      ├─ [nav] Mount
+                      └─┐
+                        ├─ [MyTrackedComponent] Mount ⚡
+                        │   Initial state count: 0
+```
+
+Full tree visible, helpful for understanding React internals and reconciliation.
+
+### Visibility Filter Values Explained
+
+#### `"never"`
+
+Hides the component entirely, even if it has props/state changes.
+
+**Use case**: You never want to see this category of events, even in ancestor chains.
+
+**Example**: Hide all reconciled events:
+```typescript
+{ includeReconciled: "never" }
+```
+
+#### `"forProps"`
+
+Shows the component only if it has:
+- Initial props (on mount)
+- Prop changes (on update)
+
+**Use case**: Track data flow through props.
+
+**Example with `includeRendered: "forProps"`**:
+```
+├─ [TodoList] Rendering ⚡       # Tracked, always shown
+└─┐
+  ├─ [Styled(div)] Rendering    # Shown: has prop change
+  │   Prop change sx: {...}→{}
+  └─┐ ... (5 levels collapsed)  # Hidden: no props
+    ├─ [TodoItem] Mount ⚡       # Tracked, always shown
+```
+
+#### `"forState"`
+
+Shows the component only if it has:
+- Initial state (on mount)
+- State changes (on update)
+
+**Use case**: Track local state management in non-tracked components.
+
+**Example with `includeRendered: "forState"`**:
+```
+├─ [TodoList] Rendering ⚡           # Tracked, always shown
+└─┐ ... (10 levels collapsed)       # Hidden: no state
+  ├─ [InternalCounter] Rendering    # Shown: has state change
+  │   State change count: 0 → 1
+  └─┐ ... (3 levels collapsed)
+    ├─ [TodoItem] Mount ⚡           # Tracked, always shown
+```
+
+#### `"forPropsOrState"`
+
+Shows the component if it has any of:
+- Initial props or state (on mount)
+- Prop or state changes (on update)
+
+**Use case**: Most common setting for curious users - show anything with meaningful data.
+
+**Example with `includeRendered: "forPropsOrState"`**:
+```
+├─ [TodoList] Rendering ⚡           # Tracked, always shown
+└─┐
+  ├─ [Styled(div)] Rendering        # Shown: has props
+  │   Prop change sx: {...}→{}
+  ├─ [InternalCounter] Rendering    # Shown: has state
+  │   State change count: 0 → 1
+  └─┐ ... (2 levels collapsed)      # Hidden: no props/state
+    ├─ [TodoItem] Mount ⚡           # Tracked, always shown
+```
+
+#### `"always"`
+
+Always shows the component regardless of content.
+
+**Use case**: Full visibility mode for deep debugging.
+
+### Interaction with `filterEmptyNodes`
+
+The visibility settings and `filterEmptyNodes` work together:
+
+1. **Visibility filtering** (first pass): Determines which components appear based on tracking status and content
+2. **Empty node collapsing** (second pass): Collapses sequences of nodes without changes
+
+**Example with both**:
+```typescript
+{
+  includeRendered: "forPropsOrState",  // Show only non-tracked with props/state
+  filterEmptyNodes: "all",              // Collapse empty sequences
+}
+```
+
+**Result**:
+- Non-tracked components without props/state are filtered by visibility
+- Remaining nodes without changes are collapsed by `filterEmptyNodes`
+- Double-filtering creates the most compact output
+
+### Empty Node Definition (Updated)
+
+An **empty node** is a component that:
+
+- Has no state changes
+- Has no prop changes
+- Has no component logs
+- Is not tracked (no `trackingGUID`)
+- Has no identical value warnings
+- Is hidden by visibility settings (when `includeReconciled/Skipped/Mount/Rendered` is not `"always"`)
+
+---
+
 ## Tree Rendering and Filter Modes
 
 ### Filter Modes Overview
 
-The `filterEmptyNodes` option controls how "empty" nodes are displayed in the console tree output. An **empty node** is a component that renders without meaningful content:
-
-- No state changes
-- No prop changes
-- No component logs
-- Not tracked (no `trackingGUID`)
-- No identical value warnings
-- Optionally hidden by visibility settings (Reconciled/Skipped when those flags are disabled)
+The `filterEmptyNodes` option controls how "empty" nodes are displayed in the console tree output after visibility filtering has been applied.
 
 ### Filter Mode: `none` (Default)
 
 **Behavior:**
 
 - No filtering applied
-- All nodes appear in the tree regardless of whether they have content
+- All nodes that pass visibility settings appear in the tree
 - Identity function with zero performance overhead
 
 **When to use:**
 
-- Need complete visibility into the entire component hierarchy
-- Debugging React's reconciliation process
-- Understanding component structure and nesting
+- With default visibility settings (`"never"`): See only tracked components with full tree structure preserved
+- With `"always"` visibility: See complete React fiber tree
+- When you want to see the exact structure without collapsing
 
-**Example Output:**
+**Example Output (with default visibility `"never"`):**
+
+```
+└─┐ ... (21 levels collapsed)
+  ├─ [MyTrackedComponent] Mount ⚡
+  │   Initial state count: 0
+  └─┐ ... (14 levels collapsed)
+    ├─ [AnotherTrackedComponent] Rendering ⚡
+    │   State change value: 0 → 5
+```
+
+**Example Output (with visibility set to `"always"`):**
 
 ```
 ├─ [App] Mount
@@ -697,6 +968,8 @@ The `filterEmptyNodes` option controls how "empty" nodes are displayed in the co
                         │   Initial state count: 0
 ```
 
+**Note:** The `filterEmptyNodes` setting works **after** visibility filtering. With default visibility (`"never"`), most non-tracked components are already hidden, so `filterEmptyNodes: "none"` simply preserves the depth markers.
+
 ### Filter Mode: `first`
 
 **Behavior:**
@@ -708,11 +981,11 @@ The `filterEmptyNodes` option controls how "empty" nodes are displayed in the co
 
 **When to use:**
 
-- Want to clean up top-level wrapper components (providers, themes, routers)
+- With `"always"` visibility: Clean up top-level wrapper components (providers, themes, routers)
 - Still need full visibility deeper in the tree
 - Balanced approach between clarity and completeness
 
-**Example Output:**
+**Example Output (with visibility set to `"always"`):**
 
 ```
 └─┐ ... (21 levels collapsed)
@@ -734,7 +1007,7 @@ The `filterEmptyNodes` option controls how "empty" nodes are displayed in the co
               │   State change value: 0 → 5
 ```
 
-**Note:** The marker `... (21 levels collapsed)` indicates the tracked component is 21 levels deeper than the root. With `first` mode, the noise reappears deeper in the tree.
+**Note:** With default visibility (`"never"`), this mode has minimal impact since non-tracked components are already filtered. The `first` mode is most useful when visibility is set to `"always"` or `"forPropsOrState"` and you want to clean up the initial wrapper noise.
 
 ### Filter Mode: `all`
 
@@ -748,24 +1021,41 @@ The `filterEmptyNodes` option controls how "empty" nodes are displayed in the co
 **When to use:**
 
 - Maximum clarity - only show components with actual changes or logs
-- Production debugging where you only care about meaningful renders
+- Works well with both default visibility (`"never"`) and `"forPropsOrState"`
 - Reducing console noise in large applications
 
-**Example Output:**
+**Example Output (with default visibility `"never"`):**
 
 ```
 └─┐ ... (21 levels collapsed)
   ├─ [MyTrackedComponent] Mount ⚡
   │   Initial state count: 0
-  └─┐ ... (3 levels collapsed)
+  └─┐ ... (14 levels collapsed)
     ├─ [DeepComponent] Rendering ⚡
     │   State change value: 0 → 5
-    └─┐ ... (5 levels collapsed)
+    └─┐ ... (8 levels collapsed)
       ├─ [FinalComponent] Rendering ⚡
       │   Prop change title: Hello → World
 ```
 
-**Note:** All sequences of empty nodes (Unknown, HTML elements, wrappers without changes) are collapsed, showing the depth difference between visible nodes.
+**Example Output (with visibility set to `"forPropsOrState"`):**
+
+```
+└─┐ ... (21 levels collapsed)
+  ├─ [MyTrackedComponent] Mount ⚡
+  │   Initial state count: 0
+  └─┐ ... (1 levels collapsed)
+    ├─ [Styled(div)] Rendering
+    │   Prop change sx: {...}→{}
+    └─┐ ... (2 levels collapsed)
+      ├─ [Box4] Mount
+      │   Initial prop display: flex
+      └─┐ ... (3 levels collapsed)
+        ├─ [DeepComponent] Rendering ⚡
+        │   State change value: 0 → 5
+```
+
+**Note:** With default visibility, `all` mode provides the cleanest output by collapsing all non-tracked components between your tracked components. With `"forPropsOrState"` visibility, it collapses only the nodes without props/state changes.
 
 ---
 
@@ -877,14 +1167,16 @@ When a node is deeper than the previous node, connecting lines show the hierarch
 
 When a marker is present (with `filterEmptyNodes: 'first'` or `'all'`), intermediate connectors are skipped since the marker already represents those levels:
 
-**With `filterEmptyNodes: 'all' or 'first'` and `includeMount: false`:**
+**With default visibility (`"never"`) and `filterEmptyNodes: 'all'`:**
 
 ```
-└─┐ ... (10 levels collapsed)
+└─┐ ... (21 levels collapsed)
   ├─ [DeepComponent] Mount ⚡
+  └─┐ ... (10 levels collapsed)
+    ├─ [AnotherTracked] Rendering ⚡
 ```
 
-**With `filterEmptyNodes: 'all'` and `includeMount: true`:**
+**With visibility set to `"always"` and `filterEmptyNodes: 'all'`:**
 
 ```
 └─┐ ... (1 levels collapsed)
@@ -899,9 +1191,9 @@ When a marker is present (with `filterEmptyNodes: 'first'` or `'all'`), intermed
           ├─ [DeepComponent] Mount ⚡
 ```
 
-**Note:** With `'all'` mode, empty nodes between every visible node are collapsed. With `includeMount: true`, Mount nodes remain visible but empty nodes between them show as "1 levels collapsed" markers.
+**Note:** With `'all'` mode and `"always"` visibility, empty nodes between every visible node are collapsed. Mount nodes remain visible but empty nodes between them show as "1 levels collapsed" markers.
 
-**Without filtering (filterEmptyNodes: 'none') - same structure:**
+**Without filtering (filterEmptyNodes: 'none') and visibility `"always"` - same structure:**
 
 ```
 └─┐
@@ -961,4 +1253,97 @@ With `enableAutoTracerInternalsLogging: true`, markers show the absolute depth a
 
 ---
 
+## Recommended Settings Combinations
+
+### Default Configuration (Out of the Box)
+
+```typescript
+{
+  includeReconciled: "never",
+  includeSkipped: "never",
+  includeMount: "never",
+  includeRendered: "never",
+  filterEmptyNodes: "none",
+}
+```
+
+**Result**: Only tracked components visible with depth markers showing their position in the tree.
+
+**Best for**: Most users who only care about their own components.
+
+### Curious Developer Configuration
+
+```typescript
+{
+  includeReconciled: "forPropsOrState",
+  includeSkipped: "forPropsOrState",
+  includeMount: "forPropsOrState",
+  includeRendered: "forPropsOrState",
+  filterEmptyNodes: "all",
+}
+```
+
+**Result**: Tracked components plus non-tracked components with props/state changes, with all empty nodes collapsed.
+
+**Best for**: Understanding how your tracked components interact with library/framework components.
+
+### Full Debug Configuration
+
+```typescript
+{
+  includeReconciled: "always",
+  includeSkipped: "always",
+  includeMount: "always",
+  includeRendered: "always",
+  filterEmptyNodes: "none",
+}
+```
+
+**Result**: Complete React fiber tree with full structural detail.
+
+**Best for**: Deep debugging, understanding React's reconciliation process, or investigating unexpected behavior.
+
+### Minimalist Configuration
+
+```typescript
+{
+  includeReconciled: "never",
+  includeSkipped: "never",
+  includeMount: "never",
+  includeRendered: "never",
+  filterEmptyNodes: "all",
+}
+```
+
+**Result**: Only tracked components with maximum collapse of intermediate nodes.
+
+**Best for**: Production debugging or applications with very deep component trees.
+
+---
+
+## Migration Guide
+
+### Breaking Change in v2.0
+
+Prior to v2.0, the default visibility settings were effectively `"always"`, showing all components in the tree. Starting with v2.0, the defaults are `"never"`, showing only tracked components.
+
+**To restore previous behavior**, use:
+
+```typescript
+const autoTracer = new AutoTracer({
+  includeReconciled: "always",
+  includeSkipped: "always",
+  includeMount: "always",
+  includeRendered: "always",
+});
+```
+
+**Why this change?**
+
+User research showed that most developers are only interested in their own tracked components. Library and framework components (Material-UI, React Router, etc.) create significant noise in the output, making it harder to focus on application-specific behavior. The new defaults provide a cleaner, more focused debugging experience.
+
+---
+
 ## End of Specification
+
+

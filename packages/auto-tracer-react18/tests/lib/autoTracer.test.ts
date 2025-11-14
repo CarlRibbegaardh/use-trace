@@ -49,8 +49,8 @@ vi.mock("@src/lib/functions/deepMerge.js", () => {
       const defaults = {
         enabled: true,
         enableAutoTracerInternalsLogging: false,
-        includeReconciled: false,
-        includeSkipped: false,
+        includeReconciled: "never" as const,
+        includeSkipped: "never" as const,
         showFlags: false,
         maxFiberDepth: 100,
         detectIdenticalValueChanges: true,
@@ -68,8 +68,8 @@ vi.mock("@src/lib/types/defaultSettings.js", () => {
     defaultAutoTracerOptions: {
       enabled: true,
       enableAutoTracerInternalsLogging: false,
-      includeReconciled: false,
-      includeSkipped: false,
+      includeReconciled: "never" as const,
+      includeSkipped: "never" as const,
       showFlags: false,
       maxFiberDepth: 100,
       detectIdenticalValueChanges: true,
@@ -217,7 +217,7 @@ describe("autoTracer", () => {
       mockInstallRenderHook.mockReturnValue(vi.fn());
 
       const options = {
-        includeReconciled: true,
+        includeReconciled: "always" as const,
         maxFiberDepth: 200,
       };
 
@@ -301,7 +301,7 @@ describe("autoTracer", () => {
   describe("updateAutoTracerOptions", () => {
     it("should update options", async () => {
       const newOptions = {
-        includeReconciled: true,
+        includeReconciled: "always" as const,
         maxFiberDepth: 150,
       };
 

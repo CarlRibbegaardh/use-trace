@@ -67,8 +67,8 @@ vi.mock("@src/lib/types/globalState.js", () => {
     traceOptions: {
       maxFiberDepth: 1000,
       includeNonTrackedBranches: true,
-      includeReconciled: true,
-      includeSkipped: true,
+      includeReconciled: "always" as const,
+      includeSkipped: "always" as const,
       showFlags: false,
     },
   };
@@ -119,8 +119,8 @@ describe("walkFiberForUpdates", () => {
     const { traceOptions } = await import("@src/lib/types/globalState.js");
     traceOptions.maxFiberDepth = 1000;
     traceOptions.includeNonTrackedBranches = true;
-    traceOptions.includeReconciled = true;
-    traceOptions.includeSkipped = true;
+    traceOptions.includeReconciled = "always" as const;
+    traceOptions.includeSkipped = "always" as const;
     traceOptions.showFlags = false;
   });
 
@@ -338,7 +338,7 @@ describe("walkFiberForUpdates", () => {
         "@src/lib/functions/walkFiberForUpdates.js"
       );
 
-      traceOptions.includeReconciled = false;
+      traceOptions.includeReconciled = "never" as const;
 
       const fiber = {
         elementType: () => {
@@ -367,7 +367,7 @@ describe("walkFiberForUpdates", () => {
         await import("@src/lib/functions/reactFiberFlags.js")
       );
 
-      traceOptions.includeSkipped = false;
+      traceOptions.includeSkipped = "never" as const;
       hasRenderWork.mockReturnValue(false);
 
       const fiber = {

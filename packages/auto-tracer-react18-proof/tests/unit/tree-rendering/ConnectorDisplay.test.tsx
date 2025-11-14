@@ -26,8 +26,8 @@ describe("DeepTreeComponent - Connector Display", () => {
   it("should show tree connectors with filter mode none", () => {
     updateAutoTracerOptions({
       filterEmptyNodes: "none",
-      includeReconciled: true,
-      includeSkipped: true,
+      includeReconciled: "always" as const,
+      includeSkipped: "always" as const,
       enableAutoTracerInternalsLogging: false,
       includeNonTrackedBranches: false, // Show non-tracked nodes
     });
@@ -51,9 +51,9 @@ describe("DeepTreeComponent - Connector Display", () => {
   it("should skip intermediate connectors when marker is present", () => {
     updateAutoTracerOptions({
       filterEmptyNodes: "all",
-      includeReconciled: false,
-      includeSkipped: false,
-      includeMount: false, // Filter out Mount nodes without tracking
+      includeReconciled: "never" as const,
+      includeSkipped: "never" as const,
+      includeMount: "never" as const, // Filter out Mount nodes without tracking
       enableAutoTracerInternalsLogging: false,
       includeNonTrackedBranches: false, // Exclude non-tracked branches to enable filtering
     });
@@ -79,9 +79,9 @@ describe("DeepTreeComponent - Connector Display", () => {
   it("should maintain depth transitions with proper connectors", () => {
     updateAutoTracerOptions({
       filterEmptyNodes: "first",
-      includeReconciled: false,
-      includeSkipped: false,
-      includeMount: false, // Filter out Mount nodes without tracking
+      includeReconciled: "never" as const,
+      includeSkipped: "never" as const,
+      includeMount: "never" as const, // Filter out Mount nodes without tracking
       enableAutoTracerInternalsLogging: false,
       includeNonTrackedBranches: false, // Exclude non-tracked branches to enable filtering
     });
@@ -127,9 +127,9 @@ describe("DeepTreeComponent - Connector Display", () => {
   it("should show consistent connector patterns in debug mode", () => {
     updateAutoTracerOptions({
       filterEmptyNodes: "all",
-      includeReconciled: false,
-      includeSkipped: false,
-      includeMount: false, // Filter out Mount nodes without tracking
+      includeReconciled: "never" as const,
+      includeSkipped: "never" as const,
+      includeMount: "never" as const, // Filter out Mount nodes without tracking
       enableAutoTracerInternalsLogging: true, // Debug mode
       includeNonTrackedBranches: false, // Exclude non-tracked branches to enable filtering
     });
@@ -155,9 +155,9 @@ describe("DeepTreeComponent - Connector Display", () => {
   it("should handle multiple tracked components with proper spacing", () => {
     updateAutoTracerOptions({
       filterEmptyNodes: "all",
-      includeReconciled: false,
-      includeSkipped: false,
-      includeMount: false, // Filter out Mount nodes without tracking
+      includeReconciled: "never" as const,
+      includeSkipped: "never" as const,
+      includeMount: "never" as const, // Filter out Mount nodes without tracking
       enableAutoTracerInternalsLogging: false,
       includeNonTrackedBranches: false, // Exclude non-tracked branches to enable filtering
     });

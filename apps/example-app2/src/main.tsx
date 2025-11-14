@@ -4,9 +4,9 @@ import "./index.css";
 import { autoTracer } from "@auto-tracer/react18";
 autoTracer({
   enabled: true,
-  includeReconciled: true,
+  includeReconciled: "always" as const,
   showFlags: false,
-  includeSkipped: true,
+  includeSkipped: "always" as const,
   enableAutoTracerInternalsLogging: true,
   maxFiberDepth: 2,
   includeNonTrackedBranches: true,

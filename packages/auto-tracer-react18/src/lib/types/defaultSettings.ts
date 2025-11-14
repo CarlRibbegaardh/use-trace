@@ -6,17 +6,17 @@ import type { AutoTracerOptions } from "../interfaces/AutoTracerOptions.js";
  */
 export const defaultAutoTracerOptions: AutoTracerOptions = {
   enabled: true, // Enable the autoTracer by default
-  includeReconciled: false,
-  includeSkipped: false,
-  includeMount: true, // Include mount components by default
-  showFlags: false,
-  enableAutoTracerInternalsLogging: false,
-  maxFiberDepth: 100, // Maximum fiber traversal depth to prevent stack overflow
-  includeNonTrackedBranches: false, // Only show tracked components and their parent chain by default
-  skippedObjectProps: [], // Skip specific props for specific object types
-  // Simple boolean per spec: enabled by default
   detectIdenticalValueChanges: true,
-  filterEmptyNodes: "none", // No empty node filtering by default (backward compatible)
+  includeReconciled: "never",
+  includeSkipped: "never",
+  includeMount: "never",
+  includeRendered: "never",
+  filterEmptyNodes: "all", // No empty node filtering by default (backward compatible)
+  includeNonTrackedBranches: false, // Only show tracked components and their parent chain by default
+  maxFiberDepth: 300, // Maximum fiber traversal depth to prevent stack overflow
+  skippedObjectProps: [], // Skip specific props for specific object types
+  enableAutoTracerInternalsLogging: false,
+  showFlags: false,
 
   // Default styling (matching comments in AutoTracerOptions.ts)
   colors: {

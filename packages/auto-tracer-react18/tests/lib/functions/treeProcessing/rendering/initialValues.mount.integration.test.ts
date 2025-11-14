@@ -33,8 +33,8 @@ describe("treeProcessing rendering - initial values on mount", () => {
     // Reset to default-ish settings relevant for output
     Object.assign(traceOptions, {
       filterEmptyNodes: "none",
-      includeReconciled: true,
-      includeSkipped: true,
+      includeReconciled: "always" as const,
+      includeSkipped: "always" as const,
       enableAutoTracerInternalsLogging: false,
       includeNonTrackedBranches: true,
       detectIdenticalValueChanges: false,

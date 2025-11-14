@@ -30,9 +30,9 @@ describe("DeepTreeComponent - Marker Calculation", () => {
     // Configure standard mode
     updateAutoTracerOptions({
       filterEmptyNodes: "all",
-      includeReconciled: false,
-      includeSkipped: false,
-      includeMount: false, // Filter out Mount nodes without tracking
+      includeReconciled: "never" as const,
+      includeSkipped: "never" as const,
+      includeMount: "never" as const, // Filter out Mount nodes without tracking
       enableAutoTracerInternalsLogging: false,
       includeNonTrackedBranches: false, // Exclude non-tracked branches to enable filtering
     });
@@ -61,9 +61,9 @@ describe("DeepTreeComponent - Marker Calculation", () => {
     // Configure debug mode
     updateAutoTracerOptions({
       filterEmptyNodes: "all",
-      includeReconciled: false,
-      includeSkipped: false,
-      includeMount: false, // Filter out Mount nodes without tracking
+      includeReconciled: "never" as const,
+      includeSkipped: "never" as const,
+      includeMount: "never" as const, // Filter out Mount nodes without tracking
       enableAutoTracerInternalsLogging: true, // Enable debug mode
       includeNonTrackedBranches: false, // Exclude non-tracked branches to enable filtering
     });
@@ -100,9 +100,9 @@ describe("DeepTreeComponent - Marker Calculation", () => {
   it("should always use plural 'levels' in standard mode", () => {
     updateAutoTracerOptions({
       filterEmptyNodes: "all",
-      includeReconciled: false,
-      includeSkipped: false,
-      includeMount: false, // Filter out Mount nodes without tracking
+      includeReconciled: "never" as const,
+      includeSkipped: "never" as const,
+      includeMount: "never" as const, // Filter out Mount nodes without tracking
       enableAutoTracerInternalsLogging: false,
       includeNonTrackedBranches: false, // Exclude non-tracked branches to enable filtering
     });
@@ -129,9 +129,9 @@ describe("DeepTreeComponent - Marker Calculation", () => {
   it("should maintain visual depth consistency with markers", () => {
     updateAutoTracerOptions({
       filterEmptyNodes: "all",
-      includeReconciled: false,
-      includeSkipped: false,
-      includeMount: false, // Filter out Mount nodes without tracking
+      includeReconciled: "never" as const,
+      includeSkipped: "never" as const,
+      includeMount: "never" as const, // Filter out Mount nodes without tracking
       enableAutoTracerInternalsLogging: false,
       includeNonTrackedBranches: false, // Exclude non-tracked branches to enable filtering
     });

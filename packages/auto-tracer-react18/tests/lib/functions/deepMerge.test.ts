@@ -4,8 +4,8 @@ import type { AutoTracerOptions } from "@src/lib/interfaces/AutoTracerOptions.js
 
 describe("deepMergeOptions", () => {
   const defaultOptions: AutoTracerOptions = {
-    includeReconciled: false,
-    includeSkipped: false,
+    includeReconciled: "never" as const,
+    includeSkipped: "never" as const,
     showFlags: false,
     enabled: true,
     enableAutoTracerInternalsLogging: false,
@@ -38,12 +38,12 @@ describe("deepMergeOptions", () => {
   describe("shallow properties", () => {
     it("should merge shallow boolean properties", () => {
       const result = deepMergeOptions(defaultOptions, {
-        includeReconciled: true,
-        includeSkipped: true,
+        includeReconciled: "always" as const,
+        includeSkipped: "always" as const,
       });
 
-      expect(result.includeReconciled).toBe(true);
-      expect(result.includeSkipped).toBe(true);
+      expect(result.includeReconciled).toBe("always");
+      expect(result.includeSkipped).toBe("always");
       expect(result.showFlags).toBe(false); // unchanged
     });
 
@@ -234,12 +234,12 @@ describe("deepMergeOptions", () => {
     it("should handle falsy values correctly", () => {
       const result = deepMergeOptions(defaultOptions, {
         enabled: false,
-        includeReconciled: false,
+        includeReconciled: "never" as const,
         maxFiberDepth: 0,
       });
 
       expect(result.enabled).toBe(false);
-      expect(result.includeReconciled).toBe(false);
+      expect(result.includeReconciled).toBe("never");
       expect(result.maxFiberDepth).toBe(0);
     });
   });

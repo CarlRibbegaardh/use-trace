@@ -23,8 +23,8 @@ describe("Hook Identity Debug", () => {
   beforeEach(() => {
     Object.assign(traceOptions, {
       filterEmptyNodes: "none",
-      includeReconciled: false,
-      includeSkipped: false,
+      includeReconciled: "never" as const,
+      includeSkipped: "never" as const,
       enableAutoTracerInternalsLogging: false,
       includeNonTrackedBranches: true,
       detectIdenticalValueChanges: false,
