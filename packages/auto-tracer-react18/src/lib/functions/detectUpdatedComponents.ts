@@ -3,12 +3,19 @@ import { logError, logGroup, logGroupEnd } from "./log.js";
 import { buildTreeFromFiber } from "./treeProcessing/building/buildTreeFromFiber.js";
 import { applyEmptyNodeFilter } from "./treeProcessing/filtering/applyEmptyNodeFilter.js";
 import { renderTree } from "./treeProcessing/rendering/renderTree.js";
-import { traceOptions } from "../types/globalState.js";
+import {
+  traceOptions,
+  incrementRenderCycle,
+  getRenderCycleInfo,
+} from "../types/globalState.js";
 
 export function detectUpdatedComponents(root: unknown): void {
   try {
     const rootNode = root as { current?: unknown };
     if (!rootNode?.current) return;
+
+    // Increment render cycle counter at the start
+    incrementRenderCycle();
 
     const shouldLogTiming =
       traceOptions.enableAutoTracerInternalsLogging ?? false;
@@ -43,7 +50,12 @@ export function detectUpdatedComponents(root: unknown): void {
     // Only open the group if there are nodes to render
     const hasNodesToRender = filtered.length > 0;
     if (hasNodesToRender) {
-      logGroup("Component render cycle:");
+      const { cycleNumber, filteredCount } = getRenderCycleInfo();
+      const cycleLabel =
+        filteredCount > 0
+          ? `Component render cycle ${cycleNumber} (${filteredCount} filtered):`
+          : `Component render cycle ${cycleNumber}:`;
+      logGroup(cycleLabel);
     }
 
     // Step 3: Render the filtered tree

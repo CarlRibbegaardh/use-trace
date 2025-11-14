@@ -162,9 +162,13 @@ describe("detectUpdatedComponents", () => {
     const mockFilterFn = vi.fn((nodes) => nodes);
     applyEmptyNodeFilter.mockReturnValue(mockFilterFn);
 
+    // Reset counter for predictable output
+    const { resetRenderCycleCounter } = await import("@src/lib/types/globalState.js");
+    resetRenderCycleCounter();
+
     detectUpdatedComponents(root);
 
-    expect(logGroup).toHaveBeenCalledWith("Component render cycle:");
+    expect(logGroup).toHaveBeenCalledWith("Component render cycle 1:");
     expect(buildTreeFromFiber).toHaveBeenCalledWith(mockFiberNode, 0);
     expect(applyEmptyNodeFilter).toHaveBeenCalled();
     expect(renderTree).toHaveBeenCalled();
@@ -407,5 +411,241 @@ describe("detectUpdatedComponents", () => {
 
     expect(buildTreeFromFiber).toHaveBeenCalledWith(mockFiberNode, 0);
     expect(buildTreeFromFiber).toHaveBeenCalledTimes(1);
+  });
+
+  describe("render cycle counter", () => {
+    it("should display 'Component render cycle 1:' on first render", async () => {
+      const { buildTreeFromFiber } = vi.mocked(
+        await import("@src/lib/functions/treeProcessing/building/buildTreeFromFiber.js")
+      );
+      const { applyEmptyNodeFilter } = vi.mocked(
+        await import("@src/lib/functions/treeProcessing/filtering/applyEmptyNodeFilter.js")
+      );
+      const { logGroup } = vi.mocked(
+        await import("@src/lib/functions/log.js")
+      );
+
+      // Mock to return nodes so the group is opened
+      const mockTreeNode = {
+        componentName: "TestComponent",
+        displayName: "TestComponent",
+        depth: 0,
+        renderType: "Rendering" as const,
+        flags: 0,
+        stateChanges: [],
+        propChanges: [],
+        componentLogs: [],
+        isTracked: false,
+        trackingGUID: null,
+        hasIdenticalValueWarning: false,
+      };
+      buildTreeFromFiber.mockReturnValue([mockTreeNode]);
+      applyEmptyNodeFilter.mockReturnValue(vi.fn((nodes) => nodes));
+
+      const root = { current: {} };
+
+      // Clear any previous state
+      const { resetRenderCycleCounter } = await import("@src/lib/types/globalState.js");
+      resetRenderCycleCounter();
+
+      detectUpdatedComponents(root);
+
+      expect(logGroup).toHaveBeenCalledWith("Component render cycle 1:");
+    });
+
+    it("should increment counter on subsequent renders with nodes", async () => {
+      const { buildTreeFromFiber } = vi.mocked(
+        await import("@src/lib/functions/treeProcessing/building/buildTreeFromFiber.js")
+      );
+      const { applyEmptyNodeFilter } = vi.mocked(
+        await import("@src/lib/functions/treeProcessing/filtering/applyEmptyNodeFilter.js")
+      );
+      const { logGroup } = vi.mocked(
+        await import("@src/lib/functions/log.js")
+      );
+
+      const mockTreeNode = {
+        componentName: "TestComponent",
+        displayName: "TestComponent",
+        depth: 0,
+        renderType: "Rendering" as const,
+        flags: 0,
+        stateChanges: [],
+        propChanges: [],
+        componentLogs: [],
+        isTracked: false,
+        trackingGUID: null,
+        hasIdenticalValueWarning: false,
+      };
+      buildTreeFromFiber.mockReturnValue([mockTreeNode]);
+      applyEmptyNodeFilter.mockReturnValue(vi.fn((nodes) => nodes));
+
+      const root = { current: {} };
+
+      // Clear state
+      const { resetRenderCycleCounter } = await import("@src/lib/types/globalState.js");
+      resetRenderCycleCounter();
+
+      // First render
+      detectUpdatedComponents(root);
+      expect(logGroup).toHaveBeenCalledWith("Component render cycle 1:");
+
+      // Second render
+      detectUpdatedComponents(root);
+      expect(logGroup).toHaveBeenCalledWith("Component render cycle 2:");
+
+      // Third render
+      detectUpdatedComponents(root);
+      expect(logGroup).toHaveBeenCalledWith("Component render cycle 3:");
+    });
+
+    it("should show filtered count when cycles are filtered", async () => {
+      const { buildTreeFromFiber } = vi.mocked(
+        await import("@src/lib/functions/treeProcessing/building/buildTreeFromFiber.js")
+      );
+      const { applyEmptyNodeFilter } = vi.mocked(
+        await import("@src/lib/functions/treeProcessing/filtering/applyEmptyNodeFilter.js")
+      );
+      const { logGroup } = vi.mocked(
+        await import("@src/lib/functions/log.js")
+      );
+
+      const mockTreeNode = {
+        componentName: "TestComponent",
+        displayName: "TestComponent",
+        depth: 0,
+        renderType: "Rendering" as const,
+        flags: 0,
+        stateChanges: [],
+        propChanges: [],
+        componentLogs: [],
+        isTracked: false,
+        trackingGUID: null,
+        hasIdenticalValueWarning: false,
+      };
+
+      const root = { current: {} };
+
+      // Clear state
+      const { resetRenderCycleCounter } = await import("@src/lib/types/globalState.js");
+      resetRenderCycleCounter();
+
+      // First render with nodes (cycle 1)
+      buildTreeFromFiber.mockReturnValue([mockTreeNode]);
+      applyEmptyNodeFilter.mockReturnValue(vi.fn((nodes) => nodes));
+      detectUpdatedComponents(root);
+      expect(logGroup).toHaveBeenCalledWith("Component render cycle 1:");
+
+      // Second render - filtered out (cycle 2, no output)
+      buildTreeFromFiber.mockReturnValue([mockTreeNode]);
+      applyEmptyNodeFilter.mockReturnValue(vi.fn(() => [])); // Filter removes all nodes
+      detectUpdatedComponents(root);
+      expect(logGroup).not.toHaveBeenCalledWith("Component render cycle 2:");
+
+      // Third render - filtered out (cycle 3, no output)
+      detectUpdatedComponents(root);
+      expect(logGroup).not.toHaveBeenCalledWith("Component render cycle 3:");
+
+      // Fourth render with nodes (cycle 4, should show "2 filtered")
+      applyEmptyNodeFilter.mockReturnValue(vi.fn((nodes) => nodes)); // Show nodes again
+      detectUpdatedComponents(root);
+      expect(logGroup).toHaveBeenCalledWith("Component render cycle 4 (2 filtered):");
+    });
+
+    it("should reset filtered count after displaying a cycle", async () => {
+      const { buildTreeFromFiber } = vi.mocked(
+        await import("@src/lib/functions/treeProcessing/building/buildTreeFromFiber.js")
+      );
+      const { applyEmptyNodeFilter } = vi.mocked(
+        await import("@src/lib/functions/treeProcessing/filtering/applyEmptyNodeFilter.js")
+      );
+      const { logGroup } = vi.mocked(
+        await import("@src/lib/functions/log.js")
+      );
+
+      const mockTreeNode = {
+        componentName: "TestComponent",
+        displayName: "TestComponent",
+        depth: 0,
+        renderType: "Rendering" as const,
+        flags: 0,
+        stateChanges: [],
+        propChanges: [],
+        componentLogs: [],
+        isTracked: false,
+        trackingGUID: null,
+        hasIdenticalValueWarning: false,
+      };
+
+      const root = { current: {} };
+
+      // Clear state
+      const { resetRenderCycleCounter } = await import("@src/lib/types/globalState.js");
+      resetRenderCycleCounter();
+
+      // Cycle 1 with nodes
+      buildTreeFromFiber.mockReturnValue([mockTreeNode]);
+      applyEmptyNodeFilter.mockReturnValue(vi.fn((nodes) => nodes));
+      detectUpdatedComponents(root);
+      expect(logGroup).toHaveBeenCalledWith("Component render cycle 1:");
+
+      // Cycle 2 filtered
+      applyEmptyNodeFilter.mockReturnValue(vi.fn(() => []));
+      detectUpdatedComponents(root);
+
+      // Cycle 3 with nodes (1 filtered)
+      applyEmptyNodeFilter.mockReturnValue(vi.fn((nodes) => nodes));
+      detectUpdatedComponents(root);
+      expect(logGroup).toHaveBeenCalledWith("Component render cycle 3 (1 filtered):");
+
+      // Cycle 4 with nodes immediately after (0 filtered)
+      detectUpdatedComponents(root);
+      expect(logGroup).toHaveBeenCalledWith("Component render cycle 4:");
+    });
+
+    it("should increment total counter even when cycles are filtered", async () => {
+      const { buildTreeFromFiber } = vi.mocked(
+        await import("@src/lib/functions/treeProcessing/building/buildTreeFromFiber.js")
+      );
+      const { applyEmptyNodeFilter } = vi.mocked(
+        await import("@src/lib/functions/treeProcessing/filtering/applyEmptyNodeFilter.js")
+      );
+      const { logGroup } = vi.mocked(
+        await import("@src/lib/functions/log.js")
+      );
+
+      const mockTreeNode = {
+        componentName: "TestComponent",
+        displayName: "TestComponent",
+        depth: 0,
+        renderType: "Rendering" as const,
+        flags: 0,
+        stateChanges: [],
+        propChanges: [],
+        componentLogs: [],
+        isTracked: false,
+        trackingGUID: null,
+        hasIdenticalValueWarning: false,
+      };
+
+      const root = { current: {} };
+
+      // Clear state
+      const { resetRenderCycleCounter } = await import("@src/lib/types/globalState.js");
+      resetRenderCycleCounter();
+
+      buildTreeFromFiber.mockReturnValue([mockTreeNode]);
+
+      // All cycles filtered
+      applyEmptyNodeFilter.mockReturnValue(vi.fn(() => []));
+      detectUpdatedComponents(root); // Cycle 1
+      detectUpdatedComponents(root); // Cycle 2
+      detectUpdatedComponents(root); // Cycle 3
+
+      // Now show nodes - should be cycle 4 with 3 filtered
+      applyEmptyNodeFilter.mockReturnValue(vi.fn((nodes) => nodes));
+      detectUpdatedComponents(root);
+      expect(logGroup).toHaveBeenCalledWith("Component render cycle 4 (3 filtered):");
+    });
   });
 });

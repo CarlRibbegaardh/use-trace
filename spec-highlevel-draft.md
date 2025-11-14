@@ -34,6 +34,7 @@ const MyComponent: React.FC<{ name: string; count: number }> = ({
 **Expected Output:**
 
 ```
+Component render cycle 1:
 ├─ [MyComponent] Mount ⚡
 │   Initial prop name: Alice
 │   Initial prop count: 5
@@ -68,6 +69,7 @@ const Button: React.FC<{ onClick: () => void; label: string }> = ({
 **Expected Output:**
 
 ```
+Component render cycle 1:
 ├─ [Button] Mount ⚡
 │   Initial prop onClick: (fn:1)
 │   Initial prop label: Submit
@@ -90,6 +92,7 @@ const UserCard: React.FC<{ user: { id: number; name: string } }> = ({
 **Expected Output:**
 
 ```
+Component render cycle 1:
 ├─ [UserCard] Mount ⚡
 │   Initial prop user: {"id":1,"name":"Bob"}
 ```
@@ -126,6 +129,7 @@ const Counter: React.FC = () => {
 **Expected Output (React fiber order):**
 
 ```
+Component render cycle 1:
 ├─ [Counter] Mount ⚡
 │   Initial state count: 0
 │   Initial state name: default
@@ -235,6 +239,7 @@ const Display: React.FC<{ value: number }> = ({ value }) => {
 **Expected Output (after button click):**
 
 ```
+Component render cycle 2:
 ├─ [Display] Rendering ⚡
 │   Prop change value: 5 → 10
 ```
@@ -347,6 +352,7 @@ const Counter: React.FC = () => {
 **Expected Output (on second render):**
 
 ```
+Component render cycle 2:
 ├─ [Counter] Rendering ⚡
 │   State change count: 0 → 5
 ```
@@ -452,6 +458,7 @@ setData({ id: 1, name: "test" });
 **Output:**
 
 ```
+Component render cycle 2:
 ├─ [MyComponent] Rendering ⚡
 │   ⚠️ State change data (identical value):
 {"id":1,"name":"test"}
@@ -483,6 +490,7 @@ const MyComponent: React.FC = () => {
 **Expected Output:**
 
 ```
+Component render cycle 1:
 ├─ [MyComponent] Mount ⚡
 │   Initial state unknown: 0
 ```
@@ -512,6 +520,7 @@ const TodoList: React.FC = () => {
 **Expected Output (showing ordinal constraints):**
 
 ```
+Component render cycle 1:
 ├─ [TodoList] Mount ⚡
 │   Initial state filteredTodos | unknown: []
 │   Initial state filteredTodos | completedTodos | unknown: []
@@ -554,6 +563,7 @@ const MyComponent: React.FC = () => {
 **Expected Output (with babel plugin):**
 
 ```
+Component render cycle 1:
 ├─ [MyComponent] Mount ⚡
 │   Initial state count: 0
 │   Initial state increment: (fn:13)
@@ -562,6 +572,7 @@ const MyComponent: React.FC = () => {
 **Output on Update:**
 
 ```
+Component render cycle 2:
 ├─ [MyComponent] Rendering ⚡
 │   State change count: 0 → 1
 ```
@@ -652,11 +663,11 @@ The auto-tracer provides fine-grained control over which components appear in th
  * Tracked components are ALWAYS visible regardless of these settings.
  */
 type NonTrackedComponentVisibility =
-  | "never"           // Never show, even if has props/state
-  | "forProps"        // Show only if has initial props or prop changes
-  | "forState"        // Show only if has initial state or state changes
+  | "never" // Never show, even if has props/state
+  | "forProps" // Show only if has initial props or prop changes
+  | "forState" // Show only if has initial state or state changes
   | "forPropsOrState" // Show if has any props or state
-  | "always";         // Always show
+  | "always"; // Always show
 ```
 
 ### Visibility Options
@@ -688,6 +699,7 @@ Four settings control different component lifecycle events:
 **Goal**: Only see tracked components, everything else is noise
 
 **Settings**:
+
 ```typescript
 {
   includeReconciled: "never",
@@ -698,7 +710,9 @@ Four settings control different component lifecycle events:
 ```
 
 **Example Output**:
+
 ```
+Component render cycle 1:
 └─┐ ... (21 levels collapsed)
   ├─ [TodoList] Rendering ⚡
   │   State change filteredTodos: []→[{...}]
@@ -716,6 +730,7 @@ Only tracked components visible, all framework/library components hidden.
 **Goal**: See tracked components plus non-tracked components that have meaningful changes
 
 **Settings**:
+
 ```typescript
 {
   includeReconciled: "forPropsOrState",
@@ -726,7 +741,9 @@ Only tracked components visible, all framework/library components hidden.
 ```
 
 **Example Output**:
+
 ```
+Component render cycle 1:
 └─┐ ... (21 levels collapsed)
   ├─ [TodoList] Rendering ⚡
   │   State change filteredTodos: []→[{...}]
@@ -755,6 +772,7 @@ Shows tracked components plus library components that receive prop/state changes
 **Goal**: See the complete React fiber tree structure, accept performance impact
 
 **Settings**:
+
 ```typescript
 {
   includeReconciled: "always",
@@ -765,7 +783,9 @@ Shows tracked components plus library components that receive prop/state changes
 ```
 
 **Example Output**:
+
 ```
+Component render cycle 1:
 ├─ [App] Mount
 └─┐
   ├─ [ThemeProvider] Mount
@@ -806,20 +826,26 @@ Hides the component entirely, even if it has props/state changes.
 **Use case**: You never want to see this category of events, even in ancestor chains.
 
 **Example**: Hide all reconciled events:
+
 ```typescript
-{ includeReconciled: "never" }
+{
+  includeReconciled: "never";
+}
 ```
 
 #### `"forProps"`
 
 Shows the component only if it has:
+
 - Initial props (on mount)
 - Prop changes (on update)
 
 **Use case**: Track data flow through props.
 
 **Example with `includeRendered: "forProps"`**:
+
 ```
+Component render cycle 1:
 ├─ [TodoList] Rendering ⚡       # Tracked, always shown
 └─┐
   ├─ [Styled(div)] Rendering    # Shown: has prop change
@@ -831,13 +857,16 @@ Shows the component only if it has:
 #### `"forState"`
 
 Shows the component only if it has:
+
 - Initial state (on mount)
 - State changes (on update)
 
 **Use case**: Track local state management in non-tracked components.
 
 **Example with `includeRendered: "forState"`**:
+
 ```
+Component render cycle 1:
 ├─ [TodoList] Rendering ⚡           # Tracked, always shown
 └─┐ ... (10 levels collapsed)       # Hidden: no state
   ├─ [InternalCounter] Rendering    # Shown: has state change
@@ -849,13 +878,16 @@ Shows the component only if it has:
 #### `"forPropsOrState"`
 
 Shows the component if it has any of:
+
 - Initial props or state (on mount)
 - Prop or state changes (on update)
 
 **Use case**: Most common setting for curious users - show anything with meaningful data.
 
 **Example with `includeRendered: "forPropsOrState"`**:
+
 ```
+Component render cycle 1:
 ├─ [TodoList] Rendering ⚡           # Tracked, always shown
 └─┐
   ├─ [Styled(div)] Rendering        # Shown: has props
@@ -880,6 +912,7 @@ The visibility settings and `filterEmptyNodes` work together:
 2. **Empty node collapsing** (second pass): Collapses sequences of nodes without changes
 
 **Example with both**:
+
 ```typescript
 {
   includeRendered: "forPropsOrState",  // Show only non-tracked with props/state
@@ -888,6 +921,7 @@ The visibility settings and `filterEmptyNodes` work together:
 ```
 
 **Result**:
+
 - Non-tracked components without props/state are filtered by visibility
 - Remaining nodes without changes are collapsed by `filterEmptyNodes`
 - Double-filtering creates the most compact output
@@ -902,6 +936,114 @@ An **empty node** is a component that:
 - Is not tracked (no `trackingGUID`)
 - Has no identical value warnings
 - Is hidden by visibility settings (when `includeReconciled/Skipped/Mount/Rendered` is not `"always"`)
+
+---
+
+## Render Cycle Counter
+
+### Overview
+
+Each component render cycle is numbered sequentially to help track component re-render frequency. The counter increments globally across all components in the application.
+
+### Format
+
+**Standard format (no filtered cycles):**
+
+```
+Component render cycle N:
+```
+
+Where `N` is the total number of render cycles that have occurred.
+
+**Format with filtered cycles:**
+
+```
+Component render cycle N (M filtered):
+```
+
+Where:
+
+- `N` = Total number of render cycles that have occurred
+- `M` = Number of render cycles since the last displayed cycle that were filtered from display due to visibility settings
+
+### Examples
+
+**Initial render:**
+
+```
+Component render cycle 1:
+├─ [TodoList] Mount ⚡
+```
+
+**Subsequent renders with no filtering:**
+
+```
+Component render cycle 2:
+├─ [TodoList] Rendering ⚡
+│   State change items: [] → [{...}]
+```
+
+**Renders with filtered cycles:**
+
+```
+Component render cycle 5 (2 filtered):
+├─ [TodoList] Rendering ⚡
+│   State change loading: true → false
+```
+
+This indicates:
+
+- 5 total render cycles have occurred
+- Cycles 3 and 4 were filtered from display (had no visible components based on current settings)
+- This is the first cycle shown since cycle 2
+
+### Filtering Scenarios
+
+**Scenario 1: All cycles visible**
+
+```
+Component render cycle 1:
+├─ [App] Mount ⚡
+
+Component render cycle 2:
+├─ [App] Rendering ⚡
+
+Component render cycle 3:
+├─ [TodoList] Mount ⚡
+```
+
+**Scenario 2: Some cycles filtered (default visibility settings)**
+
+```
+Component render cycle 1:
+├─ [App] Mount ⚡
+
+Component render cycle 5 (3 filtered):
+├─ [TodoList] Rendering ⚡
+│   State change items: [] → [{...}]
+```
+
+Cycles 2-4 had no tracked components that met visibility criteria, so they were filtered from display.
+
+**Scenario 3: Many cycles filtered**
+
+```
+Component render cycle 1:
+├─ [App] Mount ⚡
+
+Component render cycle 47 (45 filtered):
+├─ [DeepComponent] Rendering ⚡
+│   Prop change value: 1 → 2
+```
+
+This pattern is common in applications with frequent React reconciliation but infrequent changes to tracked components.
+
+### Implementation Notes
+
+- Counter increments at the start of each render cycle (when `detectUpdatedComponents` is called)
+- Filtered count tracks cycles since the last cycle that produced visible output
+- Counter persists across the entire application session
+- Counter resets only when the page reloads or the AutoTracer instance is recreated
 
 ---
 
@@ -928,6 +1070,7 @@ The `filterEmptyNodes` option controls how "empty" nodes are displayed in the co
 **Example Output (with default visibility `"never"`):**
 
 ```
+Component render cycle 1:
 └─┐ ... (21 levels collapsed)
   ├─ [MyTrackedComponent] Mount ⚡
   │   Initial state count: 0
@@ -939,6 +1082,7 @@ The `filterEmptyNodes` option controls how "empty" nodes are displayed in the co
 **Example Output (with visibility set to `"always"`):**
 
 ```
+Component render cycle 1:
 ├─ [App] Mount
 └─┐
   ├─ [ThemeProvider] Mount
@@ -988,6 +1132,7 @@ The `filterEmptyNodes` option controls how "empty" nodes are displayed in the co
 **Example Output (with visibility set to `"always"`):**
 
 ```
+Component render cycle 1:
 └─┐ ... (21 levels collapsed)
   ├─ [MyTrackedComponent] Mount ⚡
   │   Initial state count: 0
@@ -1027,6 +1172,7 @@ The `filterEmptyNodes` option controls how "empty" nodes are displayed in the co
 **Example Output (with default visibility `"never"`):**
 
 ```
+Component render cycle 1:
 └─┐ ... (21 levels collapsed)
   ├─ [MyTrackedComponent] Mount ⚡
   │   Initial state count: 0
@@ -1041,6 +1187,7 @@ The `filterEmptyNodes` option controls how "empty" nodes are displayed in the co
 **Example Output (with visibility set to `"forPropsOrState"`):**
 
 ```
+Component render cycle 1:
 └─┐ ... (21 levels collapsed)
   ├─ [MyTrackedComponent] Mount ⚡
   │   Initial state count: 0
@@ -1156,6 +1303,7 @@ Original depth:  Visual depth:
 When a node is deeper than the previous node, connecting lines show the hierarchy:
 
 ```
+Component render cycle 1:
 ├─ [Parent] Mount
 └─┐
   ├─ [Child] Mount
@@ -1170,6 +1318,7 @@ When a marker is present (with `filterEmptyNodes: 'first'` or `'all'`), intermed
 **With default visibility (`"never"`) and `filterEmptyNodes: 'all'`:**
 
 ```
+Component render cycle 1:
 └─┐ ... (21 levels collapsed)
   ├─ [DeepComponent] Mount ⚡
   └─┐ ... (10 levels collapsed)
@@ -1179,6 +1328,7 @@ When a marker is present (with `filterEmptyNodes: 'first'` or `'all'`), intermed
 **With visibility set to `"always"` and `filterEmptyNodes: 'all'`:**
 
 ```
+Component render cycle 1:
 └─┐ ... (1 levels collapsed)
   ├─ [Unknown] Mount
   └─┐ ... (1 levels collapsed)
@@ -1196,6 +1346,7 @@ When a marker is present (with `filterEmptyNodes: 'first'` or `'all'`), intermed
 **Without filtering (filterEmptyNodes: 'none') and visibility `"always"` - same structure:**
 
 ```
+Component render cycle 1:
 └─┐
   └─┐
     ├─ [Unknown] Mount
@@ -1220,6 +1371,7 @@ When a marker is present (with `filterEmptyNodes: 'first'` or `'all'`), intermed
 With `enableAutoTracerInternalsLogging: true`, markers show the absolute depth and node count:
 
 ```
+Component render cycle 1:
 ├─ [Parent] Mount
 └─┐ ... (Level: 3, Filtered nodes: 2)
   ├─ [Child] Mount
@@ -1345,5 +1497,3 @@ User research showed that most developers are only interested in their own track
 ---
 
 ## End of Specification
-
-

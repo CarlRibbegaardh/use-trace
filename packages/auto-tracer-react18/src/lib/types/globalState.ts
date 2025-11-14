@@ -6,6 +6,10 @@ import { log } from "../functions/log.js";
 export let isGlobalTracerInstalled = false;
 export let renderStartTime = 0;
 
+// Render cycle counter state
+let totalRenderCycles = 0;
+let lastDisplayedCycle = 0;
+
 // Dark mode detection utility
 function isDarkMode(): boolean {
   try {
@@ -41,4 +45,38 @@ export function setTracerOptions(options: AutoTracerOptions): void {
   if (options.enableAutoTracerInternalsLogging) {
     log("AutoTracer options updated:", JSON.stringify(options, null, 2));
   }
+}
+
+/**
+ * Increments the total render cycle counter.
+ * Called at the start of each render cycle regardless of filtering.
+ */
+export function incrementRenderCycle(): void {
+  totalRenderCycles++;
+}
+
+/**
+ * Gets the current render cycle number and filtered count.
+ * Updates the last displayed cycle when called.
+ * @returns Object containing cycle number and filtered count
+ */
+export function getRenderCycleInfo(): {
+  cycleNumber: number;
+  filteredCount: number;
+} {
+  const filteredCount = totalRenderCycles - lastDisplayedCycle - 1;
+  lastDisplayedCycle = totalRenderCycles;
+  return {
+    cycleNumber: totalRenderCycles,
+    filteredCount: filteredCount > 0 ? filteredCount : 0,
+  };
+}
+
+/**
+ * Resets the render cycle counter to zero.
+ * Used for testing purposes.
+ */
+export function resetRenderCycleCounter(): void {
+  totalRenderCycles = 0;
+  lastDisplayedCycle = 0;
 }
