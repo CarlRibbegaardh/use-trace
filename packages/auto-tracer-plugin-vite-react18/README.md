@@ -90,6 +90,17 @@ When building for production in a monorepo where your app depends on workspace l
 
 **Note:** This is **only** needed for production builds (`vite build`). Development mode (`vite dev`) works without any additional configuration.
 
+### What the Plugin Does Automatically
+
+In production builds with `buildWithWorkspaceLibs: true`, the plugin:
+
+1. **Creates the React DevTools hook**: Injects an inline script that creates a minimal DevTools hook before any React code loads. This allows AutoTracer to work in production builds without requiring the React DevTools browser extension.
+2. **Adds external-globals configuration**: Configures `rollup-plugin-external-globals` to treat `@auto-tracer/react18` as a global variable.
+3. **Emits the UMD build**: Copies the UMD build of `@auto-tracer/react18` to your output directory.
+4. **Injects script tags**: Adds `<script>` tags in your HTML to load React, ReactDOM, and AutoTracer UMD files before your app bundle.
+
+This means **you don't need the React DevTools browser extension** when using the plugin - it handles everything automatically.
+
 ### The Problem
 
 During production builds, Rollup bundles workspace library source files. The plugin injects `import { useAutoTracer } from "@auto-tracer/react18"` into these files, but workspace libraries don't declare `@auto-tracer/react18` as a dependency, causing resolution failures:

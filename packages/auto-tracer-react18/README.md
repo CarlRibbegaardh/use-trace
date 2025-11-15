@@ -9,9 +9,28 @@
 
 # auto-tracer
 
-React render tracing for humans. This package attaches to the React DevTools hook and prints structured logs for component render cycles and labeled state/prop changes. It’s framework-agnostic at runtime and works with both Vite and Next.js apps.
+React render tracing for humans. This package attaches to the React DevTools hook and prints structured logs for component render cycles and labeled state/prop changes. It's framework-agnostic at runtime and works with both Vite and Next.js apps.
 
-Important: autoTracer() performs the tracing. useAutoTracer is a helper hook that improves labeling and is typically auto-injected by a build plugin.
+**Important:** autoTracer() performs the tracing. useAutoTracer is a helper hook that improves labeling and is typically auto-injected by a build plugin.
+
+## React DevTools Requirement
+
+AutoTracer requires the React DevTools hook to function. You have two options:
+
+1. **Use the Vite or Babel plugin** (recommended): The `@auto-tracer/plugin-vite-react18` and `@auto-tracer/plugin-babel-react18` plugins automatically create a minimal DevTools hook for you in production builds. This is the easiest and most reliable approach.
+
+2. **Install the React DevTools browser extension**: If you're not using a plugin, you'll need to install the [React DevTools browser extension](https://react.dev/learn/react-developer-tools) for Chrome, Firefox, or Edge. The extension provides the DevTools hook that AutoTracer requires.
+
+**Note:** In development mode with Vite or similar tools that use React Refresh, the DevTools hook is automatically available and you don't need to do anything special.
+
+If the DevTools hook is not available, you'll see this warning:
+
+```
+⚠️ AutoTracer: React DevTools not available. To use AutoTracer, either:
+  1. Install the React DevTools browser extension, OR
+  2. Use the @auto-tracer/plugin-vite-react18 or @auto-tracer/plugin-babel-react18 plugin (recommended)
+Tracing will not work without one of these options.
+```
 
 ## Quickstart
 
@@ -138,11 +157,12 @@ The auto-tracer-inject-core with Babel/Vite plugins augments your source so useA
 
 ## Troubleshooting
 
-- No logs? Verify autoTracer() runs before React renders and that you're in a client context.
-- Unlabeled logs? Ensure the injection plugin is configured and active in your build.
-- Too verbose? Tweak options like includeReconciled/includeSkipped and maxFiberDepth.
-- Seeing repeated identical value warnings? Consider memoization (React.memo, useMemo, useCallback) or stable selectors.
-- Seeing "State change unknown" in third-party components? This is expected behavior. Third-party libraries (e.g., MUI's ButtonBase) use internal state hooks that aren't labeled because they're not transformed by the build plugin. The tracer correctly detects the state changes but can't provide meaningful labels since it only transforms your source code, not node_modules.
+- **No logs?** Verify autoTracer() runs before React renders and that you're in a client context.
+- **"React DevTools not available" warning?** Either install the [React DevTools browser extension](https://react.dev/learn/react-developer-tools) or use the `@auto-tracer/plugin-vite-react18` or `@auto-tracer/plugin-babel-react18` plugin, which automatically handles this for you.
+- **Unlabeled logs?** Ensure the injection plugin is configured and active in your build.
+- **Too verbose?** Tweak options like includeReconciled/includeSkipped and maxFiberDepth.
+- **Seeing repeated identical value warnings?** Consider memoization (React.memo, useMemo, useCallback) or stable selectors.
+- **Seeing "State change unknown" in third-party components?** This is expected behavior. Third-party libraries (e.g., MUI's ButtonBase) use internal state hooks that aren't labeled because they're not transformed by the build plugin. The tracer correctly detects the state changes but can't provide meaningful labels since it only transforms your source code, not node_modules.
 
 ## License
 
