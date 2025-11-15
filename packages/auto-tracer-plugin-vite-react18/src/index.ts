@@ -72,10 +72,31 @@ export const autoTracer = createUnplugin<AutoTracerOptions | undefined>(
             // Only inject during build with workspace lib support
             if (!enableBuildSupport) return html;
 
+            // Inline script to create DevTools hook BEFORE any React code loads
+            const hookInitScript = `
+(function() {
+  if (typeof window === 'undefined' || window.__REACT_DEVTOOLS_GLOBAL_HOOK__) return;
+  var nextID = 0;
+  window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = {
+    renderers: new Map(),
+    supportsFiber: true,
+    inject: function(injected) { return nextID++; },
+    onScheduleFiberRoot: function(id, root, children) {},
+    onCommitFiberRoot: function(id, root, maybePriorityLevel, didError) {},
+    onCommitFiberUnmount: function() {}
+  };
+})();
+`.trim();
+
             // Use Vite's tags API for proper path resolution
             return {
               html,
               tags: [
+                {
+                  tag: "script",
+                  children: hookInitScript,
+                  injectTo: "head-prepend",
+                },
                 {
                   tag: "script",
                   attrs: {
