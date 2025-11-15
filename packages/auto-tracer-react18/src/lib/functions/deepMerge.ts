@@ -20,6 +20,9 @@ export function deepMergeOptions(
   if (source.includeMount !== undefined) {
     result.includeMount = source.includeMount;
   }
+  if (source.includeRendered !== undefined) {
+    result.includeRendered = source.includeRendered;
+  }
   if (source.showFlags !== undefined) {
     result.showFlags = source.showFlags;
   }

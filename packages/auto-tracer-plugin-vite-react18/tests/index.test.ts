@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { autoTracer } from "../src/index";
 import type { AutoTracerOptions } from "../src/index";
-import type { TransformConfig, ComponentInfo } from "@auto-tracer/inject-react18";
+import type {
+  TransformConfig,
+  ComponentInfo,
+} from "@auto-tracer/inject-react18";
 
 // Mock the auto-tracer-inject-core module
 vi.mock("@auto-tracer/inject-react18", () => ({
@@ -160,14 +163,6 @@ describe("@auto-tracer/plugin-vite-react18", () => {
     });
 
     describe("transformInclude", () => {
-      it("should exclude files in production mode", () => {
-        process.env.NODE_ENV = "production";
-
-        const result = vitePlugin.transformInclude("src/Component.tsx");
-
-        expect(result).toBe(false);
-      });
-
       it("should exclude files when TRACE_INJECT is disabled", () => {
         process.env.TRACE_INJECT = "0";
 

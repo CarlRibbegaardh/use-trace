@@ -37,6 +37,7 @@ export function detectUpdatedComponents(root: unknown): void {
       includeReconciled: traceOptions.includeReconciled ?? "never",
       includeSkipped: traceOptions.includeSkipped ?? "never",
       includeMount: traceOptions.includeMount ?? "never",
+      includeRendered: traceOptions.includeRendered ?? "never",
     });
     if (shouldLogTiming) {
       const filterDuration = performance.now() - filterStartTime;

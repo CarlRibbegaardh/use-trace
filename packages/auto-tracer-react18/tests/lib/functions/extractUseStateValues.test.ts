@@ -14,27 +14,43 @@ describe("extractUseStateValues", () => {
 
   describe("basic functionality", () => {
     it("should return empty array for null fiber node", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
-      const result = extractUseStateValues(null as unknown as Record<string, unknown>);
+      const result = extractUseStateValues(
+        null as unknown as Record<string, unknown>
+      );
 
       expect(result).toEqual([]);
     });
 
     it("should return empty array for undefined fiber node", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
-      const result = extractUseStateValues(undefined as unknown as Record<string, unknown>);
+      const result = extractUseStateValues(
+        undefined as unknown as Record<string, unknown>
+      );
 
       expect(result).toEqual([]);
     });
 
     it("should return empty array for non-object fiber node", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
-      const result1 = extractUseStateValues("string" as unknown as Record<string, unknown>);
-      const result2 = extractUseStateValues(123 as unknown as Record<string, unknown>);
-      const result3 = extractUseStateValues(true as unknown as Record<string, unknown>);
+      const result1 = extractUseStateValues(
+        "string" as unknown as Record<string, unknown>
+      );
+      const result2 = extractUseStateValues(
+        123 as unknown as Record<string, unknown>
+      );
+      const result3 = extractUseStateValues(
+        true as unknown as Record<string, unknown>
+      );
 
       expect(result1).toEqual([]);
       expect(result2).toEqual([]);
@@ -42,7 +58,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should return empty array for fiber node without memoizedState", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {};
       const result = extractUseStateValues(fiberNode);
@@ -51,7 +69,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should return empty array for fiber node with null memoizedState", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = { memoizedState: null };
       const result = extractUseStateValues(fiberNode);
@@ -62,7 +82,9 @@ describe("extractUseStateValues", () => {
 
   describe("useState hook detection", () => {
     it("should extract single useState value", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {
         memoizedState: {
@@ -89,7 +111,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should extract multiple useState values", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {
         memoizedState: {
@@ -144,7 +168,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should skip hooks without queue (non-useState hooks)", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {
         memoizedState: {
@@ -175,7 +201,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should handle hooks with undefined memoizedState", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {
         memoizedState: {
@@ -219,7 +247,9 @@ describe("extractUseStateValues", () => {
 
   describe("previous state extraction", () => {
     it("should extract previous state values from alternate fiber", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {
         memoizedState: {
@@ -252,7 +282,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should handle multiple hooks with previous values", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {
         memoizedState: {
@@ -302,7 +334,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should handle mismatched hook chains between current and previous", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {
         memoizedState: {
@@ -349,7 +383,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should handle fiber without alternate", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {
         memoizedState: {
@@ -377,7 +413,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should handle alternate without memoizedState", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {
         memoizedState: {
@@ -408,12 +446,14 @@ describe("extractUseStateValues", () => {
   });
 
   describe("hook chain traversal limits", () => {
-    it("should limit traversal to 20 hooks maximum", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+    it("should limit traversal to 50 hooks maximum", async () => {
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
-      // Create a chain of 25 hooks
+      // Create a chain of 55 hooks
       let currentHook: Record<string, unknown> | null = null;
-      for (let i = 24; i >= 0; i--) {
+      for (let i = 54; i >= 0; i--) {
         currentHook = {
           memoizedState: `value-${i}`,
           queue: { dispatch: vi.fn() },
@@ -427,8 +467,8 @@ describe("extractUseStateValues", () => {
 
       const result = extractUseStateValues(fiberNode);
 
-      // Should only extract first 20 hooks
-      expect(result).toHaveLength(20);
+      // Should only extract first 50 hooks
+      expect(result).toHaveLength(50);
       expect(result[0]).toEqual({
         name: "state0",
         value: "value-0",
@@ -450,7 +490,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should handle circular references in hook chain", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const hook1: Record<string, unknown> = {
         memoizedState: "value1",
@@ -474,7 +516,7 @@ describe("extractUseStateValues", () => {
       const result = extractUseStateValues(fiberNode);
 
       // Should stop at the limit and not hang
-      expect(result).toHaveLength(20);
+      expect(result).toHaveLength(50);
       expect(result[0]).toEqual({
         name: "state0",
         value: "value1",
@@ -489,7 +531,9 @@ describe("extractUseStateValues", () => {
 
   describe("complex state values", () => {
     it("should handle object state values", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const objectValue = { count: 10, name: "test" };
       const fiberNode = {
@@ -517,7 +561,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should handle array state values", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const arrayValue = [1, 2, 3];
       const fiberNode = {
@@ -545,7 +591,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should handle null state values", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {
         memoizedState: {
@@ -572,7 +620,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should handle function state values", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const functionValue = () => {
         return "test";
@@ -604,10 +654,10 @@ describe("extractUseStateValues", () => {
 
   describe("error handling", () => {
     it("should handle errors during hook traversal and call logWarn", async () => {
-      const { logWarn } = vi.mocked(
-        await import("@src/lib/functions/log.js")
+      const { logWarn } = vi.mocked(await import("@src/lib/functions/log.js"));
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
       );
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
 
       // Create a malformed hook that will cause an error when accessed
       const problematicHook = {};
@@ -631,7 +681,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should return empty array when hook structure is completely malformed", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {
         memoizedState: {
@@ -646,10 +698,10 @@ describe("extractUseStateValues", () => {
     });
 
     it("should handle getters that throw errors", async () => {
-      const { logWarn } = vi.mocked(
-        await import("@src/lib/functions/log.js")
+      const { logWarn } = vi.mocked(await import("@src/lib/functions/log.js"));
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
       );
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
 
       const problematicFiber = {};
       Object.defineProperty(problematicFiber, "memoizedState", {
@@ -670,7 +722,9 @@ describe("extractUseStateValues", () => {
 
   describe("edge cases", () => {
     it("should handle empty hook chain", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {
         memoizedState: null,
@@ -682,7 +736,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should handle hook with null queue", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {
         memoizedState: {
@@ -698,7 +754,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should handle hook with undefined queue", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {
         memoizedState: {
@@ -714,7 +772,9 @@ describe("extractUseStateValues", () => {
     });
 
     it("should handle mixed hook types in chain", async () => {
-      const { extractUseStateValues } = await import("@src/lib/functions/extractUseStateValues.js");
+      const { extractUseStateValues } = await import(
+        "@src/lib/functions/extractUseStateValues.js"
+      );
 
       const fiberNode = {
         memoizedState: {

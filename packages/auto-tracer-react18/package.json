@@ -39,10 +39,11 @@
     "react-dom": "^18.3.1",
     "rimraf": "^6.0.1",
     "typescript": "~5.5.3",
+    "vite": "^5.3.3",
     "vitest": "^4.0.3"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && vite build --config vite.config.umd.ts",
     "prebuild": "pnpm run clean",
     "postbuild": "tsc --project ./tests/tsconfig.json --noEmit",
     "clean": "rimraf dist coverage",
@@ -60,5 +61,12 @@
     "README.md"
   ],
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts"
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./dist/index.umd.js": "./dist/index.umd.js"
+  }
 }

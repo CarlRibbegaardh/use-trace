@@ -8,8 +8,9 @@ Theme file support
 Config scenarios (named combinations for all but theme)
 CICD?
 GLOB with minimatch
-Make Mount optional in config
 The babelconfig in next client only looks like it's a bug in the babel plugin.
+For microfrontends; add a system name in autoTracer to use in the render cycle
+Create a multiple microfrontends example with lazy loaded components
 
 DOING
 
@@ -26,3 +27,4 @@ Can autoTracker sense hooks?
 Can autoTracker learn state names from AST?
 Global on off setting for useTrace.
 Changes on separate lines if message is over a specific length.
+Make Mount optional in config
