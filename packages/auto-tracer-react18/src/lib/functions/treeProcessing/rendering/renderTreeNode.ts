@@ -57,7 +57,7 @@ export function renderTreeNode(
 
   // Handle marker nodes specially
   if (renderType === "Marker") {
-    const indent = "  ".repeat(Math.max(visualDepth, 0));
+    const indent = "\u2007\u2007".repeat(Math.max(visualDepth, 0));
     const showLevel = traceOptions.enableAutoTracerInternalsLogging ?? false;
 
     if (showLevel) {
@@ -75,7 +75,7 @@ export function renderTreeNode(
     return visualDepth;
   }
 
-  const indent = "  ".repeat(visualDepth);
+  const indent = "\u2007\u2007".repeat(visualDepth);
 
   // Show connecting lines when transitioning to deeper levels
   // Skip intermediate connectors if previous node was a marker (it already represents those levels)

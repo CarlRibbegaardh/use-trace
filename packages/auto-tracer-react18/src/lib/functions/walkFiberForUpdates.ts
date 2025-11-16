@@ -109,7 +109,7 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
     const componentName = getComponentName(fiberNode.elementType);
     const realComponentName = getRealComponentName(fiberNode);
 
-    const indent = "  ".repeat(depth);
+    const indent = "\u2007\u2007".repeat(depth);
     const displayName =
       realComponentName !== "Unknown" ? realComponentName : componentName;
 
@@ -181,13 +181,15 @@ export function walkFiberForUpdates(fiber: unknown, depth: number): void {
             missingLevel < depth;
             missingLevel++
           ) {
-            const missingIndent = "  ".repeat(Math.max(missingLevel - 1, 0));
+            const missingIndent = "\u2007\u2007".repeat(
+              Math.max(missingLevel - 1, 0)
+            );
             log(`${missingIndent}└─┐`);
           }
         }
 
         // Add the final connector for the current level
-        const connectIndent = "  ".repeat(Math.max(depth - 1, 0));
+        const connectIndent = "\u2007\u2007".repeat(Math.max(depth - 1, 0));
         log(`${connectIndent}└─┐`); //└─┐
       }
       lastDepth = depth;
