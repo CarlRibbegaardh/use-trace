@@ -1,0 +1,9 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignoreWorkspaces": [".", "apps/*"],
+  "ignore": ["**/*.d.ts", "**/tests/setupTests.ts", "**/.eslintrc.cjs"],
+  "ignoreDependencies": ["jsdom", "@vitest/coverage-v8"],
+  "workspaces": {
+    "packages/*": {}
+  }
+}
