@@ -35,9 +35,10 @@ function captureConsoleLogs(fn: () => void): string[] {
 
 /**
  * Helper to get indent length from a string
+ * Note: The rendering code uses Unicode figure space (\u2007) for indentation
  */
 function getIndentLength(line: string): number {
-  const match = line.match(/^( *)/);
+  const match = line.match(/^(\u2007*)/);
   if (!match || !match[1]) {
     return 0;
   }

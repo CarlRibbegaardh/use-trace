@@ -2,14 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { extractUseStateValues } from "../../../src/lib/functions/extractUseStateValues.js";
 import { findStatefulHookAnchors } from "../../../src/lib/functions/hookMapping/findStatefulHookAnchors.js";
 import type { Hook } from "../../../src/lib/functions/hookMapping/types.js";
-import {
-  walkFiberForUpdates,
-  resetDepthTracking,
-} from "../../../src/lib/functions/walkFiberForUpdates.js";
-import {
-  addLabelForGuid,
-  clearAllHookLabels,
-} from "../../../src/lib/functions/hookLabels.js";
+import { clearAllHookLabels } from "../../../src/lib/functions/hookLabels.js";
 import { traceOptions } from "../../../src/lib/types/globalState.js";
 import type { AutoTracerOptions } from "../../../src/lib/interfaces/AutoTracerOptions.js";
 
@@ -29,8 +22,6 @@ describe("Hook Identity Debug", () => {
       includeNonTrackedBranches: true,
       detectIdenticalValueChanges: false,
     } satisfies Partial<AutoTracerOptions>);
-
-    resetDepthTracking();
 
     consoleOutput = [];
     console.log = (...args: unknown[]) => {
