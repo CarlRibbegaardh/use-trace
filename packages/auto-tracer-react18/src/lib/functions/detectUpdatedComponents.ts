@@ -48,9 +48,10 @@ export function detectUpdatedComponents(root: unknown): void {
       );
     }
 
-    // Only open the group if there are nodes to render
-    const hasNodesToRender = filtered.length > 0;
-    if (hasNodesToRender) {
+    // Only open the group if there are actual nodes to render (not just markers)
+    // A tree containing ONLY markers means everything was filtered out
+    const hasActualContent = filtered.some((node) => node.renderType !== "Marker");
+    if (hasActualContent) {
       const { cycleNumber, filteredCount } = getRenderCycleInfo();
       const cycleLabel =
         filteredCount > 0
@@ -69,7 +70,7 @@ export function detectUpdatedComponents(root: unknown): void {
 
     clearRenderRegistry(); // Clear tracked fibers for next cycle
 
-    if (hasNodesToRender) {
+    if (hasActualContent) {
       logGroupEnd();
     }
 

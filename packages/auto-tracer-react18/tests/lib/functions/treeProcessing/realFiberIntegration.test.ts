@@ -104,8 +104,10 @@ describe("filterEmptyNodes - Real Fiber Integration", () => {
     // Verify we got output
     expect(logs.length).toBeGreaterThan(0);
 
-    // Should have component render cycle group
-    expect(output).toContain("Component render cycle");
+    // When all nodes are filtered to a single marker, cycle header should NOT be shown
+    expect(output).not.toContain("Component render cycle");
+    // Should have the marker showing levels collapsed
+    expect(output).toContain("levels collapsed");
   });
 
   it("should process real fiber with filterEmptyNodes: all", () => {
@@ -122,8 +124,10 @@ describe("filterEmptyNodes - Real Fiber Integration", () => {
     // Verify we got output
     expect(logs.length).toBeGreaterThan(0);
 
-    // Should have component render cycle group
-    expect(output).toContain("Component render cycle");
+    // When all nodes are filtered to a single marker, cycle header should NOT be shown
+    expect(output).not.toContain("Component render cycle");
+    // Should have the marker showing levels collapsed
+    expect(output).toContain("levels collapsed");
   });
 
   it("should show depth indicators when enabled", () => {
