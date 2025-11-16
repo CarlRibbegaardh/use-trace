@@ -45,6 +45,7 @@
     "@types/babel__traverse": "^7.18.0",
     "@types/node": "^22.12.0",
     "@vitest/coverage-v8": "^4.0.3",
+    "jsdom": "^24.1.0",
     "rimraf": "^6.0.1",
     "typescript": "^5.2.0",
     "vite-tsconfig-paths": "^5.1.4",
