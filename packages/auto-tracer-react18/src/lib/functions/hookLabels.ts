@@ -223,7 +223,7 @@ export function resolveHookLabel(
         // Check if key order matches
         if (
           storedKeys.length !== currentKeys.length ||
-          !storedKeys.every((k, i) => k === currentKeys[i])
+          !storedKeys.every((k, i) => {return k === currentKeys[i]})
         ) {
           return false; // Key mismatch (different count or order)
         }
@@ -362,10 +362,7 @@ function tryStructuralMatching(
       typeof labelEntry.normalizedValue === "object" &&
       labelEntry.normalizedValue !== null
     ) {
-      const labelObject = labelEntry.normalizedValue as Record<
-        string,
-        unknown
-      >;
+      const labelObject = labelEntry.normalizedValue as Record<string, unknown>;
       const normalizedCurrentStr = stringify(normalizedCurrent);
 
       // Check if the primitive matches any property value in the registered object
@@ -450,7 +447,7 @@ function tryStructuralMatching(
       // Check if structures match (same keys in same order)
       if (
         reconstructedKeys.length !== currentKeys.length ||
-        !reconstructedKeys.every((k, i) => k === currentKeys[i])
+        !reconstructedKeys.every((k, i) => {return k === currentKeys[i]})
       ) {
         // Structure mismatch - current value has evolved (Bug 1: different keys, Bug 2: different order)
         continue; // Skip this label, try next one

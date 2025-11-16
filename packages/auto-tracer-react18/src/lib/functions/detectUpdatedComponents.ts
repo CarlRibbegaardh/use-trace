@@ -4,9 +4,9 @@ import { buildTreeFromFiber } from "./treeProcessing/building/buildTreeFromFiber
 import { applyEmptyNodeFilter } from "./treeProcessing/filtering/applyEmptyNodeFilter.js";
 import { renderTree } from "./treeProcessing/rendering/renderTree.js";
 import {
-  traceOptions,
-  incrementRenderCycle,
   getRenderCycleInfo,
+  incrementRenderCycle,
+  traceOptions,
 } from "../types/globalState.js";
 
 export function detectUpdatedComponents(root: unknown): void {
@@ -50,7 +50,9 @@ export function detectUpdatedComponents(root: unknown): void {
 
     // Only open the group if there are actual nodes to render (not just markers)
     // A tree containing ONLY markers means everything was filtered out
-    const hasActualContent = filtered.some((node) => node.renderType !== "Marker");
+    const hasActualContent = filtered.some(
+      (node) => {return node.renderType !== "Marker"}
+    );
     if (hasActualContent) {
       const { cycleNumber, filteredCount } = getRenderCycleInfo();
       const cycleLabel =
