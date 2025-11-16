@@ -11,7 +11,7 @@ autoTracer({
   includeMount: "never",
   maxFiberDepth: 100,
   filterEmptyNodes: "all",
-  enableAutoTracerInternalsLogging: false,
+  enableAutoTracerInternalsLogging: true,
   detectIdenticalValueChanges: true,
   skippedObjectProps: [
     {

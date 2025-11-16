@@ -3,7 +3,7 @@ applyTo: "**"
 ---
 
 NEVER CHANGE CODE WHEN ASKED A QUESTION, OR DISCUSSING A PROBLEM.
-ALWAYS ASK FOR PERMISSION BEFORE EDITING, MOVING OR DELETING FILES.
+ASK FOR SPECIAL PERMISSON IF MOVING OR DELETING FILES.
 FOLLOW ALL INSTRUCTIONS IN THIS FILE TO THE LETTER.
 
 # Background
@@ -52,11 +52,13 @@ The **apps** are examples and demos of how to use the packages.
 - Run E2E via `pnpm --filter <app-name> test:e2e` (no ad-hoc flags)
 - Run **one spec file at a time** for E2E (pass a single test **file path** to the script if supported by the repo scripts)
 - When checking for a string in a test, **use a direct string comparison** instead of asserting on match counts; it yields clearer failures and is easier to read.
+- Quick reference: `@auto-tracer/react18-proof` components manually call `useAutoTracer`/`labelState`, import only from the public API, and mirror `spec-highlevel-draft.md`. Its test output is the acceptance signal for all "core project" behavior.
 
 # Development Practices
 
 - The main tracing library provides `useAutoTracer` hooks for component render tracking.
 - Initialize AutoTracer in `main.tsx` **before** React renders.
+- Treat `@auto-tracer/react18-proof` as the canonical integration harness for `@auto-tracer/react18` and any shared tracing capability. It validates the specification without Babel/Vite injection, so run it first, understand its failures, and only afterward move on to demo apps.
 - When working with tests, use the repository’s `pnpm` scripts (source of truth for running tests).
 - Follow the monorepo structure when changing code across packages.
 - Every package and app must have a **README** with **detailed** descriptions, usage, code examples, and mermaid flowcharts where helpful. Update the README when behavior changes.
@@ -107,6 +109,8 @@ A task is **not done** unless:
 
 - The **target** library or app builds successfully from the root using a filtered command (e.g., `pnpm --filter <target> build`), and
 - The tests for the **target** library or app pass from the root using a filtered command (e.g., `pnpm --filter <target> test`).
+- If the target touches `@auto-tracer/react18` or shared tracing infrastructure, include `pnpm --filter @auto-tracer/react18-proof test` in the required test run before moving on to any demo apps.
+- Updates to the @auto-tracer/react18-proof suite must be documented in the associated README.
 
 # Feature Verification
 
