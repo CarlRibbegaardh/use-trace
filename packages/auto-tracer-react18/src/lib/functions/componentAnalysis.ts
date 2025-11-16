@@ -2,7 +2,7 @@ import { getComponentName } from "./getComponentName.js";
 import { getRealComponentName } from "./getRealComponentName.js";
 import { getTrackingGUID } from "./renderRegistry.js";
 import { Placement, hasRenderWork } from "./reactFiberFlags.js";
-import type { FiberNode } from "./fiberTraversal.js";
+import type { FiberNode } from "../interfaces/FiberNode.js";
 
 /**
  * Analysis result for a component fiber
@@ -37,7 +37,9 @@ export interface ComponentDisplayInfo {
 /**
  * Analyze a component fiber to extract information needed for processing
  */
-export function analyzeComponentFiber(fiber: unknown): ComponentAnalysis | null {
+export function analyzeComponentFiber(
+  fiber: unknown
+): ComponentAnalysis | null {
   if (!fiber || typeof fiber !== "object") {
     return null;
   }
@@ -50,8 +52,11 @@ export function analyzeComponentFiber(fiber: unknown): ComponentAnalysis | null 
   }
 
   const componentName = getComponentName(fiberNode.elementType);
-  const realComponentName = getRealComponentName(fiberNode as Record<string, unknown>);
-  const displayName = realComponentName !== "Unknown" ? realComponentName : componentName;
+  const realComponentName = getRealComponentName(
+    fiberNode as Record<string, unknown>
+  );
+  const displayName =
+    realComponentName !== "Unknown" ? realComponentName : componentName;
 
   const trackingGUID = getTrackingGUID(fiberNode);
   const isTracked = trackingGUID !== null;
@@ -121,7 +126,9 @@ export function shouldTrackComponent(
 /**
  * Get display information for a component
  */
-export function getComponentDisplayInfo(analysis: ComponentAnalysis): ComponentDisplayInfo {
+export function getComponentDisplayInfo(
+  analysis: ComponentAnalysis
+): ComponentDisplayInfo {
   return {
     displayName: analysis.displayName,
     isTracked: analysis.isTracked,
