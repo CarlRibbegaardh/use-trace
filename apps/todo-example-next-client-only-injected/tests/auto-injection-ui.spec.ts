@@ -12,7 +12,7 @@ test.describe('Auto-injection logs', () => {
     await page.waitForTimeout(1000);
 
     const renderCycleLogs = pageLogs.filter((l) =>
-      l.includes('Component render cycle:')
+      /Component render cycle \d+/.test(l)
     );
     expect(renderCycleLogs.length).toBeGreaterThan(0);
   });

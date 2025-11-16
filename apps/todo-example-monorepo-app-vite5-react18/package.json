@@ -1,0 +1,45 @@
+{
+  "name": "todo-example-monorepo-app-vite5-react18",
+  "private": true,
+  "version": "0.0.0",
+  "author": "Carl Ribbegårdh",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "prebuild": "pnpm run clean",
+    "clean": "rimraf dist",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.15.15",
+    "@mui/material": "^5.15.15",
+    "@reduxjs/toolkit": "^2.2.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-redux": "^9.1.0",
+    "todo-example-monorepo-lib-built-dep-vite5-react18": "workspace:*",
+    "todo-example-monorepo-lib-built-nodep-vite5-react18": "workspace:*",
+    "todo-example-monorepo-lib-source-vite5-react18": "workspace:*"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.43.1",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/parser": "^7.13.1",
+    "@vitejs/plugin-react": "^4.3.1",
+    "@auto-tracer/plugin-vite-react18": "workspace:*",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.7",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.2.2",
+    "@auto-tracer/react18": "workspace:*",
+    "vite": "^5.3.1"
+  }
+}

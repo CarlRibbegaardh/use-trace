@@ -70,9 +70,7 @@ describe("devToolsUtils", () => {
     });
 
     it("should handle errors gracefully and return null", async () => {
-      const { logWarn } = vi.mocked(
-        await import("@src/lib/functions/log.js")
-      );
+      const { logWarn } = vi.mocked(await import("@src/lib/functions/log.js"));
 
       // Create a window object that throws when accessing the hook
       Object.defineProperty(globalThis, "window", {
@@ -187,9 +185,7 @@ describe("devToolsUtils", () => {
     });
 
     it("should handle errors and return null", async () => {
-      const { logError } = vi.mocked(
-        await import("@src/lib/functions/log.js")
-      );
+      const { logError } = vi.mocked(await import("@src/lib/functions/log.js"));
 
       // Create a DevTools object that throws when setting the hook
       const mockDevTools = {};
@@ -255,9 +251,7 @@ describe("devToolsUtils", () => {
     });
 
     it("should handle errors and return false", async () => {
-      const { logError } = vi.mocked(
-        await import("@src/lib/functions/log.js")
-      );
+      const { logError } = vi.mocked(await import("@src/lib/functions/log.js"));
 
       // Create a DevTools object that throws when setting the hook
       const mockDevTools = {};
@@ -317,9 +311,7 @@ describe("devToolsUtils", () => {
     });
 
     it("should log errors when enableAutoTracerInternalsLogging is true", async () => {
-      const { logError } = vi.mocked(
-        await import("@src/lib/functions/log.js")
-      );
+      const { logError } = vi.mocked(await import("@src/lib/functions/log.js"));
 
       const error = new Error("Hook error");
       const mockHookFn = vi.fn(() => {
@@ -336,9 +328,7 @@ describe("devToolsUtils", () => {
     });
 
     it("should not log errors when enableAutoTracerInternalsLogging is false", async () => {
-      const { logError } = vi.mocked(
-        await import("@src/lib/functions/log.js")
-      );
+      const { logError } = vi.mocked(await import("@src/lib/functions/log.js"));
 
       const mockHookFn = vi.fn(() => {
         throw new Error("Hook error");
@@ -351,9 +341,7 @@ describe("devToolsUtils", () => {
     });
 
     it("should not log errors when enableAutoTracerInternalsLogging is undefined (default)", async () => {
-      const { logError } = vi.mocked(
-        await import("@src/lib/functions/log.js")
-      );
+      const { logError } = vi.mocked(await import("@src/lib/functions/log.js"));
 
       const mockHookFn = vi.fn(() => {
         throw new Error("Hook error");
@@ -387,9 +375,7 @@ describe("devToolsUtils", () => {
     });
 
     it("should log success message when DevTools is available and logging is enabled", async () => {
-      const { log } = vi.mocked(
-        await import("@src/lib/functions/log.js")
-      );
+      const { log } = vi.mocked(await import("@src/lib/functions/log.js"));
 
       Object.defineProperty(globalThis, "window", {
         value: {
@@ -405,9 +391,7 @@ describe("devToolsUtils", () => {
     });
 
     it("should log warning when DevTools is not available and logging is enabled", async () => {
-      const { logWarn } = vi.mocked(
-        await import("@src/lib/functions/log.js")
-      );
+      const { logWarn } = vi.mocked(await import("@src/lib/functions/log.js"));
 
       Object.defineProperty(globalThis, "window", {
         value: {},
@@ -418,7 +402,10 @@ describe("devToolsUtils", () => {
       logDevToolsStatus(true);
 
       expect(logWarn).toHaveBeenCalledWith(
-        "AutoTracer: React DevTools not found. Install React DevTools extension for tracing to work."
+        "AutoTracer: React DevTools not available. To use AutoTracer, either:\r\n" +
+          "  1. Install the React DevTools browser extension, OR\r\n" +
+          "  2. Use the @auto-tracer/plugin-vite-react18 or @auto-tracer/plugin-babel-react18 plugin\r\n" +
+          "Automatic Tracing will not work without one of these options."
       );
     });
   });

@@ -14,7 +14,7 @@ export function formatConnector(
   originalDepth: number,
   showLevel: boolean
 ): string {
-  const indent = "  ".repeat(Math.max(visualDepth - 1, 0));
+  const indent = "\u2007\u2007".repeat(Math.max(visualDepth - 1, 0));
   const levelText = showLevel ? ` (Level: ${originalDepth})` : "";
   return `${indent}└─┐${levelText}`;
 }

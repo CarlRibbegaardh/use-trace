@@ -15,6 +15,7 @@ test.describe('Auto-tracer logging (Next client-only)', () => {
     const joined = consoleLogs.join('\n');
 
     // Fails until autoTracer() is initialized on the client
-    expect(joined).toContain('Component render cycle');
+    // The counter starts at 1 and increments for each render cycle
+    expect(joined).toMatch(/Component render cycle \d+/);
   });
 });

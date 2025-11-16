@@ -1,6 +1,7 @@
 import type { StateValue } from "../interfaces/StateValue.js";
 import { logWarn } from "./log.js";
-//import { extractHookNameFromFiber } from "./extractHookNameFromFiber.js";
+
+const MAX_HOOK_CHAIN_DEPTH = 50 as const;
 
 export function extractUseStateValues(
   fiberNode: Record<string, unknown>
@@ -26,7 +27,7 @@ export function extractUseStateValues(
     let hookIndex = 0;
 
     // Walk through the hook chain to find useState hooks
-    while (currentHook && hookIndex < 20) {
+    while (currentHook && hookIndex < MAX_HOOK_CHAIN_DEPTH) {
       const typedHook = currentHook as {
         memoizedState?: unknown;
         queue?: unknown;
@@ -54,7 +55,11 @@ export function extractUseStateValues(
           name: hookName,
           value: currentValue,
           prevValue: prevValue,
-          hook: typedHook as { memoizedState: unknown; queue: unknown; next: unknown },
+          hook: typedHook as {
+            memoizedState: unknown;
+            queue: unknown;
+            next: unknown;
+          },
         });
       }
 

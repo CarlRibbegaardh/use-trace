@@ -113,13 +113,16 @@ export function createSafeRenderHook(
 export function logDevToolsStatus(
   enableAutoTracerInternalsLogging: boolean
 ): void {
-  if (!enableAutoTracerInternalsLogging) return;
-
   if (isDevToolsAvailable()) {
-    log("AutoTracer: React DevTools detected");
+    if (enableAutoTracerInternalsLogging) {
+      log("AutoTracer: React DevTools detected");
+    }
   } else {
     logWarn(
-      "AutoTracer: React DevTools not found. Install React DevTools extension for tracing to work."
+      "AutoTracer: React DevTools not available. To use AutoTracer, either:\r\n" +
+        "  1. Install the React DevTools browser extension, OR\r\n" +
+        "  2. Use the @auto-tracer/plugin-vite-react18 or @auto-tracer/plugin-babel-react18 plugin\r\n" +
+        "Automatic Tracing will not work without one of these options."
     );
   }
 }
