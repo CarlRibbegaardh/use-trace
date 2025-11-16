@@ -3,9 +3,7 @@ import { defineConfig } from "vitest/config";
 // https://vitest.dev/guide/#configuring-vitest
 export default defineConfig(({ command, mode }) => {
   console.log("command:", command); // Will  return "build" or "serve"
-  console.log("mode:", mode); // Will return "production", "ci" or "development". We use --mode ci for coverage on ci builds.
-
-  const ci = mode === "ci";
+  console.log("mode:", mode); // Will return "production" or "development".
 
   return {
     test: {
@@ -29,12 +27,7 @@ export default defineConfig(({ command, mode }) => {
           "**/index.*",
           "**/interfaces/**",
         ],
-        reporter: ci
-          ? [
-              ["lcov", { projectRoot: "./src" }],
-              ["json", { file: "coverage.json" }],
-            ]
-          : ["html", "text", "json-summary", "text-summary"],
+        reporter: ["html", "text", "json-summary", "text-summary"],
         thresholds: {
           global: {
             branches: 80,
