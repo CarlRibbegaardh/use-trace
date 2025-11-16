@@ -664,9 +664,6 @@ importers:
       typescript:
         specifier: ^5.2.0
         version: 5.5.3
-      vite-tsconfig-paths:
-        specifier: ^5.1.4
-        version: 5.1.4(typescript@5.5.3)(vite@7.1.12(@types/node@22.12.0)(jiti@2.6.1))
       vitest:
         specifier: ^4.0.3
         version: 4.0.3(@types/node@22.12.0)(jiti@2.6.1)(jsdom@24.1.0)
@@ -737,6 +734,9 @@ importers:
       unplugin:
         specifier: ^1.5.0
         version: 1.16.1
+      vite:
+        specifier: ^4.0.0 || ^5.0.0
+        version: 5.3.3(@types/node@22.12.0)
     devDependencies:
       '@types/node':
         specifier: ^22.12.0
@@ -753,9 +753,6 @@ importers:
       typescript:
         specifier: ^5.2.0
         version: 5.5.3
-      vite:
-        specifier: ^5.3.1
-        version: 5.3.3(@types/node@22.12.0)
       vitest:
         specifier: ^4.0.3
         version: 4.0.3(@types/node@22.12.0)(jiti@2.6.1)(jsdom@24.1.0)
@@ -768,9 +765,6 @@ importers:
       safe-stable-stringify:
         specifier: ^2.4.3
         version: 2.5.0
-      tslib:
-        specifier: ^2.6.3
-        version: 2.6.3
     devDependencies:
       '@testing-library/react':
         specifier: ^14.3.1
@@ -844,30 +838,12 @@ importers:
 
   packages/auto-tracer-react18-proof:
     dependencies:
-      '@emotion/react':
-        specifier: ^11.11.4
-        version: 11.14.0(@types/react@18.3.3)(react@18.3.1)
-      '@emotion/styled':
-        specifier: ^11.11.5
-        version: 11.14.1(@emotion/react@11.14.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
-      '@mui/icons-material':
-        specifier: ^5.15.15
-        version: 5.18.0(@mui/material@5.18.0(@emotion/react@11.14.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
-      '@mui/material':
-        specifier: ^5.15.15
-        version: 5.18.0(@emotion/react@11.14.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@reduxjs/toolkit':
-        specifier: ^2.2.3
-        version: 2.9.2(react-redux@9.2.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
       react:
         specifier: ^18.3.1
         version: 18.3.1
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
-      react-redux:
-        specifier: ^9.1.0
-        version: 9.2.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1)
     devDependencies:
       '@auto-tracer/react18':
         specifier: workspace:*
@@ -914,9 +890,6 @@ importers:
       jsdom:
         specifier: ^24.1.0
         version: 24.1.0
-      react-devtools-core:
-        specifier: ^7.0.1
-        version: 7.0.1
       rimraf:
         specifier: ^6.0.1
         version: 6.1.0
@@ -931,10 +904,6 @@ importers:
         version: 4.0.3(@types/node@22.12.0)(jiti@2.6.1)(jsdom@24.1.0)
 
   packages/use-trace:
-    dependencies:
-      tslib:
-        specifier: ^2.6.3
-        version: 2.6.3
     devDependencies:
       '@testing-library/react':
         specifier: ^14.3.1
@@ -978,9 +947,6 @@ importers:
       eslint-plugin-sort-exports:
         specifier: ^0.9.1
         version: 0.9.1(eslint@8.57.0)
-      flatted:
-        specifier: ^3.3.3
-        version: 3.3.3
       jsdom:
         specifier: ^24.1.0
         version: 24.1.0
@@ -2988,9 +2954,6 @@ packages:
     resolution: {integrity: sha512-jhIXaOzy1sb8IyocaruWSn1TjmnBVs8Ayhcy83rmxNJ8q2uWKCAj3CnJY+KpGSXCueAPc0i05kVvVKtP1t9S3g==}
     engines: {node: '>=10'}
 
-  globrex@0.1.2:
-    resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
-
   gopd@1.0.1:
     resolution: {integrity: sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==}
 
@@ -3573,9 +3536,6 @@ packages:
   ramda@0.32.0:
     resolution: {integrity: sha512-GQWAHhxhxWBWA8oIBr1XahFVjQ9Fic6MK9ikijfd4TZHfE2+urfk+irVlR5VOn48uwMgM+loRRBJd6Yjsbc0zQ==}
 
-  react-devtools-core@7.0.1:
-    resolution: {integrity: sha512-C3yNvRHaizlpiASzy7b9vbnBGLrhvdhl1CbdU6EnZgxPNbai60szdLtl+VL76UNOt5bOoVTOz5rNWZxgGt+Gsw==}
-
   react-dom@18.3.1:
     resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
     peerDependencies:
@@ -3735,10 +3695,6 @@ packages:
   shebang-regex@3.0.0:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
-
-  shell-quote@1.8.3:
-    resolution: {integrity: sha512-ObmnIF4hXNg1BqhnHmgbDETF8dLPCggZWBjkQfhZpbszZnYur5DUljTcCHii5LC3J5E0yeO/1LIMyH+UvHQgyw==}
-    engines: {node: '>= 0.4'}
 
   side-channel@1.0.6:
     resolution: {integrity: sha512-fDW/EZ6Q9RiO8eFG8Hj+7u/oW+XrPTIChwCOM2+th2A6OblDtYYIpve9m+KvI9Z4C9qSEXlaGR6bTEYHReuglA==}
@@ -3901,16 +3857,6 @@ packages:
   ts-toolbelt@9.6.0:
     resolution: {integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==}
 
-  tsconfck@3.1.6:
-    resolution: {integrity: sha512-ks6Vjr/jEw0P1gmOVwutM3B7fWxoWBL2KRDb1JfqGVawBmO5UsvmWOQFGHBPl5yxYz4eERr19E6L7NMv+Fej4w==}
-    engines: {node: ^18 || >=20}
-    hasBin: true
-    peerDependencies:
-      typescript: ^5.0.0
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
   tsconfig-paths@3.15.0:
     resolution: {integrity: sha512-2Ac2RgzDe/cn48GvOe3M+o82pEFewD3UPbyoUHHdKasHwJKjds4fLXWf/Ux5kATBKN20oaFGu+jbElp1pos0mg==}
 
@@ -3988,14 +3934,6 @@ packages:
     resolution: {integrity: sha512-Pp6GSwGP/NrPIrxVFAIkOQeyw8lFenOHijQWkUTrDvrF4ALqylP2C/KCkeS9dpUM3KvYRQhna5vt7IL95+ZQ9w==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-
-  vite-tsconfig-paths@5.1.4:
-    resolution: {integrity: sha512-cYj0LRuLV2c2sMqhqhGpaO3LretdtMn/BVX4cPLanIZuwwrkVl+lK84E/miEXkCHWXuq65rhNN4rXsBcOB3S4w==}
-    peerDependencies:
-      vite: '*'
-    peerDependenciesMeta:
-      vite:
-        optional: true
 
   vite@5.3.3:
     resolution: {integrity: sha512-NPQdeCU0Dv2z5fu+ULotpuq5yfCS1BzKUIPhNbP3YBfAMGJXbt2nS+sbTFu+qchaqWTD+H3JK++nRwr6XIcp6A==}
@@ -4161,18 +4099,6 @@ packages:
 
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
-
-  ws@7.5.10:
-    resolution: {integrity: sha512-+dbF1tHwZpXcbOJdVOkzLDxZP1ailvSxM6ZweXTegylPny803bFhA+vqBYw4s31NSAk4S2Qz+AKXK9a4wkdjcQ==}
-    engines: {node: '>=8.3.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: ^5.0.2
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
 
   ws@8.18.0:
     resolution: {integrity: sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==}
@@ -6355,8 +6281,6 @@ snapshots:
       merge2: 1.4.1
       slash: 3.0.0
 
-  globrex@0.1.2: {}
-
   gopd@1.0.1:
     dependencies:
       get-intrinsic: 1.2.4
@@ -6946,14 +6870,6 @@ snapshots:
 
   ramda@0.32.0: {}
 
-  react-devtools-core@7.0.1:
-    dependencies:
-      shell-quote: 1.8.3
-      ws: 7.5.10
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
   react-dom@18.3.1(react@18.3.1):
     dependencies:
       loose-envify: 1.4.0
@@ -7132,8 +7048,6 @@ snapshots:
 
   shebang-regex@3.0.0: {}
 
-  shell-quote@1.8.3: {}
-
   side-channel@1.0.6:
     dependencies:
       call-bind: 1.0.7
@@ -7270,10 +7184,6 @@ snapshots:
 
   ts-toolbelt@9.6.0: {}
 
-  tsconfck@3.1.6(typescript@5.5.3):
-    optionalDependencies:
-      typescript: 5.5.3
-
   tsconfig-paths@3.15.0:
     dependencies:
       '@types/json5': 0.0.29
@@ -7369,17 +7279,6 @@ snapshots:
   use-sync-external-store@1.6.0(react@18.3.1):
     dependencies:
       react: 18.3.1
-
-  vite-tsconfig-paths@5.1.4(typescript@5.5.3)(vite@7.1.12(@types/node@22.12.0)(jiti@2.6.1)):
-    dependencies:
-      debug: 4.4.3
-      globrex: 0.1.2
-      tsconfck: 3.1.6(typescript@5.5.3)
-    optionalDependencies:
-      vite: 7.1.12(@types/node@22.12.0)(jiti@2.6.1)
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
 
   vite@5.3.3(@types/node@22.12.0):
     dependencies:
@@ -7562,8 +7461,6 @@ snapshots:
       strip-ansi: 7.1.2
 
   wrappy@1.0.2: {}
-
-  ws@7.5.10: {}
 
   ws@8.18.0: {}
 

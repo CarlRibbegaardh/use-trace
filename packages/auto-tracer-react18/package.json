@@ -15,8 +15,7 @@
   "type": "module",
   "dependencies": {
     "ramda": "^0.32.0",
-    "safe-stable-stringify": "^2.4.3",
-    "tslib": "^2.6.3"
+    "safe-stable-stringify": "^2.4.3"
   },
   "devDependencies": {
     "@testing-library/react": "^14.3.1",
