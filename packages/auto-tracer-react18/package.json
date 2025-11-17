@@ -66,6 +66,7 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./dist/index.umd.js": "./dist/index.umd.js"
+    "./dist/index.umd.js": "./dist/index.umd.js",
+    "./package.json": "./package.json"
   }
 }

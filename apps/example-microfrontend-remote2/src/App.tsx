@@ -1,18 +1,12 @@
 import { useState, useEffect } from "react";
-import { useAutoTracer } from "@auto-tracer/react18";
 import "./App.css";
 
 /**
  * Timer component for Remote 2
  */
 function Timer() {
-  const logger = useAutoTracer();
-
   const [seconds, setSeconds] = useState(0);
-  logger.labelState(0, "seconds", seconds, "setSeconds", setSeconds);
-
   const [isRunning, setIsRunning] = useState(false);
-  logger.labelState(1, "isRunning", isRunning, "setIsRunning", setIsRunning);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -41,16 +35,9 @@ function Timer() {
  * Form component for Remote 2
  */
 function Form() {
-  const logger = useAutoTracer();
-
   const [name, setName] = useState("");
-  logger.labelState(0, "name", name, "setName", setName);
-
   const [email, setEmail] = useState("");
-  logger.labelState(1, "email", email, "setEmail", setEmail);
-
   const [submitted, setSubmitted] = useState(false);
-  logger.labelState(2, "submitted", submitted, "setSubmitted", setSubmitted);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,13 +78,8 @@ function Form() {
  * Remote 2 App - Exposed to host via Module Federation
  */
 function App() {
-  const logger = useAutoTracer();
-
   const [showTimer, setShowTimer] = useState(true);
-  logger.labelState(0, "showTimer", showTimer, "setShowTimer", setShowTimer);
-
   const [showForm, setShowForm] = useState(true);
-  logger.labelState(1, "showForm", showForm, "setShowForm", setShowForm);
 
   return (
     <div className="remote-app remote2">

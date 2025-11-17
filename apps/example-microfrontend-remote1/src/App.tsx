@@ -1,15 +1,11 @@
 import { useState } from "react";
-import { useAutoTracer } from "@auto-tracer/react18";
 import "./App.css";
 
 /**
  * Counter component for Remote 1
  */
 function Counter() {
-  const logger = useAutoTracer();
-
   const [count, setCount] = useState(0);
-  logger.labelState(0, "count", count, "setCount", setCount);
 
   return (
     <div className="counter">
@@ -24,13 +20,8 @@ function Counter() {
  * Todo list component for Remote 1
  */
 function TodoList() {
-  const logger = useAutoTracer();
-
   const [todos, setTodos] = useState<string[]>([]);
-  logger.labelState(0, "todos", todos, "setTodos", setTodos);
-
   const [input, setInput] = useState("");
-  logger.labelState(1, "input", input, "setInput", setInput);
 
   const addTodo = () => {
     if (input.trim()) {
@@ -65,13 +56,8 @@ function TodoList() {
  * Remote 1 App - Exposed to host via Module Federation
  */
 function App() {
-  const logger = useAutoTracer();
-
   const [showCounter, setShowCounter] = useState(true);
-  logger.labelState(0, "showCounter", showCounter, "setShowCounter", setShowCounter);
-
   const [showTodos, setShowTodos] = useState(true);
-  logger.labelState(1, "showTodos", showTodos, "setShowTodos", setShowTodos);
 
   return (
     <div className="remote-app remote1">

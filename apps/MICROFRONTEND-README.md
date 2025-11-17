@@ -186,10 +186,12 @@ pnpm --filter example-microfrontend-remote2 build
 
 ### 4. Labeled State Behavior
 
-All components use `logger.labelState()` for clear state identification:
-- Host: `hostCounter`, `showRemote1`, `showRemote2`
-- Remote 1: `count`, `todos`, `input`, `showCounter`, `showTodos`
-- Remote 2: `seconds`, `isRunning`, `name`, `email`, `submitted`, `showTimer`, `showForm`
+All components use labeled state for clear identification:
+- **Host**: Uses manual `logger.labelState()` calls - `hostCounter`, `showRemote1`, `showRemote2`
+- **Remote 1**: Uses automatic plugin injection - `count`, `todos`, `input`, `showCounter`, `showTodos`
+- **Remote 2**: Uses automatic plugin injection - `seconds`, `isRunning`, `name`, `email`, `submitted`, `showTimer`, `showForm`
+
+The host app demonstrates **manual instrumentation** with explicit `useAutoTracer()` and `logger.labelState()` calls, while the remotes use the **@auto-tracer/plugin-vite-react18** Vite plugin for **automatic instrumentation** at build time. This showcases both approaches side-by-side.
 
 ## Module Federation Configuration
 

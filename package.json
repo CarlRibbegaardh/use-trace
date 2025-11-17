@@ -9,6 +9,7 @@
     "clean": "turbo run clean",
     "dev": "turbo run dev",
     "dev:microfrontend": "turbo run dev --filter=example-microfrontend-host --filter=example-microfrontend-remote1 --filter=example-microfrontend-remote2",
+    "preview:microfrontend": "turbo run preview --filter=example-microfrontend-host --filter=example-microfrontend-remote1 --filter=example-microfrontend-remote2",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
