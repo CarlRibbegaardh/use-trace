@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Island 2 - Standalone</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 2rem;
+      font-family: system-ui, sans-serif;
+      background: #f3f4f6;
+    }
+  </style>
+</head>
+<body>
+  <h1>Island 2 - Standalone Mode</h1>
+  <div id="root"></div>
+
+  <script src="/auto-tracer-react18.umd.js"></script>
+  <script>
+    if (window.AutoTracer) {
+      window.AutoTracer.autoTracer({
+        enabled: true,
+        detectIdenticalValueChanges: true,
+        enableAutoTracerInternalsLogging: true,
+      });
+    }
+  </script>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

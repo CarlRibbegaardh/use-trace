@@ -1,0 +1,29 @@
+{
+  "name": "example-islands-react2",
+  "private": true,
+  "version": "0.0.0",
+  "author": "Carl Ribbegårdh",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "prebuild": "pnpm run clean",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@auto-tracer/react18": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@auto-tracer/plugin-vite-react18": "workspace:*",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "rimraf": "^5.0.7",
+    "typescript": "~5.5.3",
+    "vite": "^5.3.3"
+  }
+}
