@@ -1,0 +1,148 @@
+.remote-app {
+  padding: 1rem;
+}
+
+.remote2 {
+  background: linear-gradient(135deg, #48bb7815 0%, #2ecc7115 100%);
+  border-left: 4px solid #48bb78;
+}
+
+.remote-header {
+  margin-bottom: 1rem;
+}
+
+.remote-header h2 {
+  margin: 0 0 0.5rem 0;
+  color: #48bb78;
+}
+
+.remote-header p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.toggle-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.toggle-buttons button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #48bb78;
+  background: white;
+  color: #48bb78;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggle-buttons button:hover {
+  background: #48bb78;
+  color: white;
+}
+
+.components-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.timer {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.timer-display {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #48bb78;
+  margin-bottom: 1rem;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.timer-controls button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: #48bb78;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 1rem;
+}
+
+.timer-controls button:hover {
+  background: #38a169;
+}
+
+.form-container {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-container h4 {
+  margin-top: 0;
+  color: #333;
+}
+
+.form-field {
+  margin-bottom: 1rem;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.form-field input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: #48bb78;
+}
+
+form button[type="submit"] {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: #48bb78;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 1rem;
+  width: 100%;
+}
+
+form button[type="submit"]:hover {
+  background: #38a169;
+}
+
+.success-message {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #c6f6d5;
+  color: #22543d;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 500;
+}

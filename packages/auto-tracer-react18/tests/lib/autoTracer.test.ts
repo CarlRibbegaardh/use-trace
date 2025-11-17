@@ -29,6 +29,7 @@ import {
 vi.mock("@src/lib/types/globalState.js", () => {
   return {
     setTracerOptions: vi.fn(),
+    setIsGlobalTracerInstalled: vi.fn(),
   };
 });
 
@@ -110,10 +111,11 @@ vi.mock("@src/lib/functions/log.js", () => {
   };
 });
 
-// Mock render registry
+// Mock render registry (include clearRenderRegistry to satisfy stopAutoTracer clearing logic)
 vi.mock("@src/lib/functions/renderRegistry.js", () => {
   return {
     useAutoTracer: vi.fn(),
+    clearRenderRegistry: vi.fn(),
   };
 });
 

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignoreWorkspaces": [".", "apps/*"],
+  "ignore": ["**/*.d.ts", "**/tests/setupTests.ts", "**/.eslintrc.cjs"],
+  "ignoreDependencies": ["jsdom", "@vitest/coverage-v8"],
+  "workspaces": {
+    "packages/*": {},
+    "packages/auto-tracer-react18": {
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "tests/**/*.{ts,tsx}"
+      ],
+      "paths": {
+        "@src/*": ["src/*"],
+        "@tests/*": ["tests/*"]
+      }
+    },
+    "packages/auto-tracer-react18-proof": {
+      "entry": [
+        "tests/**/*.{test,spec}.{ts,tsx}"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "tests/**/*.{ts,tsx}"
+      ],
+      "paths": {
+        "@src/*": ["src/*"],
+        "@tests/*": ["tests/*"]
+      }
+    },
+    "packages/auto-tracer-plugin-vite-react18": {
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "tests/**/*.{ts,tsx}"
+      ],
+      "paths": {
+        "@src/*": ["src/*"],
+        "@tests/*": ["tests/*"]
+      }
+    }
+  }
+}

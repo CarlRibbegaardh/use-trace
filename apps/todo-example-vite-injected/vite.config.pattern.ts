@@ -14,9 +14,11 @@ export default defineConfig({
     })
   ],
   server: {
-    port: 5176, // Different port for pattern testing
+      port: 5184, // Different port for pattern testing
+      strictPort: true,
   },
   preview: {
-    port: 5176,
+      port: 5184,
+      strictPort: true,
   },
 })

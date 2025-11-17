@@ -1,3 +1,4 @@
+import type { FiberNode } from "../interfaces/FiberNode.js";
 import { traceOptions } from "../types/globalState.js";
 import { logWarn } from "./log.js";
 import { getTrackingGUID } from "./renderRegistry.js";
@@ -13,20 +14,6 @@ export interface FiberVisitor {
    * @returns boolean - true to continue traversing children, false to skip
    */
   visit(fiber: unknown, depth: number): boolean;
-}
-
-/**
- * Basic fiber node interface for type safety
- */
-export interface FiberNode {
-  elementType?: unknown;
-  child?: unknown;
-  sibling?: unknown;
-  flags?: number;
-  alternate?: unknown;
-  memoizedProps?: Record<string, unknown>;
-  pendingProps?: Record<string, unknown>;
-  memoizedState?: unknown;
 }
 
 // Track the last depth we processed for connecting line visualization

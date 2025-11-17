@@ -1,8 +1,12 @@
 import type { AutoTracerOptions } from "./interfaces/AutoTracerOptions.js";
 import { detectUpdatedComponents } from "./functions/detectUpdatedComponents.js";
+import { clearRenderRegistry } from "./functions/renderRegistry.js";
 import { log, logWarn } from "./functions/log.js";
 import { deepMergeOptions } from "./functions/deepMerge.js";
-import { setTracerOptions } from "./types/globalState.js";
+import {
+  setIsGlobalTracerInstalled,
+  setTracerOptions,
+} from "./types/globalState.js";
 import { defaultAutoTracerOptions } from "./types/defaultSettings.js";
 import { validateAutoTracerOptions } from "./functions/validateOptions.js";
 import {
@@ -77,6 +81,7 @@ export function autoTracer(options: AutoTracerOptions = {}): () => void {
   originalOnCommitFiberRoot = installRenderHook(safeRenderHook);
 
   isAutoTracerActive = true;
+  setIsGlobalTracerInstalled(true);
 
   if (currentOptions.enableAutoTracerInternalsLogging) {
     log("AutoTracer: Global render monitor initialized");
@@ -94,8 +99,12 @@ export function stopAutoTracer(): void {
   // Restore the original hook
   restoreRenderHook(originalOnCommitFiberRoot);
 
+  // Clear registries once upon stop to release retained references
+  clearRenderRegistry();
+
   isAutoTracerActive = false;
   originalOnCommitFiberRoot = null;
+  setIsGlobalTracerInstalled(false);
 
   if (currentOptions.enableAutoTracerInternalsLogging) {
     log("AutoTracer: Global render monitor stopped");
@@ -115,11 +124,21 @@ export function isAutoTracerInitialized(): boolean {
 export function updateAutoTracerOptions(
   options: Partial<AutoTracerOptions>
 ): void {
+  const prevEnabled = currentOptions.enabled;
   const validatedOptions = validateAutoTracerOptions(
     options as AutoTracerOptions
   );
   currentOptions = deepMergeOptions(currentOptions, validatedOptions);
   updateTracerOptions(currentOptions);
+
+  // Auto-stop when transitioning from enabled true -> false
+  if (
+    prevEnabled === true &&
+    currentOptions.enabled === false &&
+    isAutoTracerActive
+  ) {
+    stopAutoTracer();
+  }
 }
 
 // Helper function to update the global trace options

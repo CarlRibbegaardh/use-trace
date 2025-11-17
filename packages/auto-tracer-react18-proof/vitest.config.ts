@@ -3,9 +3,7 @@ import { type ConfigEnv, ViteUserConfig, defineConfig } from "vitest/config";
 // https://vitest.dev/guide/#configuring-vitest
 const config = defineConfig(({ command, mode }: ConfigEnv): ViteUserConfig => {
   console.log("command:", command); // Will  return "build" or "serve"
-  console.log("mode:", mode); // Will return "production", "ci" or "development". We use --mode ci for coverage on ci builds.
-
-  const ci = mode === "ci";
+  console.log("mode:", mode); // Will return "production" or "development".
 
   const result: ViteUserConfig = {
     resolve: {
@@ -36,12 +34,7 @@ const config = defineConfig(({ command, mode }: ConfigEnv): ViteUserConfig => {
           "**/vitest.config.*",
           "**/tsconfig.*",
         ],
-        reporter: ci
-          ? [
-              ["lcov", { projectRoot: "./src" }],
-              ["json", { file: "coverage.json" }],
-            ]
-          : ["html", "text", "json-summary", "text-summary"],
+        reporter: ["html", "text", "json-summary", "text-summary"],
         thresholds: {
           global: {
             branches: 80,

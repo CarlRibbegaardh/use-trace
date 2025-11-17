@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React Islands Demo - AutoTracer</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      header {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #667eea;
+        margin-bottom: 0.5rem;
+      }
+
+      .subtitle {
+        color: #6b7280;
+        font-size: 1.1rem;
+      }
+
+      .islands-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .island-wrapper {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        min-height: 400px;
+      }
+
+      .island-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e5e7eb;
+      }
+
+      .island-title {
+        color: #374151;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .island-meta {
+        color: #9ca3af;
+        font-size: 0.875rem;
+      }
+
+      .loading {
+        color: #9ca3af;
+        text-align: center;
+        padding: 2rem;
+      }
+
+      .info-box {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .info-box h2 {
+        color: #374151;
+        margin-bottom: 1rem;
+      }
+
+      .info-box ul {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .info-box li {
+        padding: 0.5rem 0;
+        color: #6b7280;
+      }
+
+      .info-box li::before {
+        content: "✓ ";
+        color: #10b981;
+        font-weight: bold;
+        margin-right: 0.5rem;
+      }
+
+      @media (max-width: 768px) {
+        .islands-container {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🏝️ React Islands Architecture Demo</h1>
+        <p class="subtitle">
+          Two completely independent React applications - each with its own
+          tracing
+        </p>
+      </header>
+
+      <div class="islands-container">
+        <!-- Island 1: Counter & Todo -->
+        <div class="island-wrapper">
+          <div class="island-header">
+            <h2 class="island-title">🟦 Island 1: Counter & Todo</h2>
+            <p class="island-meta">Port 5201 • React 18 • AutoTracer</p>
+          </div>
+          <div id="island-1" class="loading">Loading island 1...</div>
+        </div>
+
+        <!-- Island 2: Timer & Form -->
+        <div class="island-wrapper">
+          <div class="island-header">
+            <h2 class="island-title">🟩 Island 2: Timer & Form</h2>
+            <p class="island-meta">Port 5202 • React 18 • AutoTracer</p>
+          </div>
+          <div id="island-2" class="loading">Loading island 2...</div>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <h2>📊 Open DevTools Console</h2>
+        <ul>
+          <li>Each island is a completely independent React application</li>
+          <li>Each island bundles its own React, ReactDOM, and AutoTracer</li>
+          <li>Each island produces separate trace logs with its own prefix</li>
+          <li>
+            Islands are loaded as UMD bundles and mount to specific DOM nodes
+          </li>
+          <li>
+            This demonstrates true "islands architecture" with zero coordination
+            required
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Install React DevTools hook BEFORE any React loads (required for AutoTracer) -->
+    <script>
+      if (!window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+        // This minimal hook allows AutoTracer to intercept React renders
+        // Must be installed before ANY React instance loads
+        let originalOnCommitFiberRoot = null;
+
+        window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = {
+          supportsFiber: true,
+          renderers: new Map(),
+
+          // Store original to allow AutoTracer to wrap it
+          get onCommitFiberRoot() {
+            return originalOnCommitFiberRoot || function () {};
+          },
+
+          // Allow AutoTracer to set its hook
+          set onCommitFiberRoot(value) {
+            originalOnCommitFiberRoot = value;
+          },
+
+          onCommitFiberUnmount: function () {},
+
+          inject: function (renderer) {
+            const id = Math.random().toString(16).slice(2);
+            this.renderers.set(id, renderer);
+            return id;
+          },
+        };
+      }
+    </script>
+
+    <!-- Each island bundles its own React, ReactDOM, and AutoTracer -->
+    <!-- This ensures complete independence - no shared dependencies -->
+
+    <!-- Load Island 1 -->
+    <script src="http://localhost:5201/island.umd.js"></script>
+    <script>
+      if (window.Island1) {
+        window.Island1.mount("island-1");
+      }
+    </script>
+
+    <!-- Load Island 2 -->
+    <script src="http://localhost:5202/island.umd.js"></script>
+    <script>
+      if (window.Island2) {
+        window.Island2.mount("island-2");
+      }
+    </script>
+  </body>
+</html>

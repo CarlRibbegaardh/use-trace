@@ -93,6 +93,13 @@ if (isAutoTracerInitialized()) {
 }
 ```
 
+### Inactive behavior and runtime changes
+
+- When `autoTracer()` has not been initialized or `enabled` is `false`, the `useAutoTracer()` hook is a strict no-op. It still anchors a hook position to preserve React’s rules of hooks, but it does not register GUIDs, labels, or logs.
+- If `enableAutoTracerInternalsLogging` is `true` and `enabled=true` but the tracer is not initialized, a one-time guidance message is printed: `AutoTracer: useAutoTracer() called while tracer not initialized. Call autoTracer() early in app startup.`
+- Calling `stopAutoTracer()` restores the original DevTools hook and clears internal registries once.
+- Updating options at runtime with `{ enabled: false }` when the tracer is active will automatically stop tracing (and clear registries). Subsequent `useAutoTracer()` calls remain no-ops until tracing is re-enabled and initialized again.
+
 ## What you’ll see
 
 - Component render cycle …
@@ -158,6 +165,7 @@ The auto-tracer-inject-core with Babel/Vite plugins augments your source so useA
 ## Troubleshooting
 
 - **No logs?** Verify autoTracer() runs before React renders and that you're in a client context.
+- **Seeing the guidance message about initialization?** You’re calling `useAutoTracer()` (directly or via injection) but haven’t called `autoTracer()` yet. Initialize early in your app’s startup, or disable tracing via `{ enabled:false }`.
 - **"React DevTools not available" warning?** Either install the [React DevTools browser extension](https://react.dev/learn/react-developer-tools) or use the `@auto-tracer/plugin-vite-react18` or `@auto-tracer/plugin-babel-react18` plugin, which automatically handles this for you.
 - **Unlabeled logs?** Ensure the injection plugin is configured and active in your build.
 - **Too verbose?** Tweak options like includeReconciled/includeSkipped and maxFiberDepth.

@@ -5,7 +5,7 @@ test.describe("Hook Labeling E2E Tests", () => {
     page,
     pageLogs,
   }) => {
-    await page.goto("http://localhost:5174");
+    await page.goto("/");
 
     // Wait for components to render and auto-tracer to initialize
     await page.waitForSelector('[data-testid="label-hooks-test"]');

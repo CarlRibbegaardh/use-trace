@@ -11,7 +11,7 @@
     "prebuild": "pnpm run clean",
     "clean": "rimraf .next",
     "start": "next start -p 5177",
-    "test:e2e": "playwright test --config=playwright.config.mjs --reporter=list"
+    "test:e2e": "playwright test --config=playwright.config.ts --reporter=list"
   },
   "dependencies": {
     "next": "^14.2.3",
