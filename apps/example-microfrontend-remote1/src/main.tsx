@@ -15,7 +15,7 @@ if (!window.__AUTOTRACER_INITIALIZED__) {
     maxFiberDepth: 2,
     includeNonTrackedBranches: true,
   });
-  (window as any).__AUTOTRACER_INITIALIZED__ = true;
+  window.__AUTOTRACER_INITIALIZED__ = true;
 }
 
 ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
