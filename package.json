@@ -3,13 +3,15 @@
   "author": "Carl Ribbegårdh",
   "license": "MIT",
   "type": "module",
+  "packageManager": "pnpm@10.18.3",
   "scripts": {
-    "build": "pnpm -r build",
-    "clean": "pnpm -r clean",
-    "dev": "pnpm -r dev",
-    "lint": "pnpm -r lint",
-    "test": "pnpm -r test",
-    "test:e2e": "pnpm -r test:e2e",
+    "build": "turbo run build",
+    "clean": "turbo run clean",
+    "dev": "turbo run dev",
+    "dev:microfrontend": "turbo run dev --filter=example-microfrontend-host --filter=example-microfrontend-remote1 --filter=example-microfrontend-remote2",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
     "verify": "pnpm run build && pnpm run lint && pnpm run test && pnpm run test:e2e",
     "list-packages": "pnpm list --depth 0 --json -r | node ./tools/list-packages.cjs",
     "list-packages-duplicates": "pnpm list --depth 0 --json -r | node ./tools/list-packages-duplicates.cjs",
@@ -26,7 +28,9 @@
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.3",
-    "vitest": "4.0.3",
-    "knip": "^5.0.0"
+    "concurrently": "^9.1.0",
+    "knip": "^5.0.0",
+    "turbo": "^2.6.1",
+    "vitest": "4.0.3"
   }
 }
