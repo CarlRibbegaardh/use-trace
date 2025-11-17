@@ -16,7 +16,7 @@ export default defineConfig({
   testMatch: /.*label-hooks-explicit\.spec\.ts/,
 
   use: {
-    baseURL: "http://localhost:5175", // Different port for explicit testing
+    baseURL: "http://localhost:5183", // Different port for explicit testing
     trace: "on-first-retry",
     video: "off",
     screenshot: "only-on-failure",
@@ -40,8 +40,8 @@ export default defineConfig({
   /* Start dev server before tests using explicit config */
   webServer: {
     command: "vite dev --config vite.config.explicit.ts",
-    url: "http://localhost:5175",
-    reuseExistingServer: !process.env.CI,
+    url: "http://localhost:5183",
+    reuseExistingServer: false,
     timeout: 120 * 1000,
   },
 });

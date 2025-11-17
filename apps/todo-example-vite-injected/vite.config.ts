@@ -27,6 +27,11 @@ export default defineConfig(({ mode }) => ({
     react(),
   ],
   server: {
-    port: 5174,
+    port: 5182,
+    strictPort: true,
+  },
+  preview: {
+    port: 5182,
+    strictPort: true,
   },
 }));

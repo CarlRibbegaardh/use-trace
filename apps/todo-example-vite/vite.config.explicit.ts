@@ -14,9 +14,11 @@ export default defineConfig({
     })
   ],
   server: {
-    port: 5175, // Different port for explicit testing
+    port: 5173, // Different port for explicit testing
+    strictPort: true,
   },
   preview: {
-    port: 5175,
+    port: 5173,
+    strictPort: true,
   },
 });

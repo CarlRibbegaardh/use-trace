@@ -16,7 +16,7 @@ export default defineConfig({
   testMatch: /.*label-hooks-pattern\.spec\.ts/,
 
   use: {
-    baseURL: "http://localhost:5176", // Different port for pattern testing
+    baseURL: "http://localhost:5174", // Different port for pattern testing
     trace: "on-first-retry",
     video: "off",
     screenshot: "only-on-failure",
@@ -32,8 +32,8 @@ export default defineConfig({
   /* Start dev server before tests using pattern config */
   webServer: {
     command: "vite dev --config vite.config.pattern.ts",
-    url: "http://localhost:5176",
-    reuseExistingServer: !process.env.CI,
+    url: "http://localhost:5174",
+    reuseExistingServer: false,
     timeout: 120 * 1000,
   },
 });
