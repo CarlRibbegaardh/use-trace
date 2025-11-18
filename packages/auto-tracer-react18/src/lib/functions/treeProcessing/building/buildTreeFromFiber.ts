@@ -4,18 +4,22 @@ import { traceOptions } from "../../../types/globalState.js";
 import { getTrackingGUID } from "../../renderRegistry.js";
 
 /**
- * Checks if a fiber node is in the parent chain of any tracked component.
+ * Checks whether the subtree rooted at a fiber contains any tracked component.
  *
- * @param fiber - The fiber node to check
- * @param currentDepth - Current depth in traversal
- * @returns true if any descendant is tracked
+ * Iterative depth-first search to avoid call stack growth on deep trees.
+ *
+ * @param fiber - The fiber node that acts as the subtree root
+ * @returns True if any descendant in the subtree is tracked; otherwise false
  */
-function isInParentChainOfTracked(
-  fiber: unknown,
-  currentDepth: number
-): boolean {
-  function hasTrackedDescendant(node: unknown, depth: number): boolean {
-    if (!node || typeof node !== "object") return false;
+function hasTrackedDescendant(fiber: unknown): boolean {
+  if (!fiber || typeof fiber !== "object") return false;
+
+  // Stack-based iterative traversal to avoid recursion depth issues
+  const stack: unknown[] = [fiber];
+
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (!node || typeof node !== "object") continue;
 
     const nodeAsFiber = node as {
       elementType?: unknown;
@@ -28,32 +32,39 @@ function isInParentChainOfTracked(
       return true;
     }
 
-    // Check children
-    if (
-      nodeAsFiber.child &&
-      hasTrackedDescendant(nodeAsFiber.child, depth + 1)
-    ) {
-      return true;
+    // Push siblings and children to stack (sibling first for DFS order)
+    if (nodeAsFiber.sibling) {
+      stack.push(nodeAsFiber.sibling);
     }
-
-    // Check siblings
-    if (
-      nodeAsFiber.sibling &&
-      hasTrackedDescendant(nodeAsFiber.sibling, depth)
-    ) {
-      return true;
+    if (nodeAsFiber.child) {
+      stack.push(nodeAsFiber.child);
     }
-
-    return false;
   }
 
-  return hasTrackedDescendant(fiber, currentDepth);
+  return false;
 }
 
 /**
- * Internal recursive helper that builds TreeNodes into an accumulator array.
+ * Frame representing a position in the explicit DFS traversal stack.
  *
- * Uses accumulator pattern to avoid exponential array spreading.
+ * @internal
+ * @remarks Mirrors the parameters used by the prior recursive form so that
+ * the depth calculation and traversal order remain identical while avoiding
+ * recursion.
+ *
+ * @property fiber - The current fiber-like node to process
+ * @property depth - Logical depth of the node used for limits and rendering
+ */
+interface TraversalFrame {
+  fiber: unknown;
+  depth: number;
+}
+
+/**
+ * Internal iterative helper that builds TreeNodes into an accumulator array.
+ *
+ * Uses explicit stack-based iteration to avoid stack overflow on deep fiber trees.
+ * Processes nodes in depth-first order matching the original recursive behavior.
  *
  * @param fiber - Current fiber node
  * @param depth - Current depth in the tree
@@ -70,52 +81,80 @@ function buildTreeFromFiberInternal(
 
   // Prevent infinite recursion - use configurable traversal depth limit
   const maxDepth = traceOptions.maxFiberDepth ?? 1000;
-  if (depth > maxDepth) {
-    return;
-  }
 
-  const fiberNode = fiber as {
-    elementType?: unknown;
-    child?: unknown;
-    sibling?: unknown;
-  };
+  // Stack-based iterative traversal to avoid call stack overflow
+  const stack: TraversalFrame[] = [{ fiber, depth }];
 
-  // If this is not a component node, continue traversal without creating a TreeNode
-  if (!fiberNode.elementType) {
-    buildTreeFromFiberInternal(fiberNode.child, depth + 1, accumulator);
-    buildTreeFromFiberInternal(fiberNode.sibling, depth, accumulator);
-    return;
-  }
+  while (stack.length > 0) {
+    const frame = stack.pop();
+    if (!frame) continue;
 
-  // Check if we should skip non-tracked branches
-  const isTracked = !!getTrackingGUID(fiber);
-  if (!traceOptions.includeNonTrackedBranches && !isTracked) {
-    // Only include if this component or any descendant is tracked
-    if (!isInParentChainOfTracked(fiber, depth)) {
-      // Skip this entire branch (no node, no children, continue with siblings)
-      buildTreeFromFiberInternal(fiberNode.sibling, depth, accumulator);
-      return;
+    const { fiber: currentFiber, depth: currentDepth } = frame;
+
+    if (!currentFiber || typeof currentFiber !== "object") {
+      continue;
+    }
+
+    // Prevent infinite traversal
+    if (currentDepth > maxDepth) {
+      continue;
+    }
+
+    const fiberNode = currentFiber as {
+      elementType?: unknown;
+      child?: unknown;
+      sibling?: unknown;
+    };
+
+    // If this is not a component node, continue traversal without creating a TreeNode
+    if (!fiberNode.elementType) {
+      // Push sibling first (will be processed after child due to LIFO stack)
+      if (fiberNode.sibling) {
+        stack.push({ fiber: fiberNode.sibling, depth: currentDepth });
+      }
+      if (fiberNode.child) {
+        stack.push({ fiber: fiberNode.child, depth: currentDepth + 1 });
+      }
+      continue;
+    }
+
+    // Check if we should skip non-tracked branches
+    const isTracked = !!getTrackingGUID(currentFiber);
+    if (!traceOptions.includeNonTrackedBranches && !isTracked) {
+      // Only include if this component or any descendant is tracked
+      if (!hasTrackedDescendant(currentFiber)) {
+        // Skip this entire branch (no node, no children, continue with siblings)
+        if (fiberNode.sibling) {
+          stack.push({ fiber: fiberNode.sibling, depth: currentDepth });
+        }
+        continue;
+      }
+    }
+
+    // Build the TreeNode for this fiber
+    const node = buildTreeNode(currentFiber, currentDepth);
+    accumulator.push(node);
+
+    // Push sibling and child to stack (sibling first for DFS order)
+    if (fiberNode.sibling) {
+      stack.push({ fiber: fiberNode.sibling, depth: currentDepth });
+    }
+    if (fiberNode.child) {
+      stack.push({ fiber: fiberNode.child, depth: currentDepth + 1 });
     }
   }
-
-  // Build the TreeNode for this fiber
-  const node = buildTreeNode(fiber, depth);
-  accumulator.push(node);
-
-  // Recursively process children and siblings
-  buildTreeFromFiberInternal(fiberNode.child, depth + 1, accumulator);
-  buildTreeFromFiberInternal(fiberNode.sibling, depth, accumulator);
 }
 
 /**
- * Recursively builds an array of TreeNodes from a fiber tree.
+ * Iteratively builds an array of `TreeNode`s from a fiber tree.
  *
- * Uses internal accumulator to avoid exponential memory allocation.
- * Total function - handles all fiber structures safely.
+ * Uses an internal accumulator and an explicit stack to avoid recursion and
+ * prevent call stack overflows on deep component hierarchies. Total function
+ * — handles all fiber structures safely.
  *
  * @param fiber - Root fiber node
  * @param depth - Starting depth (typically 0)
- * @returns Array of TreeNodes in depth-first order
+ * @returns Array of `TreeNode`s in depth-first order
  */
 export function buildTreeFromFiber(
   fiber: unknown,
