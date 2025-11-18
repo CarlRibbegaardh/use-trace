@@ -45,4 +45,5 @@ out/
 .vercel
 .turbo
 
-.__mf__temp
+.__mf__temp/
+docs/temp/

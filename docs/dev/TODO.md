@@ -12,6 +12,8 @@ The babelconfig in next client only looks like it's a bug in the babel plugin.
 For microfrontends; add a system name in autoTracer to use in the render cycle
 Create a multiple microfrontends example with lazy loaded components
 Turborepo
+Print version in log on startup
+change apps to apps/react18/
 
 DOING
 Something has made the hasNodesToRender to be at least one even when it renders no nodes.
