@@ -8,6 +8,10 @@ import {
 } from "./consoleUtils.js";
 import {
   type StyledLoggerOptions,
+  groupDefinitive as groupDefinitiveStyled,
+  groupReconciled as groupReconciledStyled,
+  groupSkipped as groupSkippedStyled,
+  groupStyled as groupStyledStyled,
   logDefinitive as logDefinitiveStyled,
   logErrorStatement as logErrorStatementStyled,
   logIdenticalPropValueWarning as logIdenticalPropValueWarningStyled,
@@ -46,6 +50,10 @@ export const logError = safeError;
  */
 export function logDefinitive(prefix: string, message: string): void {
   logDefinitiveStyled(prefix, message, styledLoggerOptions);
+}
+
+export function groupDefinitive(prefix: string, message: string): void {
+  groupDefinitiveStyled(prefix, message, styledLoggerOptions);
 }
 
 /**
@@ -105,11 +113,27 @@ export function logReconciled(prefix: string, message: string): void {
 }
 
 /**
+ * Styled console group for reconciled components
+ * Starts a group with the same styling as logReconciled.
+ */
+export function groupReconciled(prefix: string, message: string): void {
+  groupReconciledStyled(prefix, message, styledLoggerOptions);
+}
+
+/**
  * Styled logging for skipped components
  * Prefix is monochrome, message+icon are styled: "  │   [Component] Skipped ⏭️"
  */
 export function logSkipped(prefix: string, message: string): void {
   logSkippedStyled(prefix, message, styledLoggerOptions);
+}
+
+/**
+ * Styled console group for skipped components
+ * Starts a group with the same styling as logSkipped.
+ */
+export function groupSkipped(prefix: string, message: string): void {
+  groupSkippedStyled(prefix, message, styledLoggerOptions);
 }
 
 /**
@@ -139,4 +163,15 @@ export function logStyled(
   isDefinitive: boolean = false
 ): void {
   logStyledStyled(prefix, message, isDefinitive, styledLoggerOptions);
+}
+
+/**
+ * Starts a styled console group with optional definitive render styling.
+ */
+export function groupStyled(
+  prefix: string,
+  message: string,
+  isDefinitive: boolean = false
+): void {
+  groupStyledStyled(prefix, message, isDefinitive, styledLoggerOptions);
 }

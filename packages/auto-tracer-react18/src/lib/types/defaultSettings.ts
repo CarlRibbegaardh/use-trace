@@ -12,6 +12,7 @@ export const defaultAutoTracerOptions: AutoTracerOptions = {
   includeMount: "never",
   includeRendered: "never",
   filterEmptyNodes: "all", // No empty node filtering by default (backward compatible)
+  renderer: "indented", // Default to traditional indented output
   includeNonTrackedBranches: false, // Only show tracked components and their parent chain by default
   maxFiberDepth: 300, // Maximum fiber traversal depth to prevent stack overflow
   skippedObjectProps: [], // Skip specific props for specific object types

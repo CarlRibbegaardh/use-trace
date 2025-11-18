@@ -186,6 +186,23 @@ interface AutoTracerOptions {
   filterEmptyNodes?: "none" | "first" | "all";
 
   /**
+   * Selects the output format for the component tree.
+   *
+   * - "indented": Traditional text-based indentation (default).
+   *   Best for copy-pasting and general readability.
+   *   Example:
+   *   ├─ [Parent]
+   *   │   └─ [Child]
+   *
+   * - "console-group": Uses browser's native console.group().
+   *   Best for interactive debugging, filtering, and deep trees.
+   *   Allows collapsing/expanding sections in DevTools.
+   *
+   * @default "indented"
+   */
+  renderer?: "indented" | "console-group";
+
+  /**
    * Maximum depth to traverse in the React fiber tree.
    * Prevents stack overflow in deeply nested component hierarchies.
    * Valid range: 20-1000

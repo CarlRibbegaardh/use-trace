@@ -48,6 +48,9 @@ export function deepMergeOptions(
   if (source.filterEmptyNodes !== undefined) {
     result.filterEmptyNodes = source.filterEmptyNodes;
   }
+  if (source.renderer !== undefined) {
+    result.renderer = source.renderer;
+  }
 
   // Handle nested colors object
   if (source.colors) {

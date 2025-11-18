@@ -62,6 +62,19 @@ const stop = autoTracer({
   maxFiberDepth: 100,
   includeNonTrackedBranches: false,
   /**
+   * Selects the output format for the component tree.
+   * - "indented" (default): Traditional text-based indentation. Best for copy-pasting.
+   * - "console-group": Uses browser's native console.group(). Best for interactive debugging.
+   */
+  renderer: "indented",
+  /**
+   * Filter mode for collapsing empty nodes (no changes/logs) in the component tree.
+   * - "none" (default): No filtering.
+   * - "first": Collapses only the initial sequence of empty nodes.
+   * - "all": Collapses all empty node sequences.
+   */
+  filterEmptyNodes: "none",
+  /**
    * Detects re-renders where the new value is structurally identical to the previous
    * value but with a different reference (e.g. re-created arrays, objects, inline
    * functions). When true a warning line is logged:

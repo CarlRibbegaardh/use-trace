@@ -49,10 +49,18 @@ describe("deepMergeOptions", () => {
 
     it("should merge shallow numeric properties", () => {
       const result = deepMergeOptions(defaultOptions, {
-        maxFiberDepth: 20,
+        maxFiberDepth: 50,
       });
 
-      expect(result.maxFiberDepth).toBe(20);
+      expect(result.maxFiberDepth).toBe(50);
+    });
+
+    it("should merge renderer property", () => {
+      const result = deepMergeOptions(defaultOptions, {
+        renderer: "console-group",
+      });
+
+      expect(result.renderer).toBe("console-group");
     });
 
     it("should merge array properties", () => {

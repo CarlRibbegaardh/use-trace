@@ -14,6 +14,9 @@ Create a multiple microfrontends example with lazy loaded components
 Turborepo
 Print version in log on startup
 change apps to apps/react18/
+bool flag for plugin enable/disable
+render objects instead of json (setting for copypaste vs browsing benefits)
+rendering tree using groups (setting for copypaste vs browsing benefits)
 
 DOING
 Something has made the hasNodesToRender to be at least one even when it renders no nodes.

@@ -4,7 +4,7 @@ import {
   buildStyle,
   getThemeOptions,
 } from "./themeManager.js";
-import { safeLog } from "./consoleUtils.js";
+import { safeGroup, safeLog } from "./consoleUtils.js";
 
 /**
  * Options for styled logger dependency injection
@@ -50,6 +50,21 @@ function logWithOptionalStyle(
 }
 
 /**
+ * Internal helper: logs with CSS style if provided, otherwise logs plain text.
+ */
+function groupWithOptionalStyle(
+  prefix: string,
+  content: string,
+  style: string
+): void {
+  if (style && style.length > 0) {
+    safeGroup(`${prefix}%c${content}`, style);
+  } else {
+    safeGroup(`${prefix}${content}`);
+  }
+}
+
+/**
  * Styled logging for definitive render markers with theme-aware colors and icons
  * Prefix is monochrome, message+icon are styled: "  │   [Component] Rendering ⚡"
  */
@@ -64,6 +79,19 @@ export function logDefinitive(
   const style = buildStyle(themeOptions);
 
   logWithOptionalStyle(prefix, `${message}${icon}`, style);
+}
+
+export function groupDefinitive(
+  prefix: string,
+  message: string,
+  options: StyledLoggerOptions
+): void {
+  const colorOptions = options.getColors().definitiveRender;
+  const themeOptions = getThemeOptions(colorOptions, options.themeManager);
+  const icon = colorOptions?.icon ? ` ${colorOptions.icon}` : "";
+  const style = buildStyle(themeOptions);
+
+  groupWithOptionalStyle(prefix, `${message}${icon}`, style);
 }
 
 /**
@@ -174,6 +202,19 @@ export function logReconciled(
   logWithOptionalStyle(prefix, `${message}${icon}`, style);
 }
 
+export function groupReconciled(
+  prefix: string,
+  message: string,
+  options: StyledLoggerOptions
+): void {
+  const colorOptions = options.getColors().reconciled;
+  const themeOptions = getThemeOptions(colorOptions, options.themeManager);
+  const icon = colorOptions?.icon ? ` ${colorOptions.icon}` : "";
+  const style = buildStyle(themeOptions);
+
+  groupWithOptionalStyle(prefix, `${message}${icon}`, style);
+}
+
 /**
  * Styled logging for skipped components
  * Prefix is monochrome, message+icon are styled: "  │   [Component] Skipped ⏭️"
@@ -189,6 +230,19 @@ export function logSkipped(
   const style = buildStyle(themeOptions);
 
   logWithOptionalStyle(prefix, `${message}${icon}`, style);
+}
+
+export function groupSkipped(
+  prefix: string,
+  message: string,
+  options: StyledLoggerOptions
+): void {
+  const colorOptions = options.getColors().skipped;
+  const themeOptions = getThemeOptions(colorOptions, options.themeManager);
+  const icon = colorOptions?.icon ? ` ${colorOptions.icon}` : "";
+  const style = buildStyle(themeOptions);
+
+  groupWithOptionalStyle(prefix, `${message}${icon}`, style);
 }
 
 /**
@@ -236,5 +290,18 @@ export function logStyled(
     logDefinitive(prefix, message, options);
   } else {
     safeLog(`${prefix}${message}`);
+  }
+}
+
+export function groupStyled(
+  prefix: string,
+  message: string,
+  isDefinitive: boolean,
+  options: StyledLoggerOptions
+): void {
+  if (isDefinitive) {
+    groupDefinitive(prefix, message, options);
+  } else {
+    safeGroup(`${prefix}${message}`);
   }
 }
