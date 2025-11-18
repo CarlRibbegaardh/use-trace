@@ -105,6 +105,12 @@ export function transform(
     // Traverse and transform
     traverseDefault(ast, {
       FunctionDeclaration(path: any) {
+        // Only process top-level function declarations (not nested inside other functions)
+        const parent = path.parent;
+        if (!t.isProgram(parent) && !t.isExportNamedDeclaration(parent) && !t.isExportDefaultDeclaration(parent)) {
+          return; // Skip nested function declarations
+        }
+
         if (isComponentFunction(path.node)) {
           const componentInfo = extractComponentInfo(path.node);
           if (componentInfo) {
@@ -121,6 +127,19 @@ export function transform(
         }
       },
       VariableDeclarator(path: any) {
+        // Only process top-level variable declarators (not nested inside functions)
+        // Check if we're inside a function by walking up the parent chain
+        let currentPath = path.parentPath;
+        while (currentPath) {
+          if (t.isFunction(currentPath.node)) {
+            return; // Skip - this is a nested variable inside a function
+          }
+          if (t.isProgram(currentPath.node)) {
+            break; // Reached top level - this is good
+          }
+          currentPath = currentPath.parentPath;
+        }
+
         if (isComponentFunction(path.node)) {
           const componentInfo = extractComponentInfo(path.node);
           if (componentInfo && path.node.init && t.isFunction(path.node.init)) {
