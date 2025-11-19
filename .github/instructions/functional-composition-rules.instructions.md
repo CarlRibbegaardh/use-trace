@@ -73,6 +73,36 @@ If a function cannot be meaningfully tested or used **without importing its enti
 
 **Fix**: Extract pure logic into a function with simple types. Leave plumbing/wiring as a thin wrapper.
 
+## Anonymous Functions
+
+Anonymous functions are acceptable **only** for single-expression operations with no branching.
+
+If the function body:
+
+- Contains conditional logic (`if`, `switch`, ternary beyond simple mapping)
+- Requires multiple statements
+- Is duplicated elsewhere
+- Cannot be described in 3 words or less
+
+...it **must** be extracted to a named function.
+
+**Examples:**
+
+```typescript
+// ✅ GOOD: Single expression, no branching
+items.map((x) => x * 2);
+items.filter((x) => x.isActive);
+
+// ❌ BAD: Branching logic - extract to named function
+items.forEach((x) => {
+  if (x.type === "A") {
+    doA(x);
+  } else {
+    doB(x);
+  }
+});
+```
+
 ---
 
 ## Code Review Checklist
@@ -84,5 +114,6 @@ If a function cannot be meaningfully tested or used **without importing its enti
 5. ✓ **Do all pipeline steps produce output used by the next step?**
 6. ✓ **Is there only one code path (no mode switches)?**
 7. ✓ **Does the return type hide implementation details?**
+8. ✓ **Are anonymous functions single-expression with no branching?**
 
 If any answer is ❌, the function needs refactoring.
