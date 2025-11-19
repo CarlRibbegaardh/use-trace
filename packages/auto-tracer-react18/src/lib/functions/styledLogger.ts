@@ -40,12 +40,13 @@ export interface StyledLoggerOptions {
 function logWithOptionalStyle(
   prefix: string,
   content: string,
-  style: string
+  style: string,
+  ...args: unknown[]
 ): void {
   if (style && style.length > 0) {
-    safeLog(`${prefix}%c${content}`, style);
+    safeLog(`${prefix}%c${content}`, style, ...args);
   } else {
-    safeLog(`${prefix}${content}`);
+    safeLog(`${prefix}${content}`, ...args);
   }
 }
 
@@ -141,14 +142,15 @@ export function logStateChange(
 export function logLogStatement(
   prefix: string,
   message: string,
-  options: StyledLoggerOptions
+  options: StyledLoggerOptions,
+  ...args: unknown[]
 ): void {
   const colorOptions = options.getColors().logStatements;
   const themeOptions = getThemeOptions(colorOptions, options.themeManager);
   const icon = colorOptions?.icon ? `${colorOptions.icon} ` : "";
   const style = buildStyle(themeOptions);
 
-  logWithOptionalStyle(prefix, `${icon}${message}`, style);
+  logWithOptionalStyle(prefix, `${icon}${message}`, style, ...args);
 }
 
 /**
@@ -158,14 +160,15 @@ export function logLogStatement(
 export function logWarnStatement(
   prefix: string,
   message: string,
-  options: StyledLoggerOptions
+  options: StyledLoggerOptions,
+  ...args: unknown[]
 ): void {
   const colorOptions = options.getColors().warnStatements;
   const themeOptions = getThemeOptions(colorOptions, options.themeManager);
   const icon = colorOptions?.icon ? `${colorOptions.icon} ` : "";
   const style = buildStyle(themeOptions);
 
-  logWithOptionalStyle(prefix, `${icon}${message}`, style);
+  logWithOptionalStyle(prefix, `${icon}${message}`, style, ...args);
 }
 
 /**
@@ -175,14 +178,15 @@ export function logWarnStatement(
 export function logErrorStatement(
   prefix: string,
   message: string,
-  options: StyledLoggerOptions
+  options: StyledLoggerOptions,
+  ...args: unknown[]
 ): void {
   const colorOptions = options.getColors().errorStatements;
   const themeOptions = getThemeOptions(colorOptions, options.themeManager);
   const icon = colorOptions?.icon ? `${colorOptions.icon} ` : "";
   const style = buildStyle(themeOptions);
 
-  logWithOptionalStyle(prefix, `${icon}${message}`, style);
+  logWithOptionalStyle(prefix, `${icon}${message}`, style, ...args);
 }
 
 /**

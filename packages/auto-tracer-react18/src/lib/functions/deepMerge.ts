@@ -48,6 +48,9 @@ export function deepMergeOptions(
   if (source.filterEmptyNodes !== undefined) {
     result.filterEmptyNodes = source.filterEmptyNodes;
   }
+  if (source.objectRenderingMode !== undefined) {
+    result.objectRenderingMode = source.objectRenderingMode;
+  }
   if (source.renderer !== undefined) {
     result.renderer = source.renderer;
   }

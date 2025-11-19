@@ -17,42 +17,54 @@ export function walkObjectTree(
   maxNodes: number,
   maxDepth: number
 ): boolean {
-  // Depth limit exceeded
-  if (depth > maxDepth) {
-    return false;
-  }
+  // Stack for iterative traversal to avoid recursion limits
+  const stack = [{ value, depth }];
 
-  // Node count limit exceeded
-  if (nodeCount.count > maxNodes) {
-    return false;
-  }
+  while (stack.length > 0) {
+    const item = stack.pop();
+    if (!item) continue;
 
-  nodeCount.count++;
+    const { value: currValue, depth: currDepth } = item;
 
-  // Only walk objects and arrays
-  if (typeof value !== "object" || value === null) {
-    return true;
-  }
-
-  // Handle circular references
-  if (visited.has(value)) {
-    return true;
-  }
-  visited.add(value);
-
-  // Walk all properties
-  try {
-    for (const key in value) {
-      if (Object.prototype.hasOwnProperty.call(value, key)) {
-        const propValue = (value as Record<string, unknown>)[key];
-        if (!walkObjectTree(propValue, depth + 1, nodeCount, visited, maxNodes, maxDepth)) {
-          return false;
-        }
-      }
+    // Depth limit exceeded
+    if (currDepth > maxDepth) {
+      return false;
     }
-    return true;
-  } catch {
-    // Error walking object - assume too complex
-    return false;
+
+    // Node count limit exceeded
+    if (nodeCount.count > maxNodes) {
+      return false;
+    }
+
+    nodeCount.count++;
+
+    // Only walk objects and arrays
+    if (typeof currValue !== "object" || currValue === null) {
+      continue;
+    }
+
+    // Handle circular references
+    if (visited.has(currValue)) {
+      continue;
+    }
+    visited.add(currValue);
+
+    // Walk all properties
+    try {
+      // Use Object.keys for own properties (equivalent to for..in + hasOwnProperty)
+      // Push in reverse order to maintain depth-first order (first key processed first)
+      const keys = Object.keys(currValue);
+      for (let i = keys.length - 1; i >= 0; i--) {
+        const key = keys[i];
+        if (key === undefined) continue;
+        const propValue = (currValue as Record<string, unknown>)[key];
+        stack.push({ value: propValue, depth: currDepth + 1 });
+      }
+    } catch {
+      // Error walking object - assume too complex
+      return false;
+    }
   }
+
+  return true;
 }

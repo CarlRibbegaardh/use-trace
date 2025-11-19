@@ -5,29 +5,15 @@ import {
   groupSkipped,
   groupStyled,
   log,
-  logErrorStatement,
   logGroup,
   logGroupEnd,
-  logIdenticalPropValueWarning,
-  logIdenticalStateValueWarning,
-  logLogStatement,
-  logPropChange,
   logReconciled,
   logSkipped,
-  logStateChange,
   logStyled,
-  logWarnStatement,
 } from "../../../log.js";
 import { traceOptions } from "../../../../types/globalState.js";
 import { getFlagNames } from "../../../reactFiberFlags.js";
-import {
-  formatPropChange,
-  formatPropValue,
-  formatStateChange,
-  formatStateValue,
-} from "../../../changeFormatting.js";
-import { getSkippedProps } from "../../../getSkippedProps.js";
-import { isReactInternal } from "../../../isReactInternal.js";
+import { renderNodeDetails } from "../renderNodeDetails.js";
 
 /**
  * Creates a console group renderer.
@@ -120,7 +106,7 @@ export const createConsoleGroupRenderer = (): TreeRenderer => {
 
       if (shouldGroup) {
         depthStack.push(node.depth);
-        renderNodeDetails(node);
+        renderNodeDetails(node, "");
         // If it was only grouped because of details (not children),
         // we need to close it immediately if the next node is not a child.
         // However, our loop logic at step 2 handles this automatically:
@@ -186,89 +172,4 @@ function renderNodeHeader(node: TreeNode, asGroup: boolean) {
       log(message);
     }
   }
-}
-
-/**
- * Renders the details of a node (state/prop changes, logs) inside its group.
- *
- * @param node - The tree node to render details for
- */
-function renderNodeDetails(node: TreeNode) {
-  const { displayName, renderType } = node;
-
-  // Render state changes
-  if (renderType === "Mount") {
-    // For mounts, show initial state values
-    node.stateChanges.forEach((change) => {
-      const formattedValue = formatStateValue(change.value);
-      logStateChange(
-        "",
-        `Initial state ${change.name}: ${formattedValue}`,
-        true // isInitial
-      );
-    });
-  } else {
-    // For updates, show state changes with before/after
-    node.stateChanges.forEach((change) => {
-      const formatted = formatStateChange(change.prevValue, change.value);
-
-      // Use identical value warning logger if detected, otherwise normal state change logger
-      if (
-        change.isIdenticalValueChange === true &&
-        traceOptions.detectIdenticalValueChanges
-      ) {
-        const msg = `State change ${change.name} (identical value): ${formatted}`;
-        logIdenticalStateValueWarning("", msg);
-      } else {
-        const msg = `State change ${change.name}: ${formatted}`;
-        logStateChange("", msg, false);
-      }
-    });
-  }
-
-  // Render prop changes
-  if (renderType === "Mount") {
-    // For mounts, show initial props
-    const currentProps = node.propChanges.length > 0 ? node.propChanges : [];
-    const skippedProps = getSkippedProps(displayName || undefined);
-
-    currentProps.forEach((change) => {
-      if (!isReactInternal(change.name) && !skippedProps.has(change.name)) {
-        const formattedValue = formatPropValue(change.value);
-        logPropChange(
-          "",
-          `Initial prop ${change.name}: ${formattedValue}`,
-          true // isInitial
-        );
-      }
-    });
-  } else {
-    // For updates, show prop changes
-    node.propChanges.forEach((change) => {
-      const formatted = formatPropChange(change.prevValue, change.value);
-
-      if (
-        change.isIdenticalValueChange === true &&
-        traceOptions.detectIdenticalValueChanges
-      ) {
-        const msg = `Prop change ${change.name} (identical value): ${formatted}`;
-        logIdenticalPropValueWarning("", msg);
-      } else {
-        const msg = `Prop change ${change.name}: ${formatted}`;
-        logPropChange("", msg, false);
-      }
-    });
-  }
-
-  // Render component logs
-  node.componentLogs.forEach((logEntry) => {
-    const { message: logMsg, level } = logEntry;
-    if (level === "warn") {
-      logWarnStatement("", logMsg);
-    } else if (level === "error") {
-      logErrorStatement("", logMsg);
-    } else {
-      logLogStatement("", logMsg);
-    }
-  });
 }

@@ -203,6 +203,16 @@ interface AutoTracerOptions {
   renderer?: "indented" | "console-group";
 
   /**
+   * Control the format of object values (props, state, logs) in the console.
+   *
+   * - "copy-paste": Values are stringified and formatted for easy copy-pasting (default).
+   * - "devtools-json": Values are logged as interactive JavaScript objects for inspection in DevTools.
+   *
+   * @default "copy-paste"
+   */
+  objectRenderingMode?: "copy-paste" | "devtools-json";
+
+  /**
    * Maximum depth to traverse in the React fiber tree.
    * Prevents stack overflow in deeply nested component hierarchies.
    * Valid range: 20-1000

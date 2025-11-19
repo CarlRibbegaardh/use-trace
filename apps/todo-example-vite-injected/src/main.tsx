@@ -4,7 +4,8 @@ import App from "./App.tsx";
 
 // Initialize autoTracer before anything else
 autoTracer({
-  renderer: "console-group",
+  // renderer: "console-group",
+  // objectRenderingMode: "devtools-json",
   enabled: true,
   showFlags: true,
   includeNonTrackedBranches: false,

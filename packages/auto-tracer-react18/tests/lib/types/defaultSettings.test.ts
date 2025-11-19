@@ -14,6 +14,7 @@ describe("defaultSettings", () => {
     expect(defaultAutoTracerOptions.maxFiberDepth).toBe(300);
     expect(defaultAutoTracerOptions.includeNonTrackedBranches).toBe(false);
     expect(defaultAutoTracerOptions.skippedObjectProps).toEqual([]);
+    expect(defaultAutoTracerOptions.objectRenderingMode).toBe("copy-paste");
   });
 
   it("should have colors configuration", () => {

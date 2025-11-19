@@ -55,6 +55,14 @@ describe("deepMergeOptions", () => {
       expect(result.maxFiberDepth).toBe(50);
     });
 
+    it("should merge objectRenderingMode", () => {
+      const result = deepMergeOptions(defaultOptions, {
+        objectRenderingMode: "devtools-json",
+      });
+
+      expect(result.objectRenderingMode).toBe("devtools-json");
+    });
+
     it("should merge renderer property", () => {
       const result = deepMergeOptions(defaultOptions, {
         renderer: "console-group",

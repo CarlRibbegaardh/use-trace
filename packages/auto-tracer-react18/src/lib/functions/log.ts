@@ -84,24 +84,36 @@ export function logStateChange(
  * Styled logging for log statements with theme-aware colors
  * Prefix is monochrome, icon+message are styled: "  │   📝 Custom message"
  */
-export function logLogStatement(prefix: string, message: string): void {
-  logLogStatementStyled(prefix, message, styledLoggerOptions);
+export function logLogStatement(
+  prefix: string,
+  message: string,
+  ...args: unknown[]
+): void {
+  logLogStatementStyled(prefix, message, styledLoggerOptions, ...args);
 }
 
 /**
  * Styled logging for warn statements with theme-aware colors
  * Prefix is monochrome, icon+message are styled: "  │   ⚠️ Warning message"
  */
-export function logWarnStatement(prefix: string, message: string): void {
-  logWarnStatementStyled(prefix, message, styledLoggerOptions);
+export function logWarnStatement(
+  prefix: string,
+  message: string,
+  ...args: unknown[]
+): void {
+  logWarnStatementStyled(prefix, message, styledLoggerOptions, ...args);
 }
 
 /**
  * Styled logging for error statements with theme-aware colors
  * Prefix is monochrome, icon+message are styled: "  │   ❌ Error message"
  */
-export function logErrorStatement(prefix: string, message: string): void {
-  logErrorStatementStyled(prefix, message, styledLoggerOptions);
+export function logErrorStatement(
+  prefix: string,
+  message: string,
+  ...args: unknown[]
+): void {
+  logErrorStatementStyled(prefix, message, styledLoggerOptions, ...args);
 }
 
 /**
