@@ -1,9 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
+import type { Mock } from "vitest";
 
 // Mock the safe-stable-stringify module to test error scenarios
 vi.mock("safe-stable-stringify", () => {
+  const mockStringify = vi.fn() as Mock & { configure: Mock };
+  const mockConfigure = vi.fn(() => {
+    return mockStringify;
+  });
+  mockStringify.configure = mockConfigure;
+
   return {
-    default: vi.fn(),
+    default: mockStringify,
   };
 });
 
@@ -38,6 +45,7 @@ describe("stringify", () => {
     it("should handle circular references", async () => {
       const safeStringifyModule = vi.mocked(await import("safe-stable-stringify"));
       const safeStringifyMock = safeStringifyModule.default;
+      const mockConfigure = safeStringifyMock.configure;
       const { stringify } = await import("@src/lib/functions/stringify.js");
 
       safeStringifyMock.mockReturnValue('{"circular":"[Circular]","key":"value"}');
@@ -48,7 +56,10 @@ describe("stringify", () => {
       const result = stringify(obj);
 
       expect(result).toBe('{"circular":"[Circular]","key":"value"}');
-      expect(safeStringifyMock).toHaveBeenCalledWith(obj, expect.any(Function));
+      // Verify configure was called with circularValue option
+      expect(mockConfigure).toHaveBeenCalledWith({ circularValue: "[Circular]" });
+      // Verify the configured stringify function was called (with normalized object that still has circular reference)
+      expect(safeStringifyMock).toHaveBeenCalled();
     });
 
     it("should handle nested objects", async () => {

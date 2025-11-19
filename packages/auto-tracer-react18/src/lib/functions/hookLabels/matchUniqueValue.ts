@@ -23,6 +23,7 @@ export function matchUniqueValue(
 
   const match = labels.find((l) => {
     // First check if comparable strings match (value equality)
+    // Use stringify for registered value to preserve function IDs
     const labelComparable = stringify(l.normalizedValue);
     if (labelComparable !== anchorComparable) {
       return false;

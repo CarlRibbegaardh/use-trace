@@ -72,12 +72,13 @@ describe("FormattingStateComponent", () => {
 
   it("should format function state changes as (fn:N) → (fn:M)", async () => {
     const user = userEvent.setup();
-    render(<FormattingStateComponent />);
     consoleOutput = [];
+    render(<FormattingStateComponent />);
 
     const button = screen.getByText("Update Callback");
     await user.click(button);
 
+    originalLog(consoleOutput);
     const stateChangeLog = consoleOutput.find((line) =>
       line.includes("State change callback:")
     );

@@ -4,7 +4,7 @@
 
 import safeStringify from "safe-stable-stringify";
 import { getFunctionId } from "./getFunctionId.js";
-import { functionReplacer } from "./functionReplacer.js";
+import { normalizeValueDeepWithIDs } from "./normalizeValueDeepWithIDs.js";
 
 /**
  * Stringify for display in console.
@@ -28,14 +28,19 @@ export function stringifyForDisplay(value: unknown): string {
       return String(value);
     }
 
-    // Use safe-stable-stringify with depth/breadth limits for display
+    // Deep normalize with ID tracking - replaces ALL functions at ALL levels
+    // This eliminates the need for a replacer, preventing the 6+ second
+    // performance issue while preserving function instance distinctness
+    const normalized = normalizeValueDeepWithIDs(value);
+
+    // Use safe-stable-stringify with depth/breadth limits for display with NO replacer
     const configured = safeStringify.configure({
       maximumDepth: 10,
       maximumBreadth: 50,
       circularValue: "[Circular]",
     });
 
-    const result = configured(value, functionReplacer) ?? "[Unserializable]";
+    const result = configured(normalized) ?? "[Unserializable]";
 
     return result;
   } catch (error) {

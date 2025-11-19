@@ -19,7 +19,7 @@
 import safeStringify from "safe-stable-stringify";
 
 import { getFunctionId } from "./getFunctionId.js";
-import { functionReplacer } from "./functionReplacer.js";
+import { normalizeValueDeepWithIDs } from "./normalizeValueDeepWithIDs.js";
 
 /**
  * Main stringify function used by autoTracer for display and debugging.
@@ -71,8 +71,17 @@ export function stringify(value: unknown): string {
       return String(value);
     }
 
-    // Use safe-stable-stringify for stable key ordering
-    const result = safeStringify(value, functionReplacer);
+    // Deep normalize with ID tracking - replaces ALL functions at ALL levels
+    // This eliminates the need for a replacer, preventing the 6+ second
+    // performance issue while preserving function instance distinctness
+    const normalized = normalizeValueDeepWithIDs(value);
+
+    // Use safe-stable-stringify with circular reference handling and NO replacer
+    const configured = safeStringify.configure({
+      circularValue: "[Circular]",
+    });
+
+    const result = configured(normalized);
 
     return result ?? "[Unserializable]";
   } catch (error) {

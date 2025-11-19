@@ -1,9 +1,9 @@
 /**
- * @file Pure function for structural matching of object-valued hooks.
+ * @file Pure function to attempt structural property matching for custom hooks.
  */
 
 import { normalizeValue } from "../normalizeValue.js";
-import { stringify } from "../stringify.js";
+import { toComparableString } from "./toComparableString.js";
 import { type FiberHook, reconstructObjectFromFiber } from "../reconstructObjectFromFiber.js";
 import { matchByStructure } from "../matchByStructure.js";
 import type { LabelEntry } from "./LabelEntry.js";
@@ -68,12 +68,12 @@ export function tryStructuralMatch(
       labelEntry.normalizedValue !== null
     ) {
       const labelObject = labelEntry.normalizedValue as Record<string, unknown>;
-      const normalizedCurrentStr = stringify(normalizedCurrent);
+      const normalizedCurrentStr = toComparableString(normalizedCurrent);
 
       // Check if the primitive matches any property value in the registered object
       const matchingProperty = Object.entries(labelObject).find(
         ([_key, propValue]) => {
-          return stringify(normalizeValue(propValue)) === normalizedCurrentStr;
+          return toComparableString(normalizeValue(propValue)) === normalizedCurrentStr;
         }
       );
 

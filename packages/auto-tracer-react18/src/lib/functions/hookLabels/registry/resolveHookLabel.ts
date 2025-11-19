@@ -73,8 +73,9 @@ export function resolveHookLabel(
     return "unknown";
   }
 
-  // Scenarios 2 & 3: Duplicate values
+  //  Scenarios 2 & 3: Duplicate values
   const labelsWithValue = labels.filter((l) => {
+    // Use stringify consistently with function IDs
     const labelComparable = stringify(l.normalizedValue);
     return labelComparable === anchorComparable;
   });
