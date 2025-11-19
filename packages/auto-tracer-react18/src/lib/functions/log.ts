@@ -63,9 +63,10 @@ export function groupDefinitive(prefix: string, message: string): void {
 export function logPropChange(
   prefix: string,
   message: string,
-  isInitial: boolean = false
+  isInitial: boolean = false,
+  ...args: unknown[]
 ): void {
-  logPropChangeStyled(prefix, message, isInitial, styledLoggerOptions);
+  logPropChangeStyled(prefix, message, isInitial, styledLoggerOptions, ...args);
 }
 
 /**
@@ -75,9 +76,10 @@ export function logPropChange(
 export function logStateChange(
   prefix: string,
   message: string,
-  isInitial: boolean = false
+  isInitial: boolean = false,
+  ...args: unknown[]
 ): void {
-  logStateChangeStyled(prefix, message, isInitial, styledLoggerOptions);
+  logStateChangeStyled(prefix, message, isInitial, styledLoggerOptions, ...args);
 }
 
 /**

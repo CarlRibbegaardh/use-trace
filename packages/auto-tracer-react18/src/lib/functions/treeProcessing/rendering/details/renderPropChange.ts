@@ -8,6 +8,7 @@ import { snapshotValue } from "../../../snapshotValue.js";
 import { checkComplexObject } from "../../../checkComplexObject.js";
 import { getSkippedProps } from "../../../getSkippedProps.js";
 import { isReactInternal } from "../../../isReactInternal.js";
+import { isSimpleValue } from "../utils/isSimpleValue.js";
 
 /**
  * Rendered output for a prop change.
@@ -25,9 +26,9 @@ export interface RenderedPropChange {
 
   /**
    * Optional additional values (for devtools-json mode).
-   * First element is "before" value, second is "after" value.
+   * Single value for initial render, two values (before/after) for updates.
    */
-  readonly values?: readonly [unknown, unknown];
+  readonly values?: readonly [unknown] | readonly [unknown, unknown];
 
   /**
    * Whether this prop should be skipped (filtered out).
@@ -78,8 +79,8 @@ export function renderPropChange(
       const value = prepareValue(change.value);
       return {
         level: "prop-initial",
-        message: `Initial prop ${change.name}:`,
-        values: [value, value], // Duplicate for consistent interface
+        message: `Initial prop ${change.name}: `,
+        values: [value],
         shouldSkip,
       };
     } else {
@@ -95,16 +96,39 @@ export function renderPropChange(
     if (isObjectMode) {
       const prev = prepareValue(change.prevValue);
       const curr = prepareValue(change.value);
-      const baseMessage = `Prop change ${change.name}:`;
+      const simple = isSimpleValue(change.prevValue) && isSimpleValue(change.value);
 
-      return {
-        level: showIdenticalWarning ? "prop-identical" : "prop",
-        message: showIdenticalWarning
-          ? `${baseMessage} (identical value)`
-          : baseMessage,
-        values: [prev, curr],
-        shouldSkip,
-      };
+      if (simple) {
+        // Simple values: inline like "Changed prop loading: false → true"
+        const formatted = formatPropChange(change.prevValue, change.value);
+        const baseMessage = `Changed prop ${change.name}`;
+
+        if (showIdenticalWarning) {
+          return {
+            level: "prop-identical",
+            message: `${baseMessage} (identical value): ${formatted}`,
+            shouldSkip,
+          };
+        } else {
+          return {
+            level: "prop",
+            message: `${baseMessage}: ${formatted}`,
+            shouldSkip,
+          };
+        }
+      } else {
+        // Complex values: multi-line with Before/After
+        const baseMessage = `Changed prop ${change.name}:`;
+
+        return {
+          level: showIdenticalWarning ? "prop-identical" : "prop",
+          message: showIdenticalWarning
+            ? `${baseMessage} (identical value)`
+            : baseMessage,
+          values: [prev, curr],
+          shouldSkip,
+        };
+      }
     } else {
       const formatted = formatPropChange(change.prevValue, change.value);
       const baseMessage = `Prop change ${change.name}`;

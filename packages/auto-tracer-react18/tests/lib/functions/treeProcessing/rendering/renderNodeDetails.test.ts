@@ -105,7 +105,60 @@ describe("renderNodeDetails", () => {
       traceOptions.objectRenderingMode = "devtools-json";
     });
 
-    it("logs state changes as objects", () => {
+    it("logs initial state with value on same line", () => {
+      const node: TreeNode = {
+        ...mockNode,
+        renderType: "Mount",
+        stateChanges: [
+          {
+            name: "count",
+            value: 42,
+            prevValue: undefined,
+            hook: {} as any,
+            isIdenticalValueChange: false,
+          },
+        ],
+      };
+
+      renderNodeDetails(node, "  ");
+
+      // Initial state: message with colon-space, value on same line
+      expect(log.logStateChange).toHaveBeenCalledWith(
+        "  ",
+        "Initial state count: ",
+        true,
+        42
+      );
+      expect(log.log).not.toHaveBeenCalled();
+    });
+
+    it("logs initial prop with value on same line", () => {
+      const node: TreeNode = {
+        ...mockNode,
+        renderType: "Mount",
+        propChanges: [
+          {
+            name: "title",
+            value: { a: 1, b: 2 },
+            prevValue: undefined,
+            isIdenticalValueChange: false,
+          },
+        ],
+      };
+
+      renderNodeDetails(node, "  ");
+
+      // Initial prop: message with colon-space, value on same line
+      expect(log.logPropChange).toHaveBeenCalledWith(
+        "  ",
+        "Initial prop title: ",
+        true,
+        { a: 1, b: 2 }
+      );
+      expect(log.log).not.toHaveBeenCalled();
+    });
+
+    it("logs simple state changes inline", () => {
       const node: TreeNode = {
         ...mockNode,
         stateChanges: [
@@ -121,16 +174,17 @@ describe("renderNodeDetails", () => {
 
       renderNodeDetails(node, "  ");
 
+      // Simple values (numbers) render inline
       expect(log.logStateChange).toHaveBeenCalledWith(
         "  ",
-        "State change count:",
+        "Changed state count: 0 → 1",
         false
       );
-      expect(log.log).toHaveBeenCalledWith("     Before:", 0);
-      expect(log.log).toHaveBeenCalledWith("     After: ", 1);
+      // No separate Before/After logs for simple values
+      expect(log.log).not.toHaveBeenCalled();
     });
 
-    it("logs prop changes as objects", () => {
+    it("logs simple prop changes inline", () => {
       const node: TreeNode = {
         ...mockNode,
         propChanges: [
@@ -145,13 +199,39 @@ describe("renderNodeDetails", () => {
 
       renderNodeDetails(node, "  ");
 
+      // Simple values (strings) render inline
       expect(log.logPropChange).toHaveBeenCalledWith(
         "  ",
-        "Prop change title:",
+        "Changed prop title: A → B",
         false
       );
-      expect(log.log).toHaveBeenCalledWith("     Before:", "A");
-      expect(log.log).toHaveBeenCalledWith("     After: ", "B");
+      // No separate Before/After logs for simple values
+      expect(log.log).not.toHaveBeenCalled();
+    });
+
+    it("logs complex object changes with Before/After", () => {
+      const node: TreeNode = {
+        ...mockNode,
+        propChanges: [
+          {
+            name: "config",
+            value: { a: 1, b: 2 },
+            prevValue: { a: 0 },
+            isIdenticalValueChange: false,
+          },
+        ],
+      };
+
+      renderNodeDetails(node, "  ");
+
+      // Complex values render with Before/After (note the extra indent: prefix + "  ")
+      expect(log.logPropChange).toHaveBeenCalledWith(
+        "  ",
+        "Changed prop config:",
+        false
+      );
+      expect(log.log).toHaveBeenCalledWith("    Before", { a: 0 });
+      expect(log.log).toHaveBeenCalledWith("    After ", { a: 1, b: 2 });
     });
 
     it("logs component logs with interactive objects", () => {

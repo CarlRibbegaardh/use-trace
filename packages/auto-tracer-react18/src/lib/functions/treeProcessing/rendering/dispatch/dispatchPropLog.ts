@@ -19,7 +19,7 @@ import {
 export function dispatchPropLog(
   rendered: RenderedPropChange,
   prefix: string,
-  isObjectMode: boolean,
+  isObjectMode: boolean
 ): LogDispatch | null {
   // Skip filtered props
   if (rendered.shouldSkip) {
@@ -50,9 +50,15 @@ export function dispatchPropLog(
   if (isObjectMode && rendered.values) {
     return {
       logFn: () => {
-        baseDispatch.logFn(...(baseDispatch.args as []));
-        log(`${prefix}   Before:`, rendered.values![0]);
-        log(`${prefix}   After: `, rendered.values![1]);
+        if (rendered.values!.length === 1) {
+          // Initial: single value on same line - pass as additional arg
+          baseDispatch.logFn(...(baseDispatch.args as []), rendered.values![0]);
+        } else {
+          // Update: Before/After on separate lines
+          baseDispatch.logFn(...(baseDispatch.args as []));
+          log(`${prefix}  Before`, rendered.values![0]);
+          log(`${prefix}  After `, rendered.values![1]);
+        }
       },
       args: [],
     };

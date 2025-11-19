@@ -6,6 +6,7 @@ import {
 } from "../../../changeFormatting.js";
 import { snapshotValue } from "../../../snapshotValue.js";
 import { checkComplexObject } from "../../../checkComplexObject.js";
+import { isSimpleValue } from "../utils/isSimpleValue.js";
 
 /**
  * Rendered output for a state change.
@@ -23,9 +24,9 @@ export interface RenderedStateChange {
 
   /**
    * Optional additional values (for devtools-json mode).
-   * First element is "before" value, second is "after" value.
+   * Single value for initial render, two values (before/after) for updates.
    */
-  readonly values?: readonly [unknown, unknown];
+  readonly values?: readonly [unknown] | readonly [unknown, unknown];
 }
 
 /**
@@ -65,8 +66,8 @@ export function renderStateChange(
       const value = prepareValue(change.value);
       return {
         level: "state-initial",
-        message: `Initial state ${change.name}:`,
-        values: [value, value], // Duplicate for consistent interface
+        message: `Initial state ${change.name}: `,
+        values: [value],
       };
     } else {
       const formattedValue = formatStateValue(change.value);
@@ -80,15 +81,37 @@ export function renderStateChange(
     if (isObjectMode) {
       const prev = prepareValue(change.prevValue);
       const curr = prepareValue(change.value);
-      const baseMessage = `State change ${change.name}:`;
+      const simple =
+        isSimpleValue(change.prevValue) && isSimpleValue(change.value);
 
-      return {
-        level: showIdenticalWarning ? "state-identical" : "state",
-        message: showIdenticalWarning
-          ? `${baseMessage} (identical value)`
-          : baseMessage,
-        values: [prev, curr],
-      };
+      if (simple) {
+        // Simple values: inline like "Changed state trigger: 0 → 1"
+        const formatted = formatStateChange(change.prevValue, change.value);
+        const baseMessage = `Changed state ${change.name}`;
+
+        if (showIdenticalWarning) {
+          return {
+            level: "state-identical",
+            message: `${baseMessage} (identical value): ${formatted}`,
+          };
+        } else {
+          return {
+            level: "state",
+            message: `${baseMessage}: ${formatted}`,
+          };
+        }
+      } else {
+        // Complex values: multi-line with Before/After
+        const baseMessage = `Changed state ${change.name}:`;
+
+        return {
+          level: showIdenticalWarning ? "state-identical" : "state",
+          message: showIdenticalWarning
+            ? `${baseMessage} (identical value)`
+            : baseMessage,
+          values: [prev, curr],
+        };
+      }
     } else {
       const formatted = formatStateChange(change.prevValue, change.value);
       const baseMessage = `State change ${change.name}`;

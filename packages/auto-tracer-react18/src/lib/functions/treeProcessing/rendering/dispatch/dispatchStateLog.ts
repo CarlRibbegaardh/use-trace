@@ -18,7 +18,7 @@ import {
 export function dispatchStateLog(
   rendered: RenderedStateChange,
   prefix: string,
-  isObjectMode: boolean,
+  isObjectMode: boolean
 ): LogDispatch {
   // Determine base dispatch
   let baseDispatch: LogDispatch;
@@ -44,9 +44,15 @@ export function dispatchStateLog(
   if (isObjectMode && rendered.values) {
     return {
       logFn: () => {
-        baseDispatch.logFn(...(baseDispatch.args as []));
-        log(`${prefix}   Before:`, rendered.values![0]);
-        log(`${prefix}   After: `, rendered.values![1]);
+        if (rendered.values!.length === 1) {
+          // Initial: single value on same line - pass as additional arg
+          baseDispatch.logFn(...(baseDispatch.args as []), rendered.values![0]);
+        } else {
+          // Update: Before/After on separate lines
+          baseDispatch.logFn(...(baseDispatch.args as []));
+          log(`${prefix}  Before`, rendered.values![0]);
+          log(`${prefix}  After `, rendered.values![1]);
+        }
       },
       args: [],
     };
