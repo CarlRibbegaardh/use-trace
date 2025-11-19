@@ -92,12 +92,14 @@ export function renderStateChange(
         if (showIdenticalWarning) {
           return {
             level: "state-identical",
-            message: `${baseMessage} (identical value): ${formatted}`,
+            message: `${baseMessage} (identical value):`,
+            values: [formatted],
           };
         } else {
           return {
             level: "state",
-            message: `${baseMessage}: ${formatted}`,
+            message: `${baseMessage}:`,
+            values: [formatted],
           };
         }
       } else {

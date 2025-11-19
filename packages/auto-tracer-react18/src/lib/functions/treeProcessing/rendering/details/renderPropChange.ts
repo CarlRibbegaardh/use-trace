@@ -96,7 +96,8 @@ export function renderPropChange(
     if (isObjectMode) {
       const prev = prepareValue(change.prevValue);
       const curr = prepareValue(change.value);
-      const simple = isSimpleValue(change.prevValue) && isSimpleValue(change.value);
+      const simple =
+        isSimpleValue(change.prevValue) && isSimpleValue(change.value);
 
       if (simple) {
         // Simple values: inline like "Changed prop loading: false → true"
@@ -106,14 +107,16 @@ export function renderPropChange(
         if (showIdenticalWarning) {
           return {
             level: "prop-identical",
-            message: `${baseMessage} (identical value): ${formatted}`,
+            message: `${baseMessage} (identical value):`,
             shouldSkip,
+            values: [formatted],
           };
         } else {
           return {
             level: "prop",
-            message: `${baseMessage}: ${formatted}`,
+            message: `${baseMessage}:`,
             shouldSkip,
+            values: [formatted],
           };
         }
       } else {

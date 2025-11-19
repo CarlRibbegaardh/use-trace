@@ -174,11 +174,12 @@ describe("renderNodeDetails", () => {
 
       renderNodeDetails(node, "  ");
 
-      // Simple values (numbers) render inline
+      // Simple values (numbers) render inline with value as 4th arg
       expect(log.logStateChange).toHaveBeenCalledWith(
         "  ",
-        "Changed state count: 0 → 1",
-        false
+        "Changed state count:",
+        false,
+        "0 → 1"
       );
       // No separate Before/After logs for simple values
       expect(log.log).not.toHaveBeenCalled();
@@ -199,11 +200,12 @@ describe("renderNodeDetails", () => {
 
       renderNodeDetails(node, "  ");
 
-      // Simple values (strings) render inline
+      // Simple values (strings) render inline with value as 4th arg
       expect(log.logPropChange).toHaveBeenCalledWith(
         "  ",
-        "Changed prop title: A → B",
-        false
+        "Changed prop title:",
+        false,
+        "A → B"
       );
       // No separate Before/After logs for simple values
       expect(log.log).not.toHaveBeenCalled();
