@@ -1053,8 +1053,8 @@ importers:
         specifier: workspace:*
         version: link:../auto-tracer-inject-react18
       '@auto-tracer/react18':
-        specifier: 1.0.0-alpha.12
-        version: 1.0.0-alpha.12
+        specifier: 1.0.0-alpha.16
+        version: 1.0.0-alpha.16
       rollup-plugin-external-globals:
         specifier: ^0.13.0
         version: 0.13.0(rollup@4.52.5)
@@ -1086,6 +1086,9 @@ importers:
 
   packages/auto-tracer-react18:
     dependencies:
+      deepmerge:
+        specifier: ^4.3.1
+        version: 4.3.1
       ramda:
         specifier: ^0.32.0
         version: 0.32.0
@@ -1293,8 +1296,8 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@auto-tracer/react18@1.0.0-alpha.12':
-    resolution: {integrity: sha512-wTfd191FpMjCnu5dPYb+xj/SLk3z+UF8pF5B7/XsQ//OzqYSShLRBrXC5UzYagvY++KB5u4jiEqptabl3YDvLg==}
+  '@auto-tracer/react18@1.0.0-alpha.16':
+    resolution: {integrity: sha512-DxWw6kKbjid/DzBYL+6T1HHzeGbuic+rELymdHv0inu17DqJ2TCWnpq8Fymrfa63KasHhFvyGD0hd1PbFRVThg==}
 
   '@babel/cli@7.28.3':
     resolution: {integrity: sha512-n1RU5vuCX0CsaqaXm9I0KUCNKNQMy5epmzl/xdSSm70bSqhg9GWhgeosypyQLc0bK24+Xpk1WGzZlI9pJtkZdg==}
@@ -4573,7 +4576,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
 
-  '@auto-tracer/react18@1.0.0-alpha.12':
+  '@auto-tracer/react18@1.0.0-alpha.16':
     dependencies:
       ramda: 0.32.0
       safe-stable-stringify: 2.5.0
