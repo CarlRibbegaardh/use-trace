@@ -2,8 +2,6 @@
  * @file Pure function to match hooks by ordinal position when all occurrences are labeled.
  */
 
-import { stringify } from "../stringify.js";
-import { toComparableString } from "./toComparableString.js";
 import type { LabelEntry } from "./LabelEntry.js";
 import type { FiberAnchor } from "./FiberAnchor.js";
 
