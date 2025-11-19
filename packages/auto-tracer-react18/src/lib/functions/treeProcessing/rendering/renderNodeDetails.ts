@@ -1,19 +1,12 @@
 import type { TreeNode } from "../types/TreeNode.js";
 import type { RenderOptions } from "./types/RenderOptions.js";
 import { traceOptions } from "../../../types/globalState.js";
-import {
-  log,
-  logErrorStatement,
-  logIdenticalPropValueWarning,
-  logIdenticalStateValueWarning,
-  logLogStatement,
-  logPropChange,
-  logStateChange,
-  logWarnStatement,
-} from "../../log.js";
 import { renderStateChange } from "./details/renderStateChange.js";
 import { renderPropChange } from "./details/renderPropChange.js";
 import { renderComponentLog } from "./details/renderComponentLog.js";
+import { dispatchStateLog } from "./dispatch/dispatchStateLog.js";
+import { dispatchPropLog } from "./dispatch/dispatchPropLog.js";
+import { dispatchComponentLog } from "./dispatch/dispatchComponentLog.js";
 
 /**
  * Renders the details of a node (state/prop changes, logs) to the console.
@@ -40,68 +33,23 @@ export function renderNodeDetails(node: TreeNode, prefix: string = "") {
   // Render state changes
   node.stateChanges.forEach((change) => {
     const rendered = renderStateChange(change, options, isMount);
-
-    if (rendered.level === "state-identical") {
-      logIdenticalStateValueWarning(prefix, rendered.message);
-    } else if (rendered.level === "state-initial") {
-      logStateChange(prefix, rendered.message, true);
-    } else {
-      logStateChange(prefix, rendered.message, false);
-    }
-
-    // For object mode with values, log the before/after
-    if (isObjectMode && rendered.values) {
-      log(`${prefix}   Before:`, rendered.values[0]);
-      log(`${prefix}   After: `, rendered.values[1]);
-    }
+    const dispatch = dispatchStateLog(rendered, prefix, isObjectMode);
+    dispatch.logFn(...(dispatch.args as []));
   });
 
   // Render prop changes
   node.propChanges.forEach((change) => {
     const rendered = renderPropChange(change, options, isMount);
-
-    // Skip filtered props
-    if (rendered.shouldSkip) {
-      return;
-    }
-
-    if (rendered.level === "prop-identical") {
-      logIdenticalPropValueWarning(prefix, rendered.message);
-    } else if (rendered.level === "prop-initial") {
-      logPropChange(prefix, rendered.message, true);
-    } else {
-      logPropChange(prefix, rendered.message, false);
-    }
-
-    // For object mode with values, log the before/after
-    if (isObjectMode && rendered.values) {
-      log(`${prefix}   Before:`, rendered.values[0]);
-      log(`${prefix}   After: `, rendered.values[1]);
+    const dispatch = dispatchPropLog(rendered, prefix, isObjectMode);
+    if (dispatch) {
+      dispatch.logFn(...(dispatch.args as []));
     }
   });
 
   // Render component logs
   node.componentLogs.forEach((logEntry) => {
     const rendered = renderComponentLog(logEntry, options);
-
-    if (rendered.level === "error") {
-      if (rendered.args) {
-        logErrorStatement(prefix, rendered.message, ...rendered.args);
-      } else {
-        logErrorStatement(prefix, rendered.message);
-      }
-    } else if (rendered.level === "warn") {
-      if (rendered.args) {
-        logWarnStatement(prefix, rendered.message, ...rendered.args);
-      } else {
-        logWarnStatement(prefix, rendered.message);
-      }
-    } else {
-      if (rendered.args) {
-        logLogStatement(prefix, rendered.message, ...rendered.args);
-      } else {
-        logLogStatement(prefix, rendered.message);
-      }
-    }
+    const dispatch = dispatchComponentLog(rendered, prefix);
+    dispatch.logFn(...(dispatch.args as []));
   });
 }
