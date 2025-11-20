@@ -93,11 +93,62 @@ export function buildStateChanges(
           console.log(
             `[AutoTracer] buildStateChanges: Got anchorIndex=${anchorIndex}`
           );
+          console.log(
+            `[AutoTracer] buildStateChanges: About to validate hook structure`
+          );
+        }
+
+        // Guard: Validate hook has required properties before accessing
+        if (!hook || typeof hook !== "object") {
+          if (shouldLogDetail) {
+            console.log(
+              `[AutoTracer] buildStateChanges: GUARD FAILED - hook is not an object, skipping`
+            );
+          }
+          return {
+            name: `state${anchorIndex}`,
+            value,
+            prevValue: undefined as unknown,
+            hook,
+            isIdenticalValueChange: false,
+          } as StateChangeEntry;
+        }
+
+        if (!("memoizedState" in hook)) {
+          if (shouldLogDetail) {
+            console.log(
+              `[AutoTracer] buildStateChanges: GUARD FAILED - hook missing memoizedState property, skipping`
+            );
+          }
+          return {
+            name: `state${anchorIndex}`,
+            value,
+            prevValue: undefined as unknown,
+            hook,
+            isIdenticalValueChange: false,
+          } as StateChangeEntry;
+        }
+
+        if (shouldLogDetail) {
+          console.log(
+            `[AutoTracer] buildStateChanges: Guard passed, accessing memoizedState`
+          );
+        }
+
+        const memoizedState = (hook as Hook).memoizedState;
+
+        if (shouldLogDetail) {
+          console.log(
+            `[AutoTracer] buildStateChanges: Got memoizedState, type=${typeof memoizedState}`
+          );
+          console.log(
+            `[AutoTracer] buildStateChanges: Calling resolveHookLabel NOW`
+          );
         }
         const resolvedName = resolveHookLabel(
           trackingGUID ?? "",
           anchorIndex,
-          (hook as Hook).memoizedState,
+          memoizedState,
           allAnchors
         );
         if (shouldLogDetail) {

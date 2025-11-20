@@ -3,7 +3,8 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**"],
+      "outputLogs": "new-only"
     },
     "dev": {
       "dependsOn": ["build"],
@@ -16,13 +17,16 @@
       "persistent": true
     },
     "lint": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputLogs": "new-only"
     },
     "test": {
-      "dependsOn": ["build"]
+      "dependsOn": ["build"],
+      "outputLogs": "new-only"
     },
     "test:e2e": {
-      "dependsOn": ["build"]
+      "dependsOn": ["build"],
+      "outputLogs": "new-only"
     },
     "clean": {
       "cache": false
