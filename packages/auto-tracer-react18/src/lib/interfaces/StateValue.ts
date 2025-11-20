@@ -18,13 +18,14 @@ interface StateValue {
   prevValue?: unknown;
 
   /**
-   * The actual hook instance from the memoizedState chain
+   * The actual hook instance from the memoizedState chain.
+   * Null for unmatched labeled states that don't correspond to a current hook.
    */
   hook: {
     memoizedState: unknown;
     queue: unknown;
     next: unknown;
-  };
+  } | null;
 }
 
 export type { StateValue };

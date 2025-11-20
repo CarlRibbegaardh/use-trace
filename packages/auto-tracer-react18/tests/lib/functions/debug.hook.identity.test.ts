@@ -199,7 +199,7 @@ describe("Hook Identity Debug", () => {
         `StateValue[${idx}].hook indexOf in anchors: ${indexInAnchors}`
       );
       console.log(`  Hook type:`, typeof sv.hook);
-      console.log(`  Hook constructor:`, sv.hook.constructor.name);
+      console.log(`  Hook constructor:`, sv.hook?.constructor.name);
       console.log(`  Is Hook?:`, sv.hook instanceof Object);
     });
 

@@ -11,6 +11,30 @@ import {
 } from "../../../hookLabels.js";
 import type { AnchorEntry } from "./getHookAnchors.js";
 
+/**
+ * Find the index of a hook object in the anchors array by reference equality.
+ * Works even though the hook types are structurally different because indexOf
+ * uses === comparison which works on object references.
+ *
+ * @param hook - The hook object from UseStateValueEntry (or null)
+ * @param anchors - Array of Hook objects from fiber memoizedState chain
+ * @returns Index in anchors array, or -1 if not found or hook is null
+ */
+function findHookIndex(
+  hook: { memoizedState: unknown; queue: unknown; next: unknown } | null,
+  anchors: readonly Hook[]
+): number {
+  if (!hook) return -1;
+  // This works because the same object reference exists in both arrays
+  // even though the types are structurally incompatible
+  for (let i = 0; i < anchors.length; i++) {
+    if (anchors[i] === (hook as unknown)) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 export interface StateChangeEntry {
   name: string;
   value: unknown;
@@ -19,7 +43,7 @@ export interface StateChangeEntry {
     memoizedState: unknown;
     queue: unknown;
     next: unknown;
-  };
+  } | null;
   isIdenticalValueChange: boolean;
 }
 
@@ -31,7 +55,7 @@ export interface UseStateValueEntry {
     memoizedState: unknown;
     queue: unknown;
     next: unknown;
-  };
+  } | null;
 }
 
 /**
@@ -82,13 +106,15 @@ export function buildStateChanges(
             `[AutoTracer] buildStateChanges: About to call anchors.indexOf(hook)`
           );
           console.log(
-            `[AutoTracer] buildStateChanges: hook type=${typeof hook}, hook=${hook ? "exists" : "null"}`
+            `[AutoTracer] buildStateChanges: hook type=${typeof hook}, hook=${
+              hook ? "exists" : "null"
+            }`
           );
           console.log(
             `[AutoTracer] buildStateChanges: anchors.length=${anchors.length}`
           );
         }
-        const anchorIndex = anchors.indexOf(hook as unknown as Hook);
+        const anchorIndex = findHookIndex(hook, anchors);
         if (shouldLogDetail) {
           console.log(
             `[AutoTracer] buildStateChanges: Got anchorIndex=${anchorIndex}`
@@ -135,15 +161,29 @@ export function buildStateChanges(
           );
         }
 
-        const memoizedState = (hook as Hook).memoizedState;
+        const memoizedState = hook.memoizedState;
 
         if (shouldLogDetail) {
           console.log(
             `[AutoTracer] buildStateChanges: Got memoizedState, type=${typeof memoizedState}`
           );
           console.log(
-            `[AutoTracer] buildStateChanges: Calling resolveHookLabel NOW`
+            `[AutoTracer] buildStateChanges: About to call resolveHookLabel with:`
           );
+          console.log(
+            `  guid=${trackingGUID ?? ""}`,
+            `anchorIndex=${anchorIndex}`,
+            `memoizedState type=${typeof memoizedState}`,
+            `allAnchors.length=${allAnchors.length}`
+          );
+          if (allAnchors.length > 0 && allAnchors[0]) {
+            console.log(
+              `  allAnchors[0]=`,
+              allAnchors[0],
+              `has index?=${"index" in allAnchors[0]}`,
+              `has value?=${"value" in allAnchors[0]}`
+            );
+          }
         }
         const resolvedName = resolveHookLabel(
           trackingGUID ?? "",
@@ -159,10 +199,10 @@ export function buildStateChanges(
         return {
           name: resolvedName,
           value,
-          prevValue: undefined as unknown,
+          prevValue: undefined,
           hook,
           isIdenticalValueChange: false,
-        } as StateChangeEntry;
+        };
       });
 
     const matchedLabels = new Set(
@@ -185,10 +225,10 @@ export function buildStateChanges(
             return {
               name: label,
               value,
-              prevValue: undefined as unknown,
-              hook: null as unknown as Hook,
+              prevValue: undefined,
+              hook: null,
               isIdenticalValueChange: false,
-            } as StateChangeEntry;
+            };
           })
       : [];
 
@@ -236,11 +276,11 @@ export function buildStateChanges(
           `[AutoTracer] buildStateChanges: Resolving hook label (update)`
         );
       }
-      const anchorIndex = anchors.indexOf(hook as unknown as Hook);
+      const anchorIndex = findHookIndex(hook, anchors);
       const resolvedName = resolveHookLabel(
         trackingGUID ?? "",
         anchorIndex,
-        (hook as Hook).memoizedState,
+        hook?.memoizedState,
         allAnchors
       );
       if (shouldLogDetail) {
@@ -255,7 +295,7 @@ export function buildStateChanges(
         prevValue,
         hook,
         isIdenticalValueChange,
-      } as StateChangeEntry;
+      };
     });
 
   const matchedLabels = new Set(
@@ -270,7 +310,7 @@ export function buildStateChanges(
     );
   }
   const unmatchedLabelChanges = (() => {
-    if (!trackingGUID) return [] as StateChangeEntry[];
+    if (!trackingGUID) return [];
 
     if (shouldLogDetail) {
       console.log(
@@ -309,11 +349,11 @@ export function buildStateChanges(
           name: label,
           value,
           prevValue,
-          hook: null as unknown as Hook,
+          hook: null,
           isIdenticalValueChange,
-        } as StateChangeEntry;
+        };
       })
-      .filter((c): c is StateChangeEntry => {
+      .filter((c) => {
         return c !== null;
       });
 
