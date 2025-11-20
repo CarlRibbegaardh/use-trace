@@ -78,8 +78,22 @@ export function buildStateChanges(
           console.log(
             `[AutoTracer] buildStateChanges: Resolving hook label (mount)`
           );
+          console.log(
+            `[AutoTracer] buildStateChanges: About to call anchors.indexOf(hook)`
+          );
+          console.log(
+            `[AutoTracer] buildStateChanges: hook type=${typeof hook}, hook=${hook ? "exists" : "null"}`
+          );
+          console.log(
+            `[AutoTracer] buildStateChanges: anchors.length=${anchors.length}`
+          );
         }
         const anchorIndex = anchors.indexOf(hook as unknown as Hook);
+        if (shouldLogDetail) {
+          console.log(
+            `[AutoTracer] buildStateChanges: Got anchorIndex=${anchorIndex}`
+          );
+        }
         const resolvedName = resolveHookLabel(
           trackingGUID ?? "",
           anchorIndex,
