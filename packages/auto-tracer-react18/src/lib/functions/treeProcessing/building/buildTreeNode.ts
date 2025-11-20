@@ -21,7 +21,10 @@ import { consumeComponentLogs } from "./helpers/consumeComponentLogs.js";
  * @param depth - Current depth in the tree
  * @returns Immutable TreeNode representation
  */
-export function buildTreeNode(fiber: unknown, depth: number): TreeNode {
+export function buildTreeNode(
+  fiber: unknown,
+  depth: number
+): TreeNode {
   if (!fiber || typeof fiber !== "object") {
     throw new Error("buildTreeNode requires a valid fiber object");
   }

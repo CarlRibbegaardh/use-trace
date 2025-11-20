@@ -1,5 +1,6 @@
 import type { TreeNode } from "../types/TreeNode.js";
 import { buildTreeNode } from "./buildTreeNode.js";
+import { traceOptions } from "../../../types/globalState.js";
 
 /**
  * Frame representing a position in the explicit DFS traversal stack.
@@ -32,7 +33,15 @@ export function traverseFiber(
   shouldIncludeBranch: (fiber: unknown) => boolean,
   maxDepth: number,
 ): readonly TreeNode[] {
+  const shouldLogDetail = traceOptions.enableAutoTracerInternalsLogging ?? false;
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] traverseFiber: ENTER (depth=${startDepth})`);
+  }
+
   if (!fiber || typeof fiber !== "object") {
+    if (shouldLogDetail) {
+      console.log("[AutoTracer] traverseFiber: EXIT (invalid fiber)");
+    }
     return [];
   }
 
@@ -82,8 +91,18 @@ export function traverseFiber(
     }
 
     // Build the TreeNode for this fiber
-    const node = buildTreeNode(currentFiber, currentDepth);
-    accumulator.push(node);
+    try {
+      const node = buildTreeNode(currentFiber, currentDepth);
+      accumulator.push(node);
+    } catch (error) {
+      if (shouldLogDetail) {
+        console.error(
+          `[AutoTracer] Error building node at depth ${currentDepth}:`,
+          error
+        );
+      }
+      // Continue traversal even if one node fails
+    }
 
     // Push sibling and child to stack (sibling first for DFS order)
     if (fiberNode.sibling) {
@@ -92,6 +111,10 @@ export function traverseFiber(
     if (fiberNode.child) {
       stack.push({ fiber: fiberNode.child, depth: currentDepth + 1 });
     }
+  }
+
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] traverseFiber: EXIT (${accumulator.length} nodes)`);
   }
 
   return accumulator;

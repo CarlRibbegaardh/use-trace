@@ -1,6 +1,7 @@
 import type { TreeRenderer } from "../types/TreeRenderer.js";
 import { calculateVisualDepths } from "../helpers/calculateVisualDepths.js";
 import { renderTreeNode } from "../renderTreeNode.js";
+import { traceOptions } from "../../../../types/globalState.js";
 
 /**
  * Creates an indented tree renderer (current behavior).
@@ -12,27 +13,44 @@ import { renderTreeNode } from "../renderTreeNode.js";
  */
 export const createIndentedRenderer = (): TreeRenderer => {
   return (nodes) => {
+    const shouldLogDetail =
+      traceOptions.enableAutoTracerInternalsLogging ?? false;
+    if (shouldLogDetail) {
+      console.log(
+        `[AutoTracer] createIndentedRenderer: Processing ${nodes.length} nodes`
+      );
+    }
+
     const visualDepths = calculateVisualDepths(nodes);
     let lastVisualDepth = -1;
     let previousWasMarker = false;
 
     for (let i = 0; i < nodes.length; i++) {
-      const node = nodes[i];
-      const visualDepth = visualDepths[i];
-      const nextNode = i + 1 < nodes.length ? nodes[i + 1] : undefined;
+      try {
+        const node = nodes[i];
+        const visualDepth = visualDepths[i];
+        const nextNode = i + 1 < nodes.length ? nodes[i + 1] : undefined;
 
-      // console.log("Rendering node", node.displayName, visualDepth); // DEBUG
-
-      if (node !== undefined && visualDepth !== undefined) {
-        lastVisualDepth = renderTreeNode(
-          node,
-          visualDepth,
-          lastVisualDepth,
-          previousWasMarker,
-          nextNode
-        );
-        previousWasMarker = node.renderType === "Marker";
+        if (node !== undefined && visualDepth !== undefined) {
+          lastVisualDepth = renderTreeNode(
+            node,
+            visualDepth,
+            lastVisualDepth,
+            previousWasMarker,
+            nextNode
+          );
+          previousWasMarker = node.renderType === "Marker";
+        }
+      } catch (error) {
+        if (shouldLogDetail) {
+          console.error(`[AutoTracer] Error rendering node ${i}:`, error);
+        }
+        // Continue rendering other nodes
       }
+    }
+
+    if (shouldLogDetail) {
+      console.log("[AutoTracer] createIndentedRenderer: Complete");
     }
   };
 };

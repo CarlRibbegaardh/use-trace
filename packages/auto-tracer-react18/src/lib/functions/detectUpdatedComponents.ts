@@ -10,15 +10,23 @@ import {
 } from "../types/globalState.js";
 
 export function detectUpdatedComponents(root: unknown): void {
+  const shouldLogTiming =
+    traceOptions.enableAutoTracerInternalsLogging ?? false;
+  if (shouldLogTiming) {
+    console.log("[AutoTracer] detectUpdatedComponents: ENTER");
+  }
   try {
     const rootNode = root as { current?: unknown };
-    if (!rootNode?.current) return;
+    if (!rootNode?.current) {
+      if (shouldLogTiming) {
+        console.log("[AutoTracer] detectUpdatedComponents: EXIT (no current)");
+      }
+      return;
+    }
 
     // Increment render cycle counter at the start
     incrementRenderCycle();
 
-    const shouldLogTiming =
-      traceOptions.enableAutoTracerInternalsLogging ?? false;
     const totalStartTime = shouldLogTiming ? performance.now() : 0;
 
     // Step 1: Build tree from fiber

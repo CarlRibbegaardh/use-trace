@@ -24,6 +24,10 @@ export function buildTreeFromFiber(
   const shouldLogTiming =
     traceOptions.enableAutoTracerInternalsLogging ?? false;
 
+  if (shouldLogTiming) {
+    console.log(`[AutoTracer] buildTreeFromFiber: ENTER (depth=${depth})`);
+  }
+
   // Build inclusion predicate based on tracking settings
   const shouldIncludeBranch = (fiberNode: unknown): boolean => {
     if (includeNonTrackedBranches) {
@@ -43,5 +47,11 @@ export function buildTreeFromFiber(
   );
 
   // Execute pure traversal with explicit dependencies
-  return traverse(fiber, depth, shouldIncludeBranch, maxDepth);
+  const result = traverse(fiber, depth, shouldIncludeBranch, maxDepth);
+
+  if (shouldLogTiming) {
+    console.log("[AutoTracer] buildTreeFromFiber: EXIT");
+  }
+
+  return result;
 }

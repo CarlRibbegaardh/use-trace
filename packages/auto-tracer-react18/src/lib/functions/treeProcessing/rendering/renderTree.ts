@@ -15,6 +15,11 @@ import { traceOptions } from "../../../types/globalState.js";
  * @param nodes - Array of tree nodes to render
  */
 export function renderTree(nodes: readonly TreeNode[]): void {
+  const shouldLogTiming = traceOptions.enableAutoTracerInternalsLogging ?? false;
+  if (shouldLogTiming) {
+    console.log(`[AutoTracer] renderTree: ENTER (${nodes.length} nodes)`);
+  }
+
   const rendererType = traceOptions.renderer ?? "indented";
 
   const renderer =
@@ -23,4 +28,8 @@ export function renderTree(nodes: readonly TreeNode[]): void {
       : createIndentedRenderer();
 
   renderer(nodes);
+
+  if (shouldLogTiming) {
+    console.log("[AutoTracer] renderTree: EXIT");
+  }
 }
