@@ -10,6 +10,7 @@ import { type StateChangeEntry, buildStateChanges } from "./helpers/buildStateCh
 import { buildPropChanges } from "./helpers/buildPropChanges.js";
 import { computeIdenticalValueWarning } from "./helpers/computeIdenticalValueWarning.js";
 import { consumeComponentLogs } from "./helpers/consumeComponentLogs.js";
+import { traceOptions } from "../../../types/globalState.js";
 
 /**
  * Builds a TreeNode from a React fiber node.
@@ -25,6 +26,12 @@ export function buildTreeNode(
   fiber: unknown,
   depth: number
 ): TreeNode {
+  const shouldLogDetail = traceOptions.enableAutoTracerInternalsLogging ?? false;
+
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] buildTreeNode: ENTER (depth=${depth})`);
+  }
+
   if (!fiber || typeof fiber !== "object") {
     throw new Error("buildTreeNode requires a valid fiber object");
   }
@@ -40,6 +47,9 @@ export function buildTreeNode(
   };
 
   // Extract component name
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] buildTreeNode: Extracting component name`);
+  }
   const componentName = getComponentName(fiberNode.elementType) ?? "Unknown";
   const displayName = getRealComponentName(fiberNode);
 
@@ -47,22 +57,37 @@ export function buildTreeNode(
   const isNewMount = !fiberNode.alternate;
 
   // Check if component is tracked
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] buildTreeNode: Getting tracking GUID`);
+  }
   const trackingGUID = getTrackingGUID(fiber);
   const isTracked = !!trackingGUID;
 
   // Determine render type
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] buildTreeNode: Determining render type`);
+  }
   const renderType: TreeNode["renderType"] = determineRenderType(
     isNewMount,
     fiberNode.flags
   );
 
   // Extract state changes
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] buildTreeNode: Extracting useState values`);
+  }
   const useStateValues = extractUseStateValues(fiberNode);
 
   // Get hook anchors for label resolution from CURRENT render's memoized state
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] buildTreeNode: Getting hook anchors`);
+  }
   const memoizedState = fiberNode.memoizedState as Hook | null;
   const { anchors, allAnchors } = getHookAnchors(memoizedState);
 
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] buildTreeNode: Building state changes`);
+  }
   const stateChanges: StateChangeEntry[] = buildStateChanges(
     isNewMount,
     useStateValues,
@@ -72,16 +97,29 @@ export function buildTreeNode(
   );
 
   // Extract prop changes
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] buildTreeNode: Building prop changes`);
+  }
   const propChanges = buildPropChanges(isNewMount, fiberNode, displayName);
 
   // Check if any change has identical value warning
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] buildTreeNode: Computing identical value warning`);
+  }
   const hasIdenticalValueWarning = computeIdenticalValueWarning(
     stateChanges,
     propChanges
   );
 
   // Get component logs if tracked (logs are keyed by GUID)
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] buildTreeNode: Consuming component logs`);
+  }
   const componentLogs = consumeComponentLogs(trackingGUID || null);
+
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] buildTreeNode: EXIT (${displayName})`);
+  }
 
   return {
     depth,

@@ -48,11 +48,19 @@ export function traverseFiber(
   const accumulator: TreeNode[] = [];
   const stack: TraversalFrame[] = [{ fiber, depth: startDepth }];
 
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] traverseFiber: Starting loop with ${stack.length} items in stack`);
+  }
+
   while (stack.length > 0) {
     const frame = stack.pop();
     if (!frame) continue;
 
     const { fiber: currentFiber, depth: currentDepth } = frame;
+
+    if (shouldLogDetail) {
+      console.log(`[AutoTracer] traverseFiber: Processing fiber at depth ${currentDepth}, stack size: ${stack.length}`);
+    }
 
     if (!currentFiber || typeof currentFiber !== "object") {
       continue;
@@ -91,9 +99,15 @@ export function traverseFiber(
     }
 
     // Build the TreeNode for this fiber
+    if (shouldLogDetail) {
+      console.log(`[AutoTracer] traverseFiber: Building node at depth ${currentDepth}`);
+    }
     try {
       const node = buildTreeNode(currentFiber, currentDepth);
       accumulator.push(node);
+      if (shouldLogDetail) {
+        console.log(`[AutoTracer] traverseFiber: Successfully built node at depth ${currentDepth}`);
+      }
     } catch (error) {
       if (shouldLogDetail) {
         console.error(
