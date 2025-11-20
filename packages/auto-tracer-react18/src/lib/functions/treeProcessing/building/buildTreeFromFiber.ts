@@ -25,7 +25,7 @@ export function buildTreeFromFiber(
     traceOptions.enableAutoTracerInternalsLogging ?? false;
 
   if (shouldLogTiming) {
-    console.log(`[AutoTracer] buildTreeFromFiber: ENTER (depth=${depth})`);
+    console.group(`[AutoTracer] buildTreeFromFiber: ENTER (depth=${depth})`);
   }
 
   // Build inclusion predicate based on tracking settings
@@ -51,6 +51,7 @@ export function buildTreeFromFiber(
 
   if (shouldLogTiming) {
     console.log("[AutoTracer] buildTreeFromFiber: EXIT");
+    console.groupEnd();
   }
 
   return result;

@@ -1,6 +1,6 @@
 {
   "name": "@auto-tracer/react18",
-  "version": "1.0.0-alpha.19",
+  "version": "1.0.0-alpha.20",
   "description": "Tracing library to detect rerender causes and state changes",
   "author": "Carl Ribbegårdh",
   "license": "MIT",

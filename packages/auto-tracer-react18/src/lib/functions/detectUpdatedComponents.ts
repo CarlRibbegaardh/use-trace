@@ -13,13 +13,14 @@ export function detectUpdatedComponents(root: unknown): void {
   const shouldLogTiming =
     traceOptions.enableAutoTracerInternalsLogging ?? false;
   if (shouldLogTiming) {
-    console.log("[AutoTracer] detectUpdatedComponents: ENTER");
+    console.group("[AutoTracer] detectUpdatedComponents: ENTER");
   }
   try {
     const rootNode = root as { current?: unknown };
     if (!rootNode?.current) {
       if (shouldLogTiming) {
         console.log("[AutoTracer] detectUpdatedComponents: EXIT (no current)");
+        console.groupEnd();
       }
       return;
     }

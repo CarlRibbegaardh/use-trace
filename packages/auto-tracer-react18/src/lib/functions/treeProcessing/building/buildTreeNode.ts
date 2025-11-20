@@ -29,7 +29,7 @@ export function buildTreeNode(
   const shouldLogDetail = traceOptions.enableAutoTracerInternalsLogging ?? false;
 
   if (shouldLogDetail) {
-    console.log(`[AutoTracer] buildTreeNode: ENTER (depth=${depth})`);
+    console.group(`[AutoTracer] buildTreeNode: ENTER (depth=${depth})`);
   }
 
   if (!fiber || typeof fiber !== "object") {
@@ -119,6 +119,7 @@ export function buildTreeNode(
 
   if (shouldLogDetail) {
     console.log(`[AutoTracer] buildTreeNode: EXIT (${displayName})`);
+    console.groupEnd();
   }
 
   return {

@@ -35,12 +35,13 @@ export function traverseFiber(
 ): readonly TreeNode[] {
   const shouldLogDetail = traceOptions.enableAutoTracerInternalsLogging ?? false;
   if (shouldLogDetail) {
-    console.log(`[AutoTracer] traverseFiber: ENTER (depth=${startDepth})`);
+    console.group(`[AutoTracer] traverseFiber: ENTER (depth=${startDepth})`);
   }
 
   if (!fiber || typeof fiber !== "object") {
     if (shouldLogDetail) {
       console.log("[AutoTracer] traverseFiber: EXIT (invalid fiber)");
+      console.groupEnd();
     }
     return [];
   }
@@ -129,6 +130,7 @@ export function traverseFiber(
 
   if (shouldLogDetail) {
     console.log(`[AutoTracer] traverseFiber: EXIT (${accumulator.length} nodes)`);
+    console.groupEnd();
   }
 
   return accumulator;

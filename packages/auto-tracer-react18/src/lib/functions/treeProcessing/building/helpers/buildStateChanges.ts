@@ -54,12 +54,31 @@ export function buildStateChanges(
   allAnchors: AnchorEntry[],
   trackingGUID: string | null
 ): StateChangeEntry[] {
+  const shouldLogDetail =
+    traceOptions.enableAutoTracerInternalsLogging ?? false;
+
+  if (shouldLogDetail) {
+    console.group(
+      `[AutoTracer] buildStateChanges: ENTER (mount=${isNewMount}, useStateValues=${useStateValues.length}, trackingGUID=${trackingGUID})`
+    );
+  }
+
   if (isNewMount) {
+    if (shouldLogDetail) {
+      console.log(
+        `[AutoTracer] buildStateChanges: Processing mount - filtering ${useStateValues.length} useState values`
+      );
+    }
     const fiberStateChanges = useStateValues
       .filter(({ name, value }) => {
         return !isReactInternal(name) && value !== AUTOTRACER_STATE_MARKER;
       })
       .map(({ value, hook }) => {
+        if (shouldLogDetail) {
+          console.log(
+            `[AutoTracer] buildStateChanges: Resolving hook label (mount)`
+          );
+        }
         const anchorIndex = anchors.indexOf(hook as unknown as Hook);
         const resolvedName = resolveHookLabel(
           trackingGUID ?? "",
@@ -67,6 +86,11 @@ export function buildStateChanges(
           (hook as Hook).memoizedState,
           allAnchors
         );
+        if (shouldLogDetail) {
+          console.log(
+            `[AutoTracer] buildStateChanges: Resolved to "${resolvedName}"`
+          );
+        }
         return {
           name: resolvedName,
           value,
@@ -76,11 +100,22 @@ export function buildStateChanges(
         } as StateChangeEntry;
       });
 
-    const matchedLabels = new Set(fiberStateChanges.map((c) => {return c.name}));
+    const matchedLabels = new Set(
+      fiberStateChanges.map((c) => {
+        return c.name;
+      })
+    );
 
+    if (shouldLogDetail) {
+      console.log(
+        `[AutoTracer] buildStateChanges: Getting unmatched labels for GUID (mount)`
+      );
+    }
     const unmatchedLabelChanges = trackingGUID
       ? getLabelsForGuid(trackingGUID)
-          .filter(({ label }) => {return !matchedLabels.has(label)})
+          .filter(({ label }) => {
+            return !matchedLabels.has(label);
+          })
           .map(({ label, value }) => {
             return {
               name: label,
@@ -92,9 +127,24 @@ export function buildStateChanges(
           })
       : [];
 
+    if (shouldLogDetail) {
+      console.log(
+        `[AutoTracer] buildStateChanges: EXIT (mount) - ${
+          fiberStateChanges.length
+        } fiber + ${unmatchedLabelChanges.length} unmatched = ${
+          fiberStateChanges.length + unmatchedLabelChanges.length
+        } total`
+      );
+      console.groupEnd();
+    }
     return [...fiberStateChanges, ...unmatchedLabelChanges];
   }
 
+  if (shouldLogDetail) {
+    console.log(
+      `[AutoTracer] buildStateChanges: Processing update - filtering ${useStateValues.length} useState values`
+    );
+  }
   const fiberStateChanges = useStateValues
     .filter(({ name, value, prevValue }) => {
       return (
@@ -106,11 +156,21 @@ export function buildStateChanges(
       );
     })
     .map(({ value, prevValue, hook }) => {
+      if (shouldLogDetail) {
+        console.log(
+          `[AutoTracer] buildStateChanges: Checking identical value (update)`
+        );
+      }
       const isIdenticalValueChange =
         !!traceOptions.detectIdenticalValueChanges &&
         prevValue !== value &&
         areValuesIdentical(prevValue, value);
 
+      if (shouldLogDetail) {
+        console.log(
+          `[AutoTracer] buildStateChanges: Resolving hook label (update)`
+        );
+      }
       const anchorIndex = anchors.indexOf(hook as unknown as Hook);
       const resolvedName = resolveHookLabel(
         trackingGUID ?? "",
@@ -118,6 +178,11 @@ export function buildStateChanges(
         (hook as Hook).memoizedState,
         allAnchors
       );
+      if (shouldLogDetail) {
+        console.log(
+          `[AutoTracer] buildStateChanges: Resolved to "${resolvedName}"`
+        );
+      }
 
       return {
         name: resolvedName,
@@ -128,18 +193,46 @@ export function buildStateChanges(
       } as StateChangeEntry;
     });
 
-  const matchedLabels = new Set(fiberStateChanges.map((c) => {return c.name}));
+  const matchedLabels = new Set(
+    fiberStateChanges.map((c) => {
+      return c.name;
+    })
+  );
 
+  if (shouldLogDetail) {
+    console.log(
+      `[AutoTracer] buildStateChanges: Getting unmatched labels for GUID (update)`
+    );
+  }
   const unmatchedLabelChanges = (() => {
     if (!trackingGUID) return [] as StateChangeEntry[];
 
+    if (shouldLogDetail) {
+      console.log(
+        `[AutoTracer] buildStateChanges: Getting current and prev labels`
+      );
+    }
     const currentLabels = getLabelsForGuid(trackingGUID);
     const prevLabels = getPrevLabelsForGuid(trackingGUID);
 
-    const prevValueMap = new Map(prevLabels.map((e) => {return [e.label, e.value]}));
+    if (shouldLogDetail) {
+      console.log(`[AutoTracer] buildStateChanges: Building prevValueMap`);
+    }
+    const prevValueMap = new Map(
+      prevLabels.map((e) => {
+        return [e.label, e.value];
+      })
+    );
 
+    if (shouldLogDetail) {
+      console.log(
+        `[AutoTracer] buildStateChanges: Filtering and mapping changes`
+      );
+    }
     const changes = currentLabels
-      .filter(({ label }) => {return !matchedLabels.has(label)})
+      .filter(({ label }) => {
+        return !matchedLabels.has(label);
+      })
       .map(({ label, value }) => {
         const prevValue = prevValueMap.get(label);
         if (prevValue === undefined) return null;
@@ -155,13 +248,28 @@ export function buildStateChanges(
           isIdenticalValueChange,
         } as StateChangeEntry;
       })
-      .filter((c): c is StateChangeEntry => {return c !== null});
+      .filter((c): c is StateChangeEntry => {
+        return c !== null;
+      });
 
+    if (shouldLogDetail) {
+      console.log(`[AutoTracer] buildStateChanges: Saving prev labels`);
+    }
     // preserve side-effect timing post computation
     savePrevLabelsForGuid(trackingGUID);
 
     return changes;
   })();
 
+  if (shouldLogDetail) {
+    console.log(
+      `[AutoTracer] buildStateChanges: EXIT (update) - ${
+        fiberStateChanges.length
+      } fiber + ${unmatchedLabelChanges.length} unmatched = ${
+        fiberStateChanges.length + unmatchedLabelChanges.length
+      } total`
+    );
+    console.groupEnd();
+  }
   return [...fiberStateChanges, ...unmatchedLabelChanges];
 }
