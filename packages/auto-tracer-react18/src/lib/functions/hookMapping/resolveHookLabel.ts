@@ -3,9 +3,10 @@
  */
 
 import type { Hook } from "./types.js";
+import { traceOptions } from "../../types/globalState.js";
 
 /**
- * Resolves the build-time label for a hook using the anchor-target mapping algorithm.
+ * Resolves the build-time label for a hook using anchor-target mapping algorithm.
  *
  * This function implements the core mapping logic:
  * 1. Find the hook's position in the memoizedState chain (anchor position)
@@ -40,22 +41,88 @@ export function resolveHookLabel(
   labels: Record<number, string>,
   fallback: string
 ): string {
+  const shouldLogDetail = traceOptions.enableAutoTracerInternalsLogging;
+
+  if (shouldLogDetail) {
+    console.group(
+      `[AutoTracer] resolveHookLabel: ENTER (fallback="${fallback}")`
+    );
+    console.log(
+      `[AutoTracer] resolveHookLabel: Input - anchors.length=${
+        anchors.length
+      }, targets.length=${targets.length}, labels keys=${
+        Object.keys(labels).length
+      }`
+    );
+  }
+
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] resolveHookLabel: Finding hook in anchors array`);
+  }
+
   const anchorIndex = anchors.indexOf(hook);
 
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] resolveHookLabel: anchorIndex=${anchorIndex}`);
+  }
+
   if (anchorIndex === -1) {
+    if (shouldLogDetail) {
+      console.log(
+        `[AutoTracer] resolveHookLabel: EXIT - Hook not found in anchors, returning fallback="${fallback}"`
+      );
+      console.groupEnd();
+    }
     return fallback;
+  }
+
+  if (shouldLogDetail) {
+    console.log(
+      `[AutoTracer] resolveHookLabel: Looking up target at anchors[${anchorIndex}]`
+    );
   }
 
   const targetIndex = targets[anchorIndex];
 
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] resolveHookLabel: targetIndex=${targetIndex}`);
+  }
+
   if (targetIndex === undefined) {
+    if (shouldLogDetail) {
+      console.log(
+        `[AutoTracer] resolveHookLabel: EXIT - Target undefined at index ${anchorIndex}, returning fallback="${fallback}"`
+      );
+      console.groupEnd();
+    }
     return fallback;
+  }
+
+  if (shouldLogDetail) {
+    console.log(
+      `[AutoTracer] resolveHookLabel: Looking up label at labels[${targetIndex}]`
+    );
   }
 
   const label = labels[targetIndex];
 
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] resolveHookLabel: label="${label}"`);
+  }
+
   if (!label) {
+    if (shouldLogDetail) {
+      console.log(
+        `[AutoTracer] resolveHookLabel: EXIT - No label found at targetIndex ${targetIndex}, returning fallback="${fallback}"`
+      );
+      console.groupEnd();
+    }
     return fallback;
+  }
+
+  if (shouldLogDetail) {
+    console.log(`[AutoTracer] resolveHookLabel: EXIT - returning "${label}"`);
+    console.groupEnd();
   }
 
   return label;
