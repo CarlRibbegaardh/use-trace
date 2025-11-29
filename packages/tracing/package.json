@@ -1,6 +1,6 @@
 {
   "name": "use-trace",
-  "version": "0.3.5",
+  "version": "0.4.3",
   "description": "Tracing library to detect rerender causes and state changes",
   "author": "Carl Ribbegårdh",
   "license": "MIT",
@@ -13,33 +13,39 @@
   },
   "homepage": "https://github.com/CarlRibbegaardh/use-trace/",
   "type": "module",
-  "dependencies": {
-    "tslib": "^2.6.3"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@testing-library/react": "^14.3.1",
-    "@types/node": "^20.14.10",
+    "@types/node": "^22.12.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.16.1",
     "@typescript-eslint/parser": "^7.16.1",
+    "@vitest/coverage-v8": "^4.0.3",
+    "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-prettier": "^5.1.3",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-sort-exports": "^0.9.1",
+    "jsdom": "^24.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "jsdom": "^24.1.0",
+    "rimraf": "^6.0.1",
     "typescript": "~5.5.3",
-    "vitest": "^1.6.0"
+    "vitest": "^4.0.3"
   },
   "scripts": {
     "build": "tsc",
+    "prebuild": "pnpm run clean",
+    "postbuild": "tsc --project ./tests/tsconfig.json --noEmit",
+    "clean": "rimraf dist coverage",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --fix",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:coverage:ci": "vitest run --mode ci --coverage"
   },
   "files": [
     "dist",

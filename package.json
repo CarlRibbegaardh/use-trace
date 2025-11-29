@@ -6,6 +6,7 @@
     "dev": "pnpm -r dev",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
-    "publish-please": "pnpm --filter use-trace publish"
+    "verify": "pnpm build && pnpm lint && pnpm test",
+    "publish-please": "pnpm verify && pnpm --filter use-trace publish"
   }
 }
